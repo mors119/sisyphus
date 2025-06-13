@@ -1,0 +1,12 @@
+# start wxt 
+bunx wxt@latest init
+
+ℹ Initializing new project
+✔ Project Directory … ./
+✔ Choose a template › react
+✔ Package Manager › bun
+✔ Downloading template
+
+
+
+  // matches: ['*://*.google.com/*'],
