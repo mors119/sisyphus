@@ -1,0 +1,20 @@
+export const PATHS = {
+  HOME: '/',
+  AUTH: '/auth',
+  SIGN_IN: 'signin', // 상대경로 필요
+  SIGN_UP: 'signup',
+  AUTH_SIGN_IN: '/auth/signin',
+  AUTH_SIGN_UP: '/auth/signup',
+  OAUTH: '/oauth/success',
+  LINK: '/link',
+  DASHBOARD: 'dashboard',
+  VIEW: 'view',
+  EDIT: 'edit',
+  QUICKEDIT: 'quickedit',
+  ADD: 'add',
+  CATEGORY: 'category',
+  TAG: 'tag',
+  USER: 'user',
+  REQUIRE: 'require',
+  NOTICE: 'notice',
+} as const;

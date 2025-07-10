@@ -25,6 +25,11 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
+    public static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
+    public static final String TOKEN_PREFIX = "Bearer ";
+    public static final String HEADER_STRING = "Authorization";
+    public static final String USER_ID_KEY = "userId";
+
     // 7일
     private static final long REFRESH_TOKEN_EXPIRATION_SEC = 7L * 24 * 60 * 60;
 
@@ -47,7 +52,7 @@ public class JwtTokenProvider {
     // jwt 토큰 생성 (로그인 시 사용)
     public String createAccessToken(Long userId, String email) {
         Claims claims = Jwts.claims().setSubject(email);
-        claims.put("userId", userId);
+        claims.put(USER_ID_KEY, userId);
 
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
@@ -66,6 +71,7 @@ public class JwtTokenProvider {
         Date expiry = new Date(now.getTime() + refreshExpiration); // 예: 7일
 
         Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
+        claims.put(USER_ID_KEY, userId);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -85,7 +91,7 @@ public class JwtTokenProvider {
     public UserPrincipal getUserPrincipal(String token) {
         Claims claims = parseClaims(token);
 
-        Integer userIdInt = claims.get("userId", Integer.class);
+        Integer userIdInt = claims.get(USER_ID_KEY, Integer.class);
         if (userIdInt == null) {
             throw new UnauthorizedException("JWT 토큰에 userId가 존재하지 않습니다.");
         }
@@ -118,12 +124,20 @@ public class JwtTokenProvider {
         }
     }
 
+    /*
+    sameSite
+        Strict: 같은 출처의 요청에만 쿠키 포함 (보안 ↑, UX ↓)
+        Lax: GET 요청은 허용, POST 등은 제한 (기본값)
+        None: 모든 cross-site 요청에 쿠키 포함 → 이때 반드시 .secure(true) 필요
+    secure
+        HTTPS 사용 시 true
+    */
     // RefreshToken 을 담는 유틸 함수
     public ResponseCookie createRefreshTokenCookie(String refreshToken) {
-        return ResponseCookie.from("refreshToken", refreshToken)
+        return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
                 .httpOnly(true)
-                .secure(true) // HTTPS 사용 시 true 권장
-                .sameSite("Strict")
+                .secure(true)
+                .sameSite("None")
                 .path("/")
                 .maxAge(REFRESH_TOKEN_EXPIRATION_SEC) // 7일
                 .build();
@@ -131,27 +145,37 @@ public class JwtTokenProvider {
 
     // 서버에서 쿠키 삭제
     public ResponseCookie deleteRefreshTokenCookie() {
-        return ResponseCookie.from("refreshToken", "")
+        return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, "")
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .maxAge(0) // ✅ 만료 즉시
-                .sameSite("Strict")
+                .maxAge(0) // 즉시 만료
+                .sameSite("None")
                 .build();
     }
 
     // jwt token으로 userid 값 꺼내기
     public Long getUserId(String token) {
-        Claims claims = parseClaims(token); // JWT payload 꺼내기
-        return claims.get("userId", Integer.class).longValue(); // 이 부분 중요
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(getSigningKey()) // 여기도 SecretKey 객체로 고쳐야 함
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        Number userId = claims.get(USER_ID_KEY, Number.class);
+        if (userId == null) {
+            throw new UnauthorizedException("Invalid token: missing userId");
+        }
+
+        return userId.longValue();
     }
 
     public String resolveToken(HttpServletRequest request) {
-
+//      String token = request.getHeader("Authorization").replace("Bearer ", ""); 아래 코드를 사용하는게 안전
         // 요청 헤더에서 Authorization 값을 추출해서 토큰만 뽑음
-        String bearer = request.getHeader("Authorization");
+        String bearer = request.getHeader(HEADER_STRING);
 
-        if (bearer != null && bearer.startsWith("Bearer ")) {
+        if (bearer != null && bearer.startsWith(TOKEN_PREFIX)) {
             return bearer.substring(7);
         }
 

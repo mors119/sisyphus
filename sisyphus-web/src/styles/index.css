@@ -171,27 +171,20 @@
   }
 }
 
-/* AgreeForm Style */
-#agree-form h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  margin-top: 0.3rem;
-}
+/* animation */
+@layer utilities {
+  @keyframes fade-in-scale {
+    0% {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 
-#agree-form p {
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-#agree-form li {
-  font-size: 0.8rem;
-  line-height: normal;
-  color: var(--accent-foreground);
-}
-
-/* side-bar background */
-[data-state='open'] {
-  background-color: #f0f0f0;
-  opacity: 70%;
-  box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.1);
+  .animate-fade-up {
+    animation: fade-in-scale 0.3s ease-out forwards;
+  }
 }

@@ -1,0 +1,277 @@
+{
+  "back": "뒤로가기",
+  "edit": "수정",
+  "cancel": "취소",
+  "add": "추가",
+  "save": "저장",
+  "delete": "삭제",
+  "close": "닫기",
+  "clean": "지우기",
+  "access": {
+    "myAccount": "내 정보",
+    "restrictions": "접근 제한"
+  },
+  "auth": {
+    "required": "로그인이 필요한 서비스입니다.",
+    "failed": "로그인에 실패했습니다.",
+    "succeeded": "환영합니다!",
+    "backToHome": "홈으로",
+    "success": "✅ 성공!",
+    "false": "❌ 실패했습니다!",
+    "error": "❗ 오류가 발생했습니다."
+  },
+  "signup": {
+    "signup": "회원가입",
+    "personalInfo": "개인정보 수집 및 이용 동의서",
+    "agreeInfo": "개인정보 수집 및 이용에 동의합니다. (필수)",
+    "terms": "이용약관",
+    "agreeTerms": "이용약관에 동의합니다. (필수)",
+    "enterEmail": "이메일을 입력해주세요!",
+    "requiredEmail": "이메일 인증이 필요합니다.",
+    "confirmEmail": "이메일 중복확인이 필요합니다.",
+    "requireTerms": "이용약관 동의가 필요합니다.",
+    "requireInfo": "개인정보 수집 및 이용 동의가 필요합니다.",
+    "nickname": "이름이나 별명을 입력하세요.",
+    "name": "이름",
+    "email": "이메일",
+    "checkRedundancy": "중복확인",
+    "authCompleted": "인증완료",
+    "sendCode": "이메일로 인증코드 전송",
+    "pass": "비밀번호",
+    "passConfirm": "비밀번호 확인",
+    "view": "보기",
+    "already": "이미 가입된 아이디가 있으신가요?",
+    "code": {
+      "to": "{{target}}으로 인증 코드가 전송되었습니다.",
+      "title": "코드 인증",
+      "placeholder": "6자리 코드를 입력하세요.",
+      "timer": "남은 인증 시간: {{time}}"
+    },
+    "msg": {
+      "signup": {
+        "name": {
+          "required": "이름이나 별명을 입력하세요."
+        },
+        "email": {
+          "required": "이메일을 입력하세요",
+          "invalid": "올바른 이메일 형식이 아닙니다"
+        },
+        "password": {
+          "min": "비밀번호는 최소 8자 이상이어야 합니다",
+          "number": "하나 이상의 숫자를 포함해야 합니다",
+          "special": "하나 이상의 특수문자를 포함해야 합니다"
+        },
+        "passwordConfirm": {
+          "required": "비밀번호 확인이 필요합니다",
+          "mismatch": "비밀번호가 일치하지 않습니다"
+        }
+      },
+      "verify": {
+        "email": {
+          "invalid": "유효한 이메일 형식이 아닙니다"
+        },
+        "code": {
+          "min": "6자리 코드를 입력하세요"
+        }
+      },
+      "duplicate": "사용 중인 이메일 입니다.",
+      "available": "사용 가능한 이메일입니다",
+      "sent": "인증 코드가 전송되었습니다!",
+      "error": {
+        "check": "중복확인 중 오류가 발생했습니다.",
+        "send": "이메일 전송 실패",
+        "ing": "회원가입 중 오류가 발생했습니다."
+      },
+      "success": {
+        "title": "회원가입 완료",
+        "desc": "회원가입을 축하드립니다!"
+      }
+    }
+  },
+  "signin": {
+    "signin": "로그인",
+    "socialLogin": "간편 로그인",
+    "email": "이메일",
+    "pass": "비밀번호",
+    "notYet": "아직 가입하지 않으셨나요?",
+    "msg": {
+      "email": {
+        "required": "이메일을 입력하세요",
+        "invalid": "올바른 이메일 형식이 아닙니다"
+      },
+      "password": {
+        "min": "비밀번호는 최소 8자 이상이어야 합니다",
+        "number": "하나 이상의 숫자를 포함해야 합니다"
+      }
+    }
+  },
+  "signout": {
+    "signout": "로그아웃",
+    "description": "로그아웃 하시겠습니까?"
+  },
+  "item": {
+    "menu": "메뉴",
+    "home": "홈",
+    "dashboard": "관리",
+    "view": "전체보기",
+    "card": "카드",
+    "table": "테이블",
+    "edit": "수정",
+    "require": "요청하기",
+    "add": "추가",
+    "quick": "빠른 수정",
+    "category": "카테고리",
+    "tag": "태그",
+    "notice": "공지사항",
+    "note": "노트"
+  },
+  "notFound": {
+    "title": "404 - 페이지를 찾을 수 없습니다.",
+    "message": "요청하신 페이지가 존재하지 않거나 이동되었을 수 있습니다.",
+    "toHome": "홈으로 돌아가기"
+  },
+  "home": {
+    "banner": {
+      "p1": "연습하세요. 배우세요. 반복하세요.",
+      "p2": "계속 앞으로 나아가세요.",
+      "p3": "\"매일 한 걸음 내딛으면 새로운 당신이 드러납니다.\"",
+      "download": "확장프로그램 다운로드",
+      "howToUse": "사용 방법",
+      "desc": "현재 확장은 웨일(Whale)과 크롬(Chrome) 브라우저에서만 사용할 수 있습니다."
+    },
+    "feature": {
+      "title1": "흐름이 끊기지 않는 학습",
+      "subtitle1": "지식의 발견, 그 순간의 기록",
+      "desc1": "웹 서핑, 아티클 리딩, 동영상 시청 중 만나는 새로운 지식의 조각들. 이제 놓치지 마세요. Google Chrome과 Naver Whale 확장 프로그램을 통해 현재 페이지를 벗어날 필요 없이 클릭 한 번으로 단어를 저장하고 의미를 확인할 수 있습니다. 당신의 학습 흐름은 더 이상 방해받지 않습니다.",
+
+      "title2": "시간과 공간을 초월하는 복습",
+      "subtitle2": "내 손안에서 완성되는 스마트 단어장",
+      "desc2": "PC에서 저장한 단어는 실시간으로 모바일 앱과 완벽하게 동기화됩니다. 출퇴근길 지하철, 잠들기 전 5분. 흩어져 있던 자투리 시간을 가장 생산적인 복습 시간으로 바꿔보세요. Sisyphus-Academy 앱이 당신의 손안에서 가장 강력한 학습 도구가 되어 드립니다.",
+
+      "title3": "지속가능한 학습 생태계",
+      "subtitle3": "당신과 함께 성장하는 학습 콘텐츠",
+      "desc3": "Sisyphus-Academy는 단순한 단어 암기 도구에 머무르지 않습니다. 현재 저장된 어휘를 바탕으로 한 맞춤형 퀴즈, 작문 연습, 주제별 심화 아티클 등 당신의 지적 성장을 도울 다채로운 콘텐츠가 끊임없이 개발되고 있습니다. Sisyphus-Academy에서의 시작은 지속 가능한 성장으로 이어집니다."
+    }
+  },
+  "user": {
+    "name": "이름",
+    "email": "이메일",
+    "createdAt": "가입일",
+    "sisyphus": "시지프스",
+    "google": "구글",
+    "naver": "네이버",
+    "kakao": "카카오",
+    "linked": "연결된 계정",
+    "accountDeletion": "계정 삭제",
+    "manageAccount": "계정 관리",
+    "editProfile": "프로필 수정",
+    "edit": "수정",
+    "alert": {
+      "title": "계정을 정말 삭제하시겠어요?",
+      "desc": {
+        "p1": "확인 버튼을 클릭하시면,",
+        "p2": "회원 정보와 작성하신 모든 기록이 삭제되며,",
+        "p3": "삭제 후에는 복구가 불가능합니다."
+      },
+      "action": "모든 정보 삭제하기"
+    },
+    "create": {
+      "name": "이름은 2자 이상이어야 합니다.",
+      "email": "유효한 이메일을 입력하세요."
+    },
+    "update": {
+      "title": "업데이트가 완료되었습니다!"
+    },
+    "delete": {
+      "title": "모든 정보가 삭제되었습니다.",
+      "desc": "그동안 서비스를 이용해 주셔서 감사합니다. 좋은 하루 보내세요!"
+    }
+  },
+  "tooltip": {
+    "sidebar": "사이드바 열기",
+    "lang": "언어 변경",
+    "theme": "태마 변경"
+  },
+  "category": {
+    "msg": {
+      "schema": {
+        "title": "카테고리 이름을 입력해주세요.",
+        "color": "유효한 6자리 HEX 색상코드여야 합니다."
+      },
+      "submit": {
+        "update": "✅ 카테고리가 수정되었습니다.",
+        "create": "✅ 새로운 카테고리가 추가되었습니다.",
+        "delete": "✅ 카테고리가 삭제되었습니다.",
+        "error": "❗오류가 발생했습니다."
+      }
+    },
+    "form": {
+      "title": "이름",
+      "tit_placeholder": "예: 업무, 개인",
+      "color": "색상"
+    },
+    "page": {
+      "category": "카테고리",
+      "add_edit": "추가 / 수정"
+    },
+    "none": "선택된 카테고리 없음."
+  },
+  "tags": {
+    "tip": {
+      "delete": "삭제"
+    },
+    "placeholder": "# 없이 입력, Enter로 추가, Backspace로 삭제",
+    "submit": {
+      "update": "✅ 태그가 수정되었습니다.",
+      "create": "✅ 새로운 태그가 추가되었습니다.",
+      "delete": "✅ 태그가 삭제되었습니다.",
+      "error": "❗오류가 발생했습니다."
+    },
+    "page": {
+      "save": "등록된 태그",
+      "empty": "등록된 태그가 없습니다.",
+      "add": "태그 추가"
+    }
+  },
+  "quick": {
+    "new": "새 항목",
+    "no_category": "카테고리가 지정되지 않은 항목만 표시됩니다.",
+    "drag_msg": "항목을 원하는 카테고리로 드래그해 간편하게 분류하세요.",
+    "category": "카테고리",
+    "category_msg": "새 카테고리 추가",
+    "cate_drag_msg": "카테고리 폼으로 드래그해 빠르게 추가하세요."
+  },
+  "temp": {
+    "loading": "불러오는 중...",
+    "no_found_data": "데이터를 찾을 수 없습니다.",
+    "no_found_data_msg": "표시할 항목이 없습니다.",
+    "something_went_wrong": "문제가 발생했습니다.",
+    "something_went_wrong_msg": "예기치 않은 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
+  },
+  "view": {
+    "submit": {
+      "update": "✅ 수정이 완료되었습니다.",
+      "create": "✅ 추가가 완료되었습니다.",
+      "delete": "✅ 삭제가 완료되었습니다.",
+      "error": "❗ 오류가 발생했습니다."
+    },
+    "alert": {
+      "title": "선택한 항목을 삭제하시겠습니까?",
+      "desc": "삭제 후에는 복구할 수 없습니다.",
+      "action": "삭제하기"
+    },
+    "title": "제목",
+    "title2": "단어",
+    "subtitle": "부제목",
+    "subtitle2": "의미",
+    "desc": "설명",
+    "desc2": "예문",
+    "desc_msg": "설명이 없습니다.",
+    "tags": "태그",
+    "date": "등록일"
+  },
+  "search": {
+    "place": "검색어 입력...",
+    "no_result": "결과를 찾을 수 없습니다."
+  }
+}

@@ -1,6 +1,7 @@
 package com.sisyphus.backend.user.dto;
 
 import com.sisyphus.backend.user.entity.Account;
+import com.sisyphus.backend.user.util.Provider;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,7 +12,7 @@ public class AccountResponse {
     private final Long id;
     private final String name;
     private final String email;
-    private final String provider;
+    private final Provider provider;
 
     public AccountResponse(Account account) {
         this.id = account.getId();

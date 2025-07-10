@@ -1,5 +1,6 @@
 package com.sisyphus.backend.tag.dto;
 
+import com.sisyphus.backend.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -7,6 +8,8 @@ import lombok.Getter;
 @Getter
 public class TagSummary {
     private Long id;
-    private String title;
-    private String color;
+    private String name;
+    private User user;
 }
+
+

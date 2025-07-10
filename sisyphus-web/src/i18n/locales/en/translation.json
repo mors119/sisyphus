@@ -1,0 +1,280 @@
+{
+  "back": "Back",
+  "edit": "Edit",
+  "cancel": "Cancel",
+  "add": "Add",
+  "save": "Save",
+  "delete": "Delete",
+  "close": "Close",
+  "clean": "Clean",
+
+  "access": {
+    "myAccount": "My Account",
+    "restrictions": "access restrictions"
+  },
+  "auth": {
+    "required": "This service requires login.",
+    "failed": "Login failed.",
+    "succeeded": "Welcome!",
+    "backToHome": "Back to Home",
+    "success": "✅ Success!",
+    "false": "❌ False!",
+    "error": "❗ Error!"
+  },
+  "signup": {
+    "signup": "Sign up",
+    "personalInfo": "Consent for collecting and using personal information",
+    "agreeInfo": "I agree to collect and use personal information. (Required)",
+    "terms": "Terms and Conditions of Use",
+    "agreeTerms": "I agree to the terms and conditions. (Required)",
+    "enterEmail": "Please enter your email!",
+    "requiredEmail": "Email authentication is required.",
+    "confirmEmail": "It requires duplicate email checks.",
+    "requireTerms": "You need to agree to the terms and conditions of use.",
+    "requireInfo": "It requires consent to collect and use personal information.",
+    "nickname": "Please enter your name or nickname.",
+    "name": "Name",
+    "email": "Email",
+    "checkRedundancy": "Check",
+    "authCompleted": "Completed",
+    "sendCode": "Send code by email",
+    "pass": "Password",
+    "passConfirm": "Password Confirm",
+    "view": "View",
+    "already": "Do you already have an ID?",
+    "code": {
+      "to": "A verification code has been sent to {{target}}.",
+      "title": "Verify Code",
+      "placeholder": "Enter the 6-digit code.",
+      "timer": "Time remaining: {{time}}"
+    },
+
+    "msg": {
+      "signup": {
+        "name": {
+          "required": "Please enter your name or nickname."
+        },
+        "email": {
+          "required": "Please enter your email.",
+          "invalid": "Invalid email format."
+        },
+        "password": {
+          "min": "Password must be at least 8 characters long.",
+          "number": "Must include at least one number.",
+          "special": "Must include at least one special character."
+        },
+        "passwordConfirm": {
+          "required": "Password confirmation is required.",
+          "mismatch": "Passwords do not match."
+        }
+      },
+      "verify": {
+        "email": {
+          "invalid": "Invalid email format."
+        },
+        "code": {
+          "min": "Please enter the 6-digit code."
+        }
+      },
+      "duplicate": "This email is already in use.",
+      "available": "This email is available.",
+      "sent": "Verification code has been sent!",
+      "error": {
+        "check": "An error occurred during duplication check.",
+        "send": "Failed to send email.",
+        "ing": "An error occurred during signup."
+      },
+      "success": {
+        "title": "Signup Complete",
+        "desc": "Congratulations on your successful registration!"
+      }
+    }
+  },
+  "signin": {
+    "signin": "Sign in",
+    "socialLogin": "Social login",
+    "email": "Email",
+    "pass": "Password",
+    "notYet": "Haven't you signed up yet?",
+    "msg": {
+      "email": {
+        "required": "Please enter your email.",
+        "invalid": "Invalid email format."
+      },
+      "password": {
+        "min": "Password must be at least 8 characters long.",
+        "number": "Must include at least one number."
+      }
+    }
+  },
+  "signout": {
+    "signout": "Sign out",
+    "description": "Do you want to log out?"
+  },
+
+  "item": {
+    "menu": "Menu",
+    "home": "Home",
+    "dashboard": "DashBoard",
+    "view": "View",
+    "card": "Card",
+    "table": "Table",
+    "edit": "Edit",
+    "require": "Require",
+    "add": "Add",
+    "quick": "Quick Edit",
+    "category": "Category",
+    "tag": "Tag",
+    "notice": "Notice",
+    "note": "Note"
+  },
+  "notFound": {
+    "title": "404 - Page not found.",
+    "message": "The page you requested may not exist or may have been moved.",
+    "toHome": "Redirect to Home"
+  },
+  "home": {
+    "banner": {
+      "p1": "Practice. Learn. Repeat.",
+      "p2": "Keep pushing forward.",
+      "p3": "\"One step every day reveals a new you.\"",
+      "download": "Extension Download",
+      "howToUse": "Getting started",
+      "desc": "This extension is currently available only on Whale and Chrome browsers."
+    },
+    "feature": {
+      "title1": "Seamless Learning Experience",
+      "subtitle1": "Capture Knowledge the Moment You Discover It",
+      "desc1": "Whether you're browsing the web, reading articles, or watching videos, don't let valuable insights slip away. With our Chrome and Naver Whale extensions, you can save words and check their meanings with a single click—without leaving the current page. Your learning flow stays uninterrupted.",
+
+      "title2": "Review Anytime, Anywhere",
+      "subtitle2": "Your Smart Vocabulary Notebook in Your Pocket",
+      "desc2": "Words saved on your PC are instantly synced to your mobile app. Whether you're on the subway during your commute or winding down before bed, you can turn idle moments into the most productive review sessions. With the Sisyphus-Academy app, your most powerful learning tool is always within reach.",
+
+      "title3": "A Sustainable Learning Ecosystem",
+      "subtitle3": "Content That Grows With You",
+      "desc3": "Sisyphus-Academy goes beyond simple vocabulary memorization. Based on your saved words, you'll access personalized quizzes, writing exercises, and in-depth articles on specific topics. What begins with a few saved terms becomes a journey of continuous, meaningful growth."
+    }
+  },
+  "user": {
+    "name": "Name",
+    "email": "Email",
+    "createdAt": "Registration Date",
+    "sisyphus": "SISYPHUS",
+    "google": "Google",
+    "naver": "Naver",
+    "kakao": "Kakao",
+    "linked": "Linked Accounts",
+    "accountDeletion": "Account Deletion",
+    "manageAccount": "Manage Account",
+    "editProfile": "Edit Profile",
+    "edit": "Edit",
+    "alert": {
+      "title": "Are you sure you want to delete your account?",
+      "desc": {
+        "p1": "If you click the confirmation button,",
+        "p2": "All your membership information and recorded data will be deleted.",
+        "p3": "This action cannot be undone."
+      },
+      "action": "Delete All Information"
+    },
+    "create": {
+      "name": "The name must be at least 2 characters long.",
+      "email": "Please enter a valid email."
+    },
+    "update": {
+      "title": "Update Complete!"
+    },
+    "delete": {
+      "title": "All Information Deleted.",
+      "desc": "Thank you for using our service. Have a great day!"
+    }
+  },
+  "tooltip": {
+    "sidebar": "Open sidebar",
+    "lang": "Change language",
+    "theme": "Change theme"
+  },
+  "category": {
+    "msg": {
+      "schema": {
+        "title": "Please enter a tag name.",
+        "color": "Must be a valid 6-digit HEX color code."
+      },
+      "submit": {
+        "update": "✅ Category updated successfully.",
+        "create": "✅ New category added successfully.",
+        "delete": "✅ Category deleted successfully.",
+        "error": "❗ An error has occurred."
+      }
+    },
+    "form": {
+      "title": "Name",
+      "tit_placeholder": "e.g., Work, Personal",
+      "color": "Color"
+    },
+    "page": {
+      "category": "Category",
+      "add_edit": "Add / Edit"
+    },
+    "none": "No category selected."
+  },
+  "tags": {
+    "tip": {
+      "delete": "Delete"
+    },
+    "placeholder": "Type tag without #, press Enter to add, Backspace to remove",
+    "submit": {
+      "update": "✅ Tag updated successfully.",
+      "create": "✅ New tag added successfully.",
+      "delete": "✅ Tag deleted successfully.",
+      "error": "❗ An error has occurred."
+    },
+    "page": {
+      "save": "Saved Tags",
+      "empty": "No tags have been added.",
+      "add": "Add Tag"
+    }
+  },
+  "quick": {
+    "new": "New Item",
+    "no_category": "Only items without a category will be shown.",
+    "drag_msg": "Drag items to a category to organize them easily.",
+    "category": "Category",
+    "category_msg": "Add New Category",
+    "cate_drag_msg": "Drag here to quickly add a category."
+  },
+  "temp": {
+    "loading": "Loading...",
+    "no_found_data": "No data found.",
+    "no_found_data_msg": "There is nothing to display here.",
+    "something_went_wrong": "Something went wrong.",
+    "something_went_wrong_msg": "An unexpected error occurred. Please try again later."
+  },
+  "view": {
+    "submit": {
+      "update": "✅ Successfully updated.",
+      "create": "✅ Successfully added.",
+      "delete": "✅ Successfully deleted.",
+      "error": "❗ An error has occurred."
+    },
+    "alert": {
+      "title": "Are you sure you want to delete this item?",
+      "desc": "This action cannot be undone.",
+      "action": "Delete"
+    },
+    "title": "Title",
+    "title2": "Word",
+    "subtitle": "Subtitle",
+    "subtitle2": "Meaning",
+    "desc": "Description",
+    "desc2": "Example Sentence",
+    "desc_msg": "No description available.",
+    "tags": "Tags",
+    "date": "Created At"
+  },
+  "search": {
+    "place": "Type search...",
+    "no_result": "No results found."
+  }
+}

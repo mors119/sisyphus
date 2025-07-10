@@ -1,5 +1,7 @@
 package com.sisyphus.backend.user.dto;
 
+import com.sisyphus.backend.user.util.Provider;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,6 +15,6 @@ public record UserWithAccountResponse(
     public record AccountInfo(
             Long accountId,
             String email,
-            String provider
+            Provider provider
     ) {}
 }

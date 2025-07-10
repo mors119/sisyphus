@@ -1,0 +1,37 @@
+{
+  "header": {
+    "tooltip": "Go to the main homepage"
+  },
+  "main": {
+    "auth": {
+      "email": "Email",
+      "example": "example@example.com",
+      "required_email": "Please enter your email.",
+      "email_err": "Please enter a valid email address.",
+      "password": "Password",
+      "password_example": "Password with at least 8 characters",
+      "password_err": "Please enter a password of at least 8 characters.",
+      "required_pass": "Please enter your password.",
+      "login": "Log In",
+      "ing_login": "Logging in...",
+      "error": "Please check your information and try again."
+    },
+    "note": {
+      "tit": "Title (Word)",
+      "tit_place": "Enter a title or word.",
+      "tit_required": "A title or word is required.",
+      "sub": "Subtitle (Meaning)",
+      "sub_place": "Enter a subtitle or meaning.",
+      "save": "Save",
+      "ing_save": "Saving...",
+      "success": "✅ Saved successfully.",
+      "false": "❌ Failed to save. Please try again later."
+    }
+  },
+  "footer": {
+    "logout": "Log Out",
+    "homepage": "View all on the homepage",
+    "logout_suc": "Successfully logged out.",
+    "logout_err": "❌ Failed to log out."
+  }
+}

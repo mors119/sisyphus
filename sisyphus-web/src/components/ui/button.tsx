@@ -21,7 +21,7 @@ const buttonVariants = cva(
           'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
         link: 'text-primary underline-offset-4 hover:underline',
         sisyphus:
-          'duration-200 hover:border-[#1186ce] hover:bg-[#1186ce] hover:text-[#ffcd49] dark:hover:bg-accent/50',
+          'duration-200 hover:border-[#1186ce] hover:bg-[#1186ce] hover:text-[#ffcd49] dark:hover:border-[#ffcd49] dark:hover:bg-accent/50',
         activeBtn: 'text-[#1186ce]',
       },
       size: {

@@ -1,87 +1,48 @@
 package com.sisyphus.backend.tag.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.sisyphus.backend.note.tag.entity.NoteTag;
 import com.sisyphus.backend.user.entity.User;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
-import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Entity
+@Table(name = "tag",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_tag_user", columnNames = {"name","user_id"}))
 public class Tag {
 
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter
-    @Column(nullable = false)
-    private String title;
+    @Column(nullable = false, length = 50)
+    private String name;
 
-    // 순환참조 방지 (예시: Lombok + Jackson)
-    @Setter
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_tag_id")
-    @JsonBackReference
-    private Tag parent;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id")
+    private User owner;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<Tag> children = new ArrayList<>();
+    /* Tag 측에도 orphanRemoval=true 적용 */
+    @OneToMany(mappedBy = "tag",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private final Set<NoteTag> noteTags = new HashSet<>();
 
-    // #ffffff 같은 hex 코드만
-    @Setter
-    @Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "유효한 HEX 색상코드여야 합니다.")
-    @Column(nullable = false)
-    private String color;
-
-    @Setter
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id") // 외래 키 컬럼명
-    private User user;             // User와의 연관관계 추가
-
-    @PrePersist
-    protected void setDefaultColor() {
-        if (this.color == null) {
-            this.color = "#ffcd49";
+    /* ---------- 도메인 로직 ---------- */
+    public void changeName(String newName) {
+        if (newName == null || newName.isBlank()) {
+            throw new IllegalArgumentException("태그 이름은 비어 있을 수 없습니다.");
         }
+        this.name = newName.trim().toLowerCase();
     }
 
-    // 정적 메서드: 기본 태그 목록 생성
-    public static List<Tag> createDefaultTags(User user) {
-        Tag tag1 = new Tag();
-        tag1.title = "New";
-        tag1.color = "#ffcd49";
-        tag1.user = user;
-
-        Tag tag2 = new Tag();
-        tag2.title = "Important";
-        tag2.color = "#f87171";
-        tag2.user = user;
-
-        return List.of(tag1, tag2);
+    public static Tag of(String name, User owner) {
+        Tag t = new Tag();
+        t.name  = name.trim().toLowerCase();
+        t.owner = owner;
+        return t;
     }
-
 }
-/*
-CREATE TABLE tag (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    title VARCHAR(255) NOT NULL,
-    color VARCHAR(7) NOT NULL CHECK (color REGEXP '^#[0-9A-Fa-f]{6}$'),
-    parent_tag_id BIGINT,
-    user_id BIGINT,
-
-    CONSTRAINT fk_tag_parent
-        FOREIGN KEY (parent_tag_id)
-        REFERENCES tag(id),
-
-    CONSTRAINT fk_tag_user
-        FOREIGN KEY (user_id)
-        REFERENCES user(id)
-)
-*/

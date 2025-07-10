@@ -1,5 +1,6 @@
 package com.sisyphus.backend.auth.dto;
 
+import com.sisyphus.backend.user.util.Provider;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -19,7 +20,7 @@ public class RegisterRequest {
     @NotBlank(message = "{auth.password.blank}")
     private String password;
 
-    private String provider;
+    private Provider provider;
 
     private String name;
 }

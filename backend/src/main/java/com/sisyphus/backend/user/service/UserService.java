@@ -1,5 +1,6 @@
 package com.sisyphus.backend.user.service;
 
+import com.sisyphus.backend.user.dto.UserNameRequest;
 import com.sisyphus.backend.user.dto.UserWithAccountResponse;
 import com.sisyphus.backend.user.entity.User;
 import com.sisyphus.backend.user.exception.UserNotFoundException;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +30,6 @@ public class UserService {
     public UserWithAccountResponse getUserWithAccounts(Long userId) {
         User user = userRepository.findWithAccountsById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         List<UserWithAccountResponse.AccountInfo> accounts = user.getAccounts().stream()
                 .map(acc -> new UserWithAccountResponse.AccountInfo(
                         acc.getId(),
@@ -38,7 +37,6 @@ public class UserService {
                         acc.getProvider()
                 ))
                 .toList();
-
         return new UserWithAccountResponse(
                 user.getId(),
                 user.getEmail(),
@@ -56,4 +54,17 @@ public class UserService {
         }
         userRepository.deleteById(userId);
     }
+
+    // update user
+    @Transactional
+    public void updateUser(Long userId, UserNameRequest req ) {
+        // update 할 User
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId.toString()));
+        // update 할 User 위에 받은 값 올리기
+        user.updateName(req);
+        // DB에 update 실행
+        // save 생략 가능: 영속 상태 객체 + 트랜잭션 커밋 → 자동 update
+    }
+
 }

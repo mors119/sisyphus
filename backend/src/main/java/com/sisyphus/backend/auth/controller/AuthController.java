@@ -11,18 +11,17 @@ import com.sisyphus.backend.user.entity.Account;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Locale;
 
 //  로그인 및 회원가입
+@Slf4j
 @RequestMapping("/api/auth")
 @RestController
 @RequiredArgsConstructor
@@ -54,15 +53,15 @@ public class AuthController {
 
     // RefreshToken 추출
     @PostMapping("/refresh")
-    public ResponseEntity<TokenResponse> refreshToken(HttpServletRequest request, Locale locale) {
+    public ResponseEntity<TokenResponse> refreshToken(@CookieValue(name = JwtTokenProvider.REFRESH_TOKEN_COOKIE_NAME, required = false) String refreshToken, Locale locale) {
         // 쿠키에서 refreshToken 추출
-        String refreshToken = extractRefreshTokenFromCookie(request);
         if (refreshToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         // userId 추출
         Long userId = jwtTokenProvider.getUserId(refreshToken);
+
         // Redis 저장소에서 토큰 유효성 확인
         if (!refreshTokenService.isValid(userId, refreshToken)) {
             throw new UnauthorizedException("Refresh token invalid or expired");
@@ -73,17 +72,17 @@ public class AuthController {
         return ResponseEntity.ok(new TokenResponse(newAccessToken));
     }
 
-    // 요청(HttpServletRequest)에서 값을 추출하는 유틸성 함수
-    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
-        if (request.getCookies() == null) return null;
-
-        for (Cookie cookie : request.getCookies()) {
-            if ("refreshToken".equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
-        return null;
-    }
+    // 요청(HttpServletRequest)에서 값을 추출하는 유틸성 함수 (구형) -> @CookieValue
+//    private String extractRefreshTokenFromCookie(HttpServletRequest request) {
+//        if (request.getCookies() == null) return null;
+//
+//        for (Cookie cookie : request.getCookies()) {
+//            if ("refreshToken".equals(cookie.getName())) {
+//                return cookie.getValue();
+//            }
+//        }
+//        return null;
+//    }
 
     // 로그인
     @PostMapping("/login")
@@ -96,13 +95,17 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request) {
-        String refreshToken = extractRefreshTokenFromCookie(request);
+    public ResponseEntity<Void> logout(@CookieValue(name = JwtTokenProvider.REFRESH_TOKEN_COOKIE_NAME, required = false) String refreshToken) {
 
         if (refreshToken != null) {
-            // 서버 저장소에서 무효화 처리
-            Long userId = jwtTokenProvider.getUserId(refreshToken);
-            refreshTokenService.delete(userId);
+            try {
+                // 서버 저장소에서 무효화 처리
+                Long userId = jwtTokenProvider.getUserId(refreshToken);
+                refreshTokenService.delete(userId);
+            } catch (Exception e) {
+                // refreshToken이 유효하지 않더라도, 로그아웃의 주 목적인 쿠키 삭제는 계속 진행해야 하므로 로깅만 하고 예외를 던지지 않는다.
+                 log.warn("Invalid refresh token during logout: {}", e.getMessage());
+            }
         }
 
         // 클라이언트 쿠키 삭제

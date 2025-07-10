@@ -1,7 +1,8 @@
 package com.sisyphus.backend.user.entity;
 
-import com.sisyphus.backend.tag.entity.Tag;
+import com.sisyphus.backend.category.entity.Category;
 import com.sisyphus.backend.note.entity.Note;
+import com.sisyphus.backend.user.dto.UserNameRequest;
 import com.sisyphus.backend.user.util.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -39,7 +40,7 @@ public class User {
     private List<Note> notes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Tag> tags = new ArrayList<>();
+    private List<Category> categories = new ArrayList<>();
 
     protected User() {} // JPA 필수 기본 생성자
 
@@ -58,6 +59,11 @@ public class User {
         this.createdAt = LocalDateTime.now();
     }
 
+    public void updateName(UserNameRequest req) {
+        if (req.getName() != null && !req.getName().isBlank()) {
+            this.name = req.getName();
+        }
+    }
 
 }
 /*

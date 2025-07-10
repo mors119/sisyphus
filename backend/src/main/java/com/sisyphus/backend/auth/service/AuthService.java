@@ -10,7 +10,9 @@ import com.sisyphus.backend.user.entity.Account;
 import com.sisyphus.backend.user.entity.User;
 import com.sisyphus.backend.user.repository.AccountRepository;
 import com.sisyphus.backend.user.repository.UserRepository;
+import com.sisyphus.backend.user.util.Provider;
 import com.sisyphus.backend.user.util.Role;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +42,7 @@ public class AuthService {
     // TIP: O Auth 정보를 DB에 저장 *** AuthService에 아래처럼 순환참조 오류가 발생
     @Transactional
     public Account saveOrLinkAccount(RegisterRequest request, Locale locale) {
-        String provider = request.getProvider();
+        Provider provider = request.getProvider();
         String email = request.getEmail();
         String name = request.getName();
 
@@ -88,7 +90,7 @@ public class AuthService {
         }
 
         // 3. camus (local) 로그인 시 비밀번호 검증
-        if ("camus".equals(request.getProvider()) && !passwordEncoder.matches(request.getPassword(), account.getPasswordHash())) {
+        if (Provider.CAMUS.equals(request.getProvider()) && !passwordEncoder.matches(request.getPassword(), account.getPasswordHash())) {
                 throw new UnauthorizedException("이메일 또는 비밀번호가 올바르지 않습니다.");
             }
         // 4. 토큰 발급
@@ -114,7 +116,7 @@ public class AuthService {
 
     // 아이디 중복 확인
     public boolean check(@NotBlank(message = "{auth.email.blank}") @Email(message = "{auth.email.invalid}") String email) {
-        return  accountRepository.existsByEmailAndProvider(email, "camus");
+        return  accountRepository.existsByEmailAndProvider(email, Provider.CAMUS);
     }
 
 

@@ -11,6 +11,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static com.sisyphus.backend.auth.jwt.JwtTokenProvider.HEADER_STRING;
+import static com.sisyphus.backend.auth.jwt.JwtTokenProvider.TOKEN_PREFIX;
+
 // 요청마다 JWT 인증 처리
 //@Component FilterConfig에 Bean으로 등록했으므로 불필요
 @RequiredArgsConstructor
@@ -38,9 +41,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String resolveToken(HttpServletRequest request) {
 
         // 요청 헤더에서 Authorization 값을 추출해서 토큰만 뽑음
-        String bearer = request.getHeader("Authorization");
+        String bearer = request.getHeader(HEADER_STRING );
 
-        if (bearer != null && bearer.startsWith("Bearer ")) {
+        if (bearer != null && bearer.startsWith(TOKEN_PREFIX)) {
             return bearer.substring(7);
         }
 

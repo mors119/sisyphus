@@ -1,0 +1,37 @@
+{
+  "header": {
+    "tooltip": "홈페이지로 이동"
+  },
+  "main": {
+    "auth": {
+      "email": "이메일",
+      "example": "example@example.com",
+      "required_email": "이메일을 입력해주세요.",
+      "email_err": "유효한 이메일을 입력해주세요.",
+      "password": "비밀번호",
+      "password_example": "8자 이상 입력",
+      "password_err": "비밀번호를 8자 이상 입력해주세요.",
+      "required_pass": "비밀번호를 입력해주세요.",
+      "login": "로그인",
+      "ing_login": "로그인 중...",
+      "error": "정보를 확인한 후 다시 시도해주세요."
+    },
+    "note": {
+      "tit": "제목 (단어)",
+      "tit_place": "제목 또는 단어를 입력해주세요.",
+      "tit_required": "제목 또는 단어는 필수 입력 항목입니다.",
+      "sub": "소제목 (의미)",
+      "sub_place": "소제목이나 의미를 입력해주세요.",
+      "save": "저장",
+      "ing_save": "저장 중...",
+      "success": "✅ 저장에 성공했습니다.",
+      "false": "❌ 저장에 실패했습니다. 잠시 후 다시 시도해주세요."
+    }
+  },
+  "footer": {
+    "logout": "로그아웃",
+    "homepage": "홈페이지에서 전체 보기",
+    "logout_suc": "성공적으로 로그아웃되었습니다.",
+    "logout_err": "❌ 로그아웃에 실패했습니다."
+  }
+}

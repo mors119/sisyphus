@@ -1,0 +1,259 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  --point-y: #ffcd49;
+  --point-b: #1186ce;
+}
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+  width: 100%;
+}
+
+/* ---------------------------- header -------------------------- */
+
+#header {
+  width: 100%;
+}
+#header .logo_btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: fit-content;
+  gap: 4px;
+  width: 100%;
+}
+#header .img_png {
+  height: 40px;
+  width: fit-content;
+}
+#header .img_text {
+  height: 40px;
+  width: 100px;
+}
+
+/* ---------------------------- main -------------------------- */
+#main {
+  padding: 0.5rem;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+#main h2 {
+  margin: 0 0 10px 0;
+  color: var(--point-b);
+}
+
+#main .form {
+  max-width: 360px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+#main .title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+#main .field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+#main .field + .field {
+  width: 100;
+  border-top: 1px solid #ddd;
+  margin-bottom: 1rem;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+#main .field label {
+  text-align: start;
+  padding-left: 5px;
+  font-size: 0.95rem;
+}
+
+#main .readonly-box {
+  padding: 0.5rem;
+  background-color: #ffcd49;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+#main input[type='text'],
+input[type='email'],
+input[type='password'] {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+#main input[type='text']:focus,
+input[type='email']:focus,
+input[type='password']:focus {
+  border-color: var(--point-y);
+  outline: none;
+}
+
+#main .save-button {
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  width: 100%;
+}
+
+#main .save-button:hover {
+  background-color: var(--point-b);
+}
+
+#main .error {
+  color: crimson;
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0;
+}
+
+#main .state_msg {
+  font-weight: bold;
+  color: var(--point-y);
+  background: var(--point-b);
+  padding: 0.3rem;
+}
+
+/* ----------- auth ----------- */
+#main .auth-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+#main .auth-page .form {
+  width: 100%;
+}
+
+#main button[type='submit'] {
+  width: 100%;
+}
+
+#main .social-login-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+#main .social-login-label {
+  font-size: 0.75rem;
+  padding: 0 0.5rem;
+  color: #a3a3a3;
+}
+
+#main .social-login-buttons {
+  display: flex;
+  gap: 1.5rem;
+  padding: 0.7rem 0;
+  justify-content: center;
+}
+
+#main .social-login-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  padding: 8px;
+  min-width: 24px;
+  border-radius: 50%;
+}
+
+/* ---------------------------- footer -------------------------- */
+#footer {
+  width: 100%;
+}
+#footer button[type='button'] {
+  width: 100%;
+}
+
+/* ---------------------------- author -------------------------- */
+
+.tooltip-wrapper {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: calc(-12px - 35%);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-size: 12px;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.tooltip_top {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-size: 12px;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.tooltip_top::after {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%) rotate(180deg);
+  border-width: 6px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+.tooltip_top::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+}
+
+.tooltip-wrapper:hover .tooltip,
+.tooltip-wrapper:hover .tooltip_top {
+  opacity: 1;
+}

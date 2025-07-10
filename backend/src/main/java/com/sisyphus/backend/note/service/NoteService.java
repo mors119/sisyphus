@@ -1,22 +1,27 @@
 package com.sisyphus.backend.note.service;
 
 
+import com.sisyphus.backend.category.entity.Category;
+import com.sisyphus.backend.category.repository.CategoryRepository;
 import com.sisyphus.backend.note.dto.NoteRequest;
 import com.sisyphus.backend.note.dto.NoteResponse;
 import com.sisyphus.backend.note.entity.Note;
 import com.sisyphus.backend.note.repository.NoteRepository;
-import com.sisyphus.backend.note.util.NoteCategory;
+import com.sisyphus.backend.note.tag.entity.NoteTag;
 import com.sisyphus.backend.tag.entity.Tag;
-import com.sisyphus.backend.tag.repository.TagRepository;
+import com.sisyphus.backend.tag.service.TagService;
 import com.sisyphus.backend.user.entity.User;
 import com.sisyphus.backend.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,9 +29,10 @@ public class NoteService {
 
     private final NoteRepository noteRepository;
     private final UserRepository userRepository;
-    private final TagRepository tagRepository;
+    private final CategoryRepository categoryRepository;
+    private final TagService tagService;
 
-    public class NotFoundException extends RuntimeException {
+    public static class NotFoundException extends RuntimeException {
         public NotFoundException(String message) {
             super(message);
         }
@@ -36,15 +42,26 @@ public class NoteService {
     public String createNote(NoteRequest request, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        Tag tag = null;
-        if (request.getTagId() != null) {
-            tag = tagRepository.findById(request.getTagId())
-                    .orElseThrow(() -> new RuntimeException("Tag not found"));
+
+        Category category = null;
+        if (request.getCategoryId() != null) {
+            category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found"));
         }
 
 
-        NoteCategory category = NoteCategory.fromString(request.getCategory());
-        Note note = Note.of(request.getTitle(), toNullable(request.getSubTitle()), toNullable(request.getDescription()), tag, category, user);
+        Note note = Note.of(request.getTitle(), toNullable(request.getSubTitle()), toNullable(request.getDescription()), category, user);
+
+        List<String> tagNames = Optional.ofNullable(request.getTags())
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(Tag::getName)
+                .toList();
+
+        List<Tag> tags = tagService.getOrCreateTags(user, tagNames);
+
+        tags.forEach(note::addTag);
+
         noteRepository.save(note);
 
         return "success";
@@ -58,26 +75,26 @@ public class NoteService {
     }
 
     // notes service
-    public Page<Note> readAll(Long userId, Pageable pageable, String categoryStr) {
-        NoteCategory category = null;
-        if (categoryStr != null && !categoryStr.equalsIgnoreCase("ALL")) {
-            try {
-                category = NoteCategory.valueOf(categoryStr.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid category value: " + categoryStr);
-            }
-        }
-        return noteRepository.findAllWithTagByUserIdAndCategory(userId, category, pageable);
-    }
+    public Page<Note> readAllWithOptionalFilters(Long userId, Long categoryId, Long tagId, String title, int page, int size, String sort) {
+        String[] parts = sort.split(",");
+        String property = parts[0];
+        String direction = parts.length > 1 ? parts[1] : "asc";
 
+        Pageable pageable = PageRequest.of(page, size,
+                Sort.by(Sort.Direction.fromString(direction.toUpperCase()), property));
+        String titleParam = (title == null || title.isBlank()) ? null : title;
+        return noteRepository.findAllFiltered(userId, categoryId, tagId, titleParam, pageable);
+    }
     // note id로 note 있는지 확인
     public boolean existsNote(Long noteId) {
         return noteRepository.existsById(noteId);
     }
 
     // 상세보기
-    public Note findNoteWithTagById(Long noteId) {
-        return noteRepository.findNoteWithTagById(noteId).orElseThrow(()-> new RuntimeException("Note not found"));
+    @Transactional(readOnly = true)
+    public Note findNoteByUserId(Long noteId, Long userId) {
+        User user = userRepository.getReferenceById(userId);
+        return noteRepository.findNoteByUserId(noteId, user).orElseThrow(()-> new RuntimeException("Note not found"));
     }
 
     // 빈 값을 NULL 처리
@@ -86,33 +103,67 @@ public class NoteService {
     }
 
     @Transactional
-    public NoteResponse updateNote(Long noteId, Long userId, NoteRequest noteRequest) {
-        // 1. Note 엔티티 조회 (noteId + userId 동시 체크 → 보안 강화)
+    public NoteResponse updateNote(Long noteId, Long userId, NoteRequest req) {
+
         Note note = noteRepository.findByIdAndUserId(noteId, userId)
-                .orElseThrow(() -> new NotFoundException("해당 Note가 없거나 권한이 없습니다."));
+                .orElseThrow(() -> new NotFoundException("Note not found"));
 
-        Tag tag = null;
-        if (noteRequest.getTagId() != null) {
-            tag = tagRepository.findById(noteRequest.getTagId())
-                    .orElseThrow(() -> new RuntimeException("Tag not found"));
-        }
+        User user = userRepository.getReferenceById(userId);
 
+        Category category = Optional.ofNullable(req.getCategoryId())
+                .map(categoryRepository::getReferenceById)
+                .orElse(null);
 
-        // 2. 필드 업데이트
-        /* save(note)하지 않아도 JPA는 영속성 컨텍스트에 관리 중인 엔티티의 필드가 변경되면, 트랜잭션 커밋 시점에 자동으로 UPDATE 쿼리를 날린다. */
-        note.updateNote(
-                noteRequest.getTitle(),
-                noteRequest.getSubTitle(),
-                noteRequest.getDescription(),
-                tag,
-                NoteCategory.valueOf(noteRequest.getCategory())
-        );
+        /* 1) 필드 업데이트 */
+        note.updateNote(req.getTitle(), req.getSubTitle(), req.getDescription(), category);
 
-        // 3. 리턴 메시지
-        return NoteResponse.fromEntity(note);
+        /* 2) 태그 동기화 */
+        List<Tag> tags = tagService.getOrCreateTags(user,               // user별 태그 재사용
+                req.getTags().stream()
+                        .map(Tag::getName)
+                        .toList());
+
+        syncTags(note, tags);   // Δ 알고리즘 호출
+
+        return NoteResponse.fromEntity(note);  // flush 는 @Transactional 종료 시점
     }
 
-    public Page<Note> findNotesWithoutTag(Long userId, NoteCategory category, Pageable pageable) {
-        return noteRepository.findNotesWithNullTagByUserAndOptionalCategory(userId, category, pageable);
+    @Transactional
+    public void syncTags(Note note, List<Tag> targetTags) {
+
+        /* -------------------------
+         * 1) 현재·목표 태그 집합 준비
+         * ------------------------- */
+        Set<Tag> current = note.getNoteTags().stream()
+                .map(NoteTag::getTag)
+                .collect(Collectors.toSet());
+        Set<Tag> target  = new HashSet<>(targetTags);
+
+        /* -------------------------
+         * 2) 제거 대상 = 현재 ∖ 목표
+         * ------------------------- */
+        current.stream()
+                .filter(tag -> !target.contains(tag))
+                .forEach(tag -> {
+                    /* NoteTag 찾기 */
+                    note.getNoteTags().stream()
+                            .filter(nt -> nt.getTag().equals(tag))
+                            .findFirst()
+                            .ifPresent(NoteTag::unlink);   // 양방향 제거
+                });
+
+        /* -------------------------
+         * 3) 추가 대상 = 목표 ∖ 현재
+         * ------------------------- */
+        target.stream()
+                .filter(tag -> !current.contains(tag))
+                .forEach(note::addTag);                 // 새 NoteTag 생성
+    }
+
+
+    // category Null 인 items return
+    @Transactional(readOnly = true)
+    public Page<Note> findNotesWithoutCategory(Long userId, Pageable pageable) {
+        return noteRepository.findNotesWithNullCategoryByUser(userId, pageable);
     }
 }

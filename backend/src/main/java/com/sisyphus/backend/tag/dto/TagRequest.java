@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class TagRequest {
-    private String title;
-    private String color;
-    private Long parentId;
+    private Long id;
+    private String name;
 }

@@ -16,34 +16,57 @@ import java.util.Map;
 @Component
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
+    /**
+     * OAuth2 로그인 성공 후 사용자 정보를 로딩하고 필요한 형태로 가공하여 반환합니다.
+     * <p>
+     * Spring Security의 {@link org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService}
+     * 를 확장한 메서드로, {@link OAuth2UserRequest}를 기반으로 공급자(Naver, Kakao, Google 등)에 따라
+     * 사용자 프로필 정보를 적절히 파싱하여 {@link OAuth2User} 객체로 변환합니다.
+     * </p>
+     *
+     * @param userRequest OAuth2 인증 과정에서 전달된 사용자 요청 객체
+     *                    - clientRegistration: 어떤 OAuth 공급자(google/naver/kakao)인지 정보 포함
+     *                    - accessToken: 사용자 인증을 통해 받은 액세스 토큰
+     * @return OAuth2User 사용자 인증 정보를 담은 객체 (Spring Security 내부적으로 사용됨)
+     *         - attributes: 사용자 정보 Map (email, name 등)
+     *         - authorities: 기본으로 ROLE_USER 설정
+     *         - nameAttributeKey: 사용자 ID로 사용할 속성 키 (email)
+     * @throws OAuth2AuthenticationException 사용자 정보 로딩에 실패할 경우 발생
+     */
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        // Spring이 기본적으로 제공하는 사용자 정보 로더 실행
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        String registrationId = userRequest.getClientRegistration().getRegistrationId(); // google, naver, kakao 출력
+        // 어떤 OAuth 공급자인지 식별 (예: google, naver, kakao)
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
+
+        // 공급자로부터 받은 원본 사용자 정보
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        // Naver 사용자 정보는 'response' 안에 있음
+        // Naver는 사용자 정보가 'response' 키 하위에 JSON 객체로 제공됨
         if ("naver".equals(registrationId)) {
-            // Naver는 응답이 response 안에 들어 있음
-            attributes = extractAttributesSafely(attributes.get("response")); // email, name 등이 들어있는 Map으로 교체
+            // 예: { "response": { "email": "...", "name": "..." } }
+            attributes = extractAttributesSafely(attributes.get("response"));
         }
 
+        // Kakao는 사용자 정보가 "kakao_account" 하위에 위치
         if ("kakao".equals(registrationId)) {
             Map<String, Object> kakaoAccount = extractAttributesSafely(attributes.get("kakao_account"));
             Map<String, Object> profile = extractAttributesSafely(kakaoAccount.get("profile"));
 
+            // email과 name 정보를 뽑아서 새로 attributes 맵 구성
             attributes = Map.of(
                     "email", kakaoAccount.get("email"),
                     "name", profile.get("nickname")
             );
         }
 
-        // 'email'을 usernameAttribute로 지정
+        // 모든 공급자에서 'email'을 nameAttributeKey로 지정 (Principal의 이름 역할)
         return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-                attributes,
-                "email"  // Naver도 email이 있어야 동작
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")), // 권한은 기본으로 ROLE_USER
+                attributes, // 사용자 정보
+                "email"     // SecurityContext에서 사용할 ID 속성
         );
     }
 

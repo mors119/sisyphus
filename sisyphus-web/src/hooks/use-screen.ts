@@ -1,4 +1,4 @@
-import useDebouncedWindowSize from './use-debounced-window-size';
+import { useDebouncedWindowSize } from './useDebounce';
 
 export const useScreen = () => {
   const { width, height } = useDebouncedWindowSize(200);

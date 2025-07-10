@@ -1,5 +1,6 @@
 package com.sisyphus.backend.user.entity;
 
+import com.sisyphus.backend.user.util.Provider;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,7 +11,9 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "accounts")
+@Table(name = "accounts",
+    uniqueConstraints = @UniqueConstraint(columnNames = {"email", "provider"}) // 동일한 계정 추가 막기
+)
 public class Account {
 
     @Id
@@ -22,7 +25,9 @@ public class Account {
 
     private String name;
 
-    private String provider; // "google", "naver", "camus"
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Provider provider; // "google", "naver", "camus"
 
     @Column(name = "password_hash")
     private String passwordHash;
@@ -52,16 +57,23 @@ public class Account {
         account.email = email;
         account.name = name;
         account.passwordHash = encodedPassword;
-        account.provider = "camus";
+        account.provider = Provider.CAMUS;
         return account;
     }
 
     // OAuth 회원가입용
-    public static Account ofOauth(String email, String name, String provider) {
+    public static Account ofOauth(String email, String name, Provider provider) {
         Account account = new Account();
         account.email = email;
         account.name = name;
         account.provider = provider;
+        return account;
+    }
+
+    // 정적 팩토리 메서드는 단순 생성 역할만 수행
+    public static Account ofLink(String email, String name, Provider provider, User user) {
+        Account account = ofOauth(email, name, provider);
+        account.user = user;
         return account;
     }
 }

@@ -2,9 +2,9 @@ package com.sisyphus.backend.configuration;
 
 
 import com.sisyphus.backend.auth.jwt.JwtAuthenticationFilter;
+import com.sisyphus.backend.auth.oauth.CustomOAuth2UserService;
 import com.sisyphus.backend.auth.oauth.OAuth2LoginFailureHandler;
 import com.sisyphus.backend.auth.oauth.OAuth2LoginSuccessHandler;
-import com.sisyphus.backend.auth.oauth.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,12 +17,25 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.Arrays;
 
-//  Spring Security 설정 (경로 허용, 필터 등록 등)
+/**
+ * Spring Security 전역 (경로 허용, 필터 등록 등) 설정  클래스입니다.
+ *
+ * <p>기능 요약:
+ * <ul>
+ *     <li>JWT 기반 무상태 인증 (Stateless)</li>
+ *     <li>OAuth2 로그인 연동 (Google, Naver, Kakao)</li>
+ *     <li>CSRF 비활성화</li>
+ *     <li>세션 비활성화</li>
+ *     <li>Swagger, H2 Console 등의 예외 경로 허용</li>
+ *     <li>커스텀 로그인 성공/실패 핸들러 및 필터 설정</li>
+ * </ul>
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -33,58 +46,89 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final Environment env; // 현재 실행중인 profile을 확인하기 위해 주입
+    private final ClientRegistrationRepository clientRegistrationRepository;
 
+    /**
+     * Spring Security의 필터 체인을 정의합니다.
+     *
+     * <p>주요 설정:
+     * <ul>
+     *     <li>CSRF 비활성화</li>
+     *     <li>세션 Stateless 설정</li>
+     *     <li>401 Unauthorized 커스텀 처리</li>
+     *     <li>OAuth2 로그인 설정</li>
+     *     <li>JWT 필터 등록</li>
+     * </ul>
+     *
+     * @param http HttpSecurity 객체
+     * @return SecurityFilterChain 보안 필터 체인
+     * @throws Exception 보안 설정 중 오류 발생 시
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // CSRF JWT 헤더 방식이므로 비활성화 (프론트와 API 서버 분리 시 일반적)
         // 추후 쿠키 인증 방식 도입 시 CSRF 토큰 전략 도입 고려
         http
-                // CSRF → JWT 사용 시 항상 비활성화
+                /** CSRF 비활성화: JWT를 사용할 경우 항상 꺼야 함 */
                 .csrf(AbstractHttpConfigurer::disable)
-                // 세션 관리 → Stateless (JWT 기반 인증) / 세션 저장 안 함 (JWT 기반 무상태 인증)
+                /** 세션 정책: 무상태(stateless)로 설정 (JWT 기반 인증) / 세션 저장 안 함 (JWT 기반 무상태 인증) (Spring Security 세션 저장 금지) */
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // 예외 핸들링 → 401, 403 명확하게 커스터마이징 가능 / 로그인 정보 없을 때, /login 으로 redirect 시키는 것 막기 (401오류로 대체)
+                /** 예외 핸들링 설정 → 401, 403 명확하게 커스터마이징 가능 / 로그인 정보 없을 때, /login 으로 redirect 시키는 것 막기 (401오류로 대체) */
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) ->
                                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
                 )
-                // 경로 권한 관리
+                /** 경로 권한 설정 */
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**",
                                 "/swagger-ui/**", // TODO: Swagger 배포 시 제한 또는 보호
                                 "/v3/api-docs/**", // TODO: Swagger 배포 시 제한 또는 보호
                                 "/h2-console/**" // TODO: H2 콘솔 배포 시 제거
-                        ).permitAll() // /api/auth/** 같은 인증 제외 경로는 permitAll()
+                        ).permitAll()
+                        /** /api/auth/** 같은 인증 제외 경로는 permitAll() */
                         .anyRequest().authenticated()
                 )
-                // 헤더 관리 (H2 console iframe 허용 - local에서만)
+                /** H2 Console iframe 허용 (local에서만 활성화) */
                 .headers(headers -> {
-                //  iframe을 막는 보안 설정 (해제 시 클릭 재킹 위험 있음)
-                // H2 콘솔 iframe 허용 → env 사용안 할 경우 배포 시 제거
+                    //  iframe을 막는 보안 설정 (해제 시 클릭 재킹 위험 있음)
+                    // H2 콘솔 iframe 허용 → env 사용안 할 경우 배포 시 제거
                     if (isLocalProfile()) {
                         headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin); // local 일 때만 iframe 허용
                     }
                 })
-                // OAuth2 로그인 설정
+                /** OAuth2 로그인 설정 */
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService) // 사용자 정보 가공 (네이버 로그인에 필요)
+                                .userService(customOAuth2UserService) // 사용자 정보 가공 (Google은 불필요, Naver/Kakao 필수)
                         )
-                        .failureHandler(oAuth2LoginFailureHandler) //  실패 핸들러 추가
-                        .successHandler(oAuth2LoginSuccessHandler) // 토큰 발급 및 쿠키 처리
+                        .successHandler(oAuth2LoginSuccessHandler)   // 로그인 성공 처리
+                        .failureHandler(oAuth2LoginFailureHandler)   // 로그인 실패 처리
                 )
-                // JWT 필터 등록 (기본 UsernamePasswordAuthenticationFilter 앞에 위치) jwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter보다 먼저 실행되도록 등록
+                /** JWT 필터 등록 (기본 UsernamePasswordAuthenticationFilter보다 앞에 위치) jwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter보다 먼저 실행되도록 등록 */
+                // JWT 필터 등록 (기본 UsernamePasswordAuthenticationFilter 앞에 위치)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-                // UsernamePasswordAuthenticationFilter는 스프링 시큐리티에서 로그인 처리를 담당하는 기본 필터 (아이디 + 비밀번호로 로그인 시도하는 요청을 처리하는 필터) 제일 마지막에 배치
+                /** UsernamePasswordAuthenticationFilter는 스프링 시큐리티에서 로그인 처리를 담당하는 기본 필터 (아이디 + 비밀번호로 로그인 시도하는 요청을 처리하는 필터) 제일 마지막에 배치 */
 
         return http.build();
     }
 
-    // 현재 profile이 local인지 확인하는 메서드
+    /**
+     * 현재 활성화된 프로파일이 'local'인지 여부를 확인합니다.
+     *
+     * @return true: local 프로파일이 활성화된 경우, false: 그 외의 경우
+     */
     private boolean isLocalProfile() {
         return Arrays.asList(env.getActiveProfiles()).contains("local");
     }
 
+
+    /**
+     * 비밀번호 인코더 빈을 등록합니다.
+     *
+     * <p>BCrypt를 사용하여 비밀번호를 암호화합니다.
+     *
+     * @return BCryptPasswordEncoder 인스턴스
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
