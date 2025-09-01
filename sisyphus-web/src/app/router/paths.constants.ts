@@ -17,4 +17,5 @@ export const PATHS = {
   USER: 'user',
   REQUIRE: 'require',
   NOTICE: 'notice',
+  POLICY: 'policy',
 } as const;

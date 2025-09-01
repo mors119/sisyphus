@@ -8,6 +8,7 @@ import com.sisyphus.backend.auth.service.AuthService;
 import com.sisyphus.backend.auth.token.RefreshTokenService;
 import com.sisyphus.backend.global.exception.UnauthorizedException;
 import com.sisyphus.backend.user.entity.Account;
+import com.sisyphus.backend.user.entity.User;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Locale;
 
 //  로그인 및 회원가입
@@ -36,9 +38,13 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<TokenResponse> signup(@RequestBody RegisterRequest request, Locale locale) {
         // 회원가입 처리
-        Account user = authService.saveOrLinkAccount(request, locale);
+        Account account = authService.saveOrLinkAccount(request, locale);
+        User user = account.getUser();
+        if (user == null) {
+            throw new UnauthorizedException("연결된 사용자 정보가 없습니다.");
+        }
 
-        String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail());
+        String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), List.of(user.getRole().name()));
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
 
         // RefreshToken 쿠키로 설정

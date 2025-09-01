@@ -6,6 +6,8 @@ import { useDayjs } from '@/hooks/useDayjs.hook';
 import { ViewTableProps } from './ViewTable.container';
 import { CustomAlert } from '@/components/custom/customAlert';
 import { EmptyState } from '@/components/custom/Empty';
+import { useNoteStore } from './note.store';
+import { ImageCard } from '../image/ImageCard.component';
 
 export const ViewCardList = ({
   deleteNum,
@@ -13,7 +15,6 @@ export const ViewCardList = ({
   alertOpen,
   setAlertOpen,
   setOpenSheet,
-  setEditNote,
   setTagId,
 }: Pick<
   ViewTableProps,
@@ -33,6 +34,7 @@ export const ViewCardList = ({
   const deleteMutation = useDeleteNoteMutation();
   const { getTextColorForHex } = getColorUtils();
   const { formatRelativeDate } = useDayjs();
+  const { setEditNote } = useNoteStore();
 
   const handleDelete = async () => {
     if (deleteNum !== 0) {
@@ -69,61 +71,54 @@ export const ViewCardList = ({
               setEditNote(item);
               setOpenSheet(true);
             }}
-            className="cursor-pointer hover:shadow-md duration-300 border rounded-lg p-4 flex flex-col justify-between bg-white dark:bg-neutral-900 hover:scale-[1.02]">
-            <div>
-              <h3 className="font-semibold text-lg text-gray-900 dark:text-white truncate">
-                {item.title}
-              </h3>
-              <h4 className="text-sm text-gray-600 dark:text-gray-300 truncate">
-                {item.subTitle || '-'}
-              </h4>
-            </div>
+            className="cursor-pointer group rounded-xl shadow hover:shadow-xl transition border overflow-hidden bg-white dark:bg-neutral-900">
+            {/* 이미지 영역 */}
+            <ImageCard item={item.image && item.image[0]} />
 
-            <div className="mt-2 text-sm space-y-1">
+            {/* 내용 영역 */}
+            <div className="p-4 flex flex-col gap-2">
               <div>
-                <span className="font-medium">{t('view.date')}: </span>
-                {formatRelativeDate(item.createdAt)}
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white truncate">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
+                  {item.subTitle || '-'}
+                </p>
               </div>
 
-              <div className="flex items-center gap-1">
-                <span className="font-medium">{t('view.tags')}: </span>
-                {item.tags && item.tags.length > 0 ? (
-                  <div className="flex flex-wrap gap-1">
-                    {item.tags.slice(0, 3).map((tag) => (
-                      <span
-                        key={tag.id}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setTagId(tag.id);
-                        }}
-                        className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-800/50 text-blue-800 dark:text-blue-200 rounded-full border">
-                        # {tag.name}
-                      </span>
-                    ))}
-                    {item.tags.length > 3 && (
-                      <span className="text-xs text-gray-500">
-                        +{item.tags.length - 3}
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  '-'
+              {/* 태그 */}
+              <div className="flex flex-wrap gap-1">
+                {item.tags &&
+                  item.tags.slice(0, 3).map((tag) => (
+                    <span
+                      key={tag.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTagId(tag.id);
+                      }}
+                      className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-800/40 text-blue-800 dark:text-blue-100 rounded-full border">
+                      # {tag.name}
+                    </span>
+                  ))}
+                {item.tags && item.tags.length > 3 && (
+                  <span className="text-xs text-gray-500">
+                    +{item.tags.length - 3}
+                  </span>
                 )}
               </div>
 
-              <div>
-                <span className="font-medium">{t('view.category')}: </span>
-                {item.category ? (
+              {/* 푸터 정보 */}
+              <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <span>{formatRelativeDate(item.createdAt)}</span>
+                {item.category && (
                   <span
-                    className="text-xs font-medium px-2 py-1 rounded-sm"
+                    className="px-2 py-0.5 rounded"
                     style={{
                       background: item.category.color,
                       color: getTextColorForHex(item.category.color),
                     }}>
                     {item.category.title}
                   </span>
-                ) : (
-                  '-'
                 )}
               </div>
             </div>

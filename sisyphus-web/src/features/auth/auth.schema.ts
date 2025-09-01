@@ -40,6 +40,7 @@ export const useSignupSchema = () => {
       passwordConfirm: z
         .string()
         .min(1, { message: t('signup.msg.signup.passwordConfirm.required') }),
+      age: z.boolean().default(false).optional(),
       checkBox1: z.boolean().default(false).optional(),
       checkBox2: z.boolean().default(false).optional(),
     })

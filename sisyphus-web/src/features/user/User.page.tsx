@@ -27,7 +27,7 @@ const UserPage = () => {
     } else if (state === 'false') {
       alertMessage(t('auth.error'), { description: t('signup.already') });
     }
-  }, [state]);
+  }, [state, alertMessage, t]);
 
   // TODO: UserDetail을 안전하게 처리하는 것 고민하기
   // TODO: 비밀번호 찾기

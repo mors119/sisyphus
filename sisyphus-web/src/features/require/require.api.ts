@@ -1,11 +1,5 @@
 import api from '@/services/route';
-import { RequireForm } from './require.types';
-
-// Require
-export const fetchRequires = async () => {
-  const res = await api.get('/require/all');
-  return res.data;
-};
+import { RequireForm, RequireStatusRequest } from './require.types';
 
 export const fetchMyRequires = async (page: number = 0, size: number = 10) => {
   const res = await api.get('/require/readAll', {
@@ -24,10 +18,19 @@ export const createRequire = async (data: RequireForm) => {
   return res.data;
 };
 
-export const deleteRequire = async (categoryId: number) => {
-  await api.delete(`/require/${categoryId}`);
+export const deleteRequire = async (id: number) => {
+  await api.delete(`/require/${id}`);
 };
 
-export const updateRequire = (data: RequireForm) => {
+export const updateRequire = (data: RequireForm & { id: number }) => {
   return api.put(`/require/${data.id}`, data);
+};
+
+export const updateRequireStatus = (data: RequireStatusRequest) => {
+  return api.put(`/require/status/${data.id}`, data);
+};
+
+export const countRequireStatus = async () => {
+  const res = await api.get(`/require/status/count`);
+  return res.data;
 };

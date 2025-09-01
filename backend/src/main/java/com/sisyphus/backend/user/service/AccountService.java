@@ -2,8 +2,8 @@ package com.sisyphus.backend.user.service;
 
 import com.sisyphus.backend.category.entity.Category;
 import com.sisyphus.backend.category.repository.CategoryRepository;
-import com.sisyphus.backend.global.exception.EmailAlreadyExistsException;
 import com.sisyphus.backend.global.exception.OAuthAccountAlreadyLinkedException;
+import com.sisyphus.backend.user.dto.CountsResponse;
 import com.sisyphus.backend.user.dto.UserRequest;
 import com.sisyphus.backend.user.entity.Account;
 import com.sisyphus.backend.user.entity.User;
@@ -58,6 +58,11 @@ public class AccountService {
             UserRequest userRequest = new UserRequest();
             userRequest.setId(user.getId());
             userRequest.setEmail(user.getEmail());
+            userRequest.setRole(user.getRole());
+
+            if (user.getRole() == null) {
+                userRequest.setRole(Role.USER);
+            }
             return userRequest;
         }
 
@@ -97,9 +102,7 @@ public class AccountService {
     public void linkOAuthAccount(Long userId,  String name, String email, Provider provider) {
 
         // 1. 이메일 + 공급자(provider)로 기존 Account를 먼저 조회
-        System.out.println("중복 검사: email=" + email + ", provider=" + provider);
         Optional<Account> existing = accountRepository.findByEmailAndProvider(email, provider);
-        System.out.println("조회 결과: " + existing.isPresent());
 
         // 2. 이미 존재하면 -> 연결된 User 정보를 리턴
         if (existing.isPresent()) {
@@ -111,5 +114,10 @@ public class AccountService {
         // 연동 정보 저장
         Account account = Account.ofLink(email, name, provider, user);
         accountRepository.save(account);
+    }
+
+    @Transactional(readOnly = true)
+    public CountsResponse getUserCount() {
+        return new CountsResponse(accountRepository.count(), userRepository.count());
     }
 }

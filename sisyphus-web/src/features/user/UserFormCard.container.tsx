@@ -54,8 +54,7 @@ export const UserFormCard = ({
       email: user?.userEmail ?? '',
       createdAt: formatDate(user?.createdAt, 'YYYY-MM-DD') ?? '',
     });
-    if (user) console.log(user.userName);
-  }, [read, user, form]);
+  }, [read, user, form, formatDate]);
 
   const onSubmit = (data: UserForm) => {
     updateMutation.mutate(

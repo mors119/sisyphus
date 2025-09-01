@@ -3,15 +3,14 @@ package com.sisyphus.backend.note.controller;
 
 import com.sisyphus.backend.auth.jwt.JwtTokenHandler;
 import com.sisyphus.backend.auth.jwt.JwtTokenProvider;
+import com.sisyphus.backend.global.dto.PageResponse;
 import com.sisyphus.backend.note.dto.NoteRequest;
 import com.sisyphus.backend.note.dto.NoteResponse;
-import com.sisyphus.backend.note.dto.PageResponse;
 import com.sisyphus.backend.note.entity.Note;
 import com.sisyphus.backend.note.service.NoteService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -34,6 +33,8 @@ public class NoteController {
     ) {
         Long userId = jwtTokenHandler.extractUserIdFromRequest(httpServletRequest);
 
+//        소프트 삭제(soft delete)와 하드 삭제(hard delete) 설계 방법
+
         String response = noteService.createNote(request, userId);
         return ResponseEntity.ok(response);
     }
@@ -50,12 +51,10 @@ public class NoteController {
     ) {
         Long userId = jwtTokenHandler.extractUserIdFromRequest(request);
 
-        Page<Note> notes = noteService.readAllWithOptionalFilters(userId, categoryId, tagId, title, page, size, sort);
-        Page<NoteResponse> noteResponses = notes.map(NoteResponse::fromEntity);
-        System.out.println(noteResponses);
-        return ResponseEntity.ok(PageResponse.from(noteResponses));
+        PageResponse<NoteResponse> notes = noteService.readAllWithOptionalFilters(userId, categoryId, tagId, title, page, size, sort);
+
+        return ResponseEntity.ok(notes);
     }
-    // TODO: service 로직 확인할 것 무한 스크롤 안됨.
 
     @GetMapping("/read/{id}")
     public ResponseEntity<NoteResponse> readNote(@PathVariable Long id, HttpServletRequest request) {
@@ -86,7 +85,7 @@ public class NoteController {
     }
 
     @GetMapping("/categoryNull")
-    public ResponseEntity<Page<NoteResponse>> categoryNull(
+    public ResponseEntity<PageResponse<NoteResponse>> categoryNull(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             HttpServletRequest request
@@ -95,8 +94,8 @@ public class NoteController {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        Page<Note> notes = noteService.findNotesWithoutCategory(userId, pageable);
-        return ResponseEntity.ok(notes.map(NoteResponse::fromEntity));
+        PageResponse<NoteResponse> notes = noteService.findNotesWithoutCategory(userId, pageable);
+        return ResponseEntity.ok(notes);
     }
 
 

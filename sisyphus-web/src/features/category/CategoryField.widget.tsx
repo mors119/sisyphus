@@ -22,8 +22,9 @@ export const CategoryField = ({ condition }: { condition: boolean }) => {
 
   if (error) return <ErrorState />;
 
-  if (!data || data.length === 0) {
-    if (condition) return <EmptyState />;
+  if (!data || data.length === 0) return <EmptyState />;
+
+  if ((!condition && !data) || data.length === 0) {
     return (
       <div className="relative flex justify-center top-0 right-0 bg-white max-w-full w-full h-[300px]">
         <CategoryFormUnified />

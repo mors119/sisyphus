@@ -7,6 +7,7 @@ import com.sisyphus.backend.global.exception.OAuthAccountAlreadyLinkedException;
 import com.sisyphus.backend.user.dto.UserRequest;
 import com.sisyphus.backend.user.service.AccountService;
 import com.sisyphus.backend.user.util.Provider;
+import com.sisyphus.backend.user.util.Role;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -28,9 +31,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
     private final AccountService accountService;
-    private final JwtTokenHandler jwtTokenHandler;
 
-    @Value("${app.frontend-url}")
+    @Value("${app.hosts.app}")
     private String frontendUrl;
 
     @Override
@@ -51,9 +53,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String mode = (String) request.getSession().getAttribute("mode");
         String userIdStr = (String) request.getSession().getAttribute("userId");
         String redirectedUri = (String) request.getSession().getAttribute("redirectedUri");
-
-        System.out.println("userIdStr = " + userIdStr);
-        System.out.println("mode = " + mode);
         
         if ("link".equals(mode) && userIdStr != null) {
             try {
@@ -77,8 +76,12 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         // 2. 사용자 DB 저장 or 조회
         UserRequest userRequest = accountService.saveOrGetAccount(email, name, provider);
 
+        // 2-1. roles 클레임 생성 roles가 없는 경우 user로 지정해서 오류 방지
+        Role effectiveRole = Optional.ofNullable(userRequest.getRole()).orElse(Role.USER);
+        List<String> roleClaims = List.of(effectiveRole.name());
+
         // 3. access + refresh 토큰 발급
-        String accessToken = jwtTokenProvider.createAccessToken(userRequest.getId(), userRequest.getEmail());
+        String accessToken = jwtTokenProvider.createAccessToken(userRequest.getId(), userRequest.getEmail(), roleClaims);
         String refreshToken = jwtTokenProvider.createRefreshToken(userRequest.getId());
 
         // 4. refresh 토큰 저장 (ex: Redis)

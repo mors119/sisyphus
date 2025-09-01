@@ -6,4 +6,5 @@ export const responseToForm = (data: NoteResponse): NoteForm => ({
   description: data.description ?? '',
   tags: (data.tags ?? []).map((t) => ({ id: t.id, name: t.name })), // TagResponse → {id,name}
   categoryId: data.category?.id ?? undefined, // 없으면 undefined
+  imageId: data.image?.[0]?.id ?? undefined,
 });

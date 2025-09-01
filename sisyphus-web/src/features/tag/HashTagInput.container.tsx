@@ -20,7 +20,7 @@ export const HashTagInput = ({ value, onChange }: HashTagInputProps) => {
 
   useEffect(() => {
     if (data) setTags(data);
-  }, [data]);
+  }, [data, setTags]);
 
   const addTempTag = (tag: TagTemp) =>
     onChange(

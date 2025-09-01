@@ -67,4 +67,5 @@ public class UserService {
         // save 생략 가능: 영속 상태 객체 + 트랜잭션 커밋 → 자동 update
     }
 
+
 }

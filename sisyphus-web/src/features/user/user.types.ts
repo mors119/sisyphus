@@ -9,7 +9,7 @@ export enum Provider {
   KAKAO = 'KAKAO',
 }
 
-export type ProviderClickAction = string | 'SIGNUP';
+type ProviderClickAction = string | 'SIGNUP';
 
 export type ProviderConfig = {
   provider: Provider;
@@ -44,7 +44,7 @@ export interface UserWithAccountResponse {
 }
 
 // account 정보
-export interface AccountInfo {
+interface AccountInfo {
   accountId: number;
   email: string;
   provider: Provider; // 필요에 따라 string 또는 enum으로

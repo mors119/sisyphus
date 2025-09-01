@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -94,9 +95,13 @@ public class AuthService {
                 throw new UnauthorizedException("이메일 또는 비밀번호가 올바르지 않습니다.");
             }
         // 4. 토큰 발급
-        String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail());
+        String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), List.of(user.getRole().name()));
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
+
+        // 5. refresh 토큰 저장
         refreshTokenService.save(user.getId(), refreshToken, 7L * 24 * 60 * 60);
+
+        // 6. refresh 토큰을 쿠키로 응답에 포함
         ResponseCookie refreshCookie = jwtTokenProvider.createRefreshTokenCookie(refreshToken);
 
         return new TokenWithRefresh(accessToken, refreshCookie);
@@ -111,7 +116,7 @@ public class AuthService {
         Long userId = jwtTokenProvider.getUserId(refreshToken);
         User user = userRepository.findById(userId).orElseThrow();
 
-        return jwtTokenProvider.createAccessToken(user.getId(), user.getEmail());
+        return jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), List.of(user.getRole().name()));
     }
 
     // 아이디 중복 확인

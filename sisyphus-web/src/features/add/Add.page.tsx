@@ -3,7 +3,7 @@ import { ViewFormField } from '../view/ViewForm.container';
 
 const AddPage = () => {
   return (
-    <div>
+    <div className="w-full">
       <CustomCard content={<ViewFormField />} />
     </div>
   );

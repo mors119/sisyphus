@@ -19,6 +19,11 @@ export default defineConfig({
         secure: false, // 설정하면 프록시가 연결 가능 (배포 시 true 변경 또는 제거) TODO: true로 변경 또는 제거
         // rewrite: (path) => path.replace(/^\/api/, '/api'), // 경로 유지
       },
+      '/uploads': {
+        target: 'http://localhost:8080', // 백엔드 주소 TODO: 서버주소로 변경
+        changeOrigin: true,
+        secure: false, // 설정하면 프록시가 연결 가능 (배포 시 true 변경 또는 제거) TODO: true로 변경 또는 제거
+      },
     },
   },
 });

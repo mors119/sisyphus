@@ -2,6 +2,7 @@ import { useDayjs } from '@/hooks/useDayjs.hook';
 import { useNoteStore } from './note.store';
 import { getColorUtils } from '@/utils/getColorUtils.util';
 import { useTranslation } from 'react-i18next';
+import { ImageCard } from '../image/ImageCard.component';
 
 export const ViewDetailSection = () => {
   const { editNote: data } = useNoteStore();
@@ -9,23 +10,33 @@ export const ViewDetailSection = () => {
   const { formatDate } = useDayjs();
   const { t } = useTranslation();
 
-  return (
-    <>
-      <div className="flex flex-col gap-2">
-        {data.category && (
-          <span
-            className="inline-block w-fit px-3 py-1 rounded-full text-xs font-semibold "
-            style={{
-              background: data.category.color,
-              color: getTextColorForHex(data.category.color),
-            }}>
-            {data.category.title}
-          </span>
-        )}
-      </div>
+  const image = data.image?.[0];
 
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold">{data.title}</h1>
+  return (
+    <div className="space-y-4">
+      {/* 카테고리 */}
+      {data.category && (
+        <span
+          className="inline-block w-fit px-3 py-1 rounded-full text-xs font-semibold"
+          style={{
+            background: data.category.color,
+            color: getTextColorForHex(data.category.color),
+          }}>
+          {data.category.title}
+        </span>
+      )}
+      {/* 이미지 영역 */}
+      {image && (
+        <div className="w-full aspect-[4/3] max-w-80 bg-gray-100 dark:bg-neutral-800 overflow-hidden rounded-lg">
+          <ImageCard item={image} />
+        </div>
+      )}
+
+      {/* 제목 & 부제 */}
+      <div className="space-y-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          {data.title}
+        </h1>
         {data.subTitle && (
           <p className="text-base text-muted-foreground">{data.subTitle}</p>
         )}
@@ -33,25 +44,30 @@ export const ViewDetailSection = () => {
 
       <hr />
 
+      {/* 설명 */}
       <div>
-        <p className="text-sm whitespace-pre-wrap">
+        <p className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
           {data.description || t('view.desc_msg')}
         </p>
       </div>
+
       <hr />
-      <div className="gap-1 flex mb-0">
+
+      {/* 태그 */}
+      <div className="flex flex-wrap gap-1">
         {data.tags?.map((tag) => (
           <span
-            className="inline-block w-fit px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700"
-            key={tag.id}>
+            key={tag.id}
+            className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-800/40 dark:text-blue-200">
             # {tag.name}
           </span>
         ))}
       </div>
 
-      <div className="text-xs text-gray-400 text-end">
+      {/* 작성일 */}
+      <div className="text-xs text-right text-gray-400 dark:text-gray-500">
         {t('view.date')}: {formatDate(data.createdAt)}
       </div>
-    </>
+    </div>
   );
 };

@@ -31,6 +31,5 @@ export const AUTH_TYPE = [
 // Backend Oauth Url
 // TODO: 배포 시 변경
 export const BACK_URL = 'http://localhost:8080/api';
-export const OAUTH_URL = `${BACK_URL}/api/auth`;
 export const REDIRECT_URL = `https://${chrome.runtime.id}.chromiumapp.org`;
 export const HOST_URL = 'http://localhost:5173';

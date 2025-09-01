@@ -1,10 +1,6 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { fetchNote, fetchNotes, fetchCategoryNullNotes } from './view.api';
-import {
-  NotePageResponse,
-  NoteResponse,
-  SortOption,
-} from '../quick_edit/note.types';
+import { fetchNotes, fetchCategoryNullNotes } from './view.api';
+import { NotePageResponse, SortOption } from '../quick_edit/note.types';
 import { useAuthStore } from '../auth/auth.store';
 
 // 노트 전체 상태
@@ -47,14 +43,5 @@ export const useCategoryNullNotesQuery = () => {
       const currentPage = typeof lastPage.page === 'number' ? lastPage.page : 0;
       return lastPage.last ? undefined : currentPage + 1;
     },
-  });
-};
-
-// 개별 노트
-export const useNoteQuery = (noteId: number) => {
-  return useQuery<NoteResponse>({
-    queryKey: ['note', noteId],
-    queryFn: () => fetchNote(noteId),
-    enabled: !!noteId, // noteId가 0, null, undefined일 때 호출 방지
   });
 };

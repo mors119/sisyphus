@@ -21,6 +21,7 @@ import { SidenavMenu } from './SidenavMenu.container';
 import { LanguageSelector } from './LanguageSelector.container';
 import { ThemeToggle } from '../../theme/ThemeToggle.component';
 import { PATHS } from '@/app/router/paths.constants';
+import { PolicySidenav } from '@/features/layout/sidenav/PolicySidenav.component';
 
 export const Sidenav = () => {
   const { open, location, handleClick, role } = useSidenavState();
@@ -73,6 +74,7 @@ export const Sidenav = () => {
 
       {/* Sidebar footer */}
       <SidebarFooter>
+        <PolicySidenav open={open} />
         <Separator />
         <div className={cn(open && 'flex items-center justify-between')}>
           <LanguageSelector open={open} />

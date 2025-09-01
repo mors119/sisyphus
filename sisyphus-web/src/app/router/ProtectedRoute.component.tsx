@@ -19,7 +19,7 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       });
       setShouldRedirect(true);
     }
-  }, [accessToken, alertMessage]);
+  }, [accessToken, alertMessage, t]);
 
   if (shouldRedirect) {
     return (

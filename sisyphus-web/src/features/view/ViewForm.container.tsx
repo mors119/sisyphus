@@ -1,6 +1,5 @@
 import { cn } from '@/lib/utils';
 import { useDroppable } from '@dnd-kit/core';
-import { useLocation } from 'react-router-dom';
 
 import { Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -20,13 +19,23 @@ import { useCategoriesQuery } from '../category/category.query';
 import { useDndStore } from '../quick_edit/editDnd.store';
 import { useViewForm } from './useViewForm.hook';
 import { useTranslation } from 'react-i18next';
-import { ImageUploaderForm } from './ImageUploader.container';
+import { ImageUploaderForm } from '../image/ImageUploader.container';
 
 export const ViewFormField = () => {
-  const { form, onSubmit, isLoading, isEdit, reset } = useViewForm();
+  const {
+    form,
+    onSubmit,
+    isLoading,
+    isEdit,
+    reset,
+    setPreviewUrl,
+    previewUrl,
+    fileRef,
+    imageInfo,
+    setImageInfo,
+  } = useViewForm();
   const { t } = useTranslation();
   const { data: categoryArray = [] } = useCategoriesQuery();
-  const location = useLocation();
   const { activeSubmit, activeCategory } = useDndStore();
 
   const { isOver, setNodeRef, active } = useDroppable({
@@ -62,12 +71,15 @@ export const ViewFormField = () => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-2 w-full flex flex-col">
           <div className="flex justify-between gap-3 items-center">
-            <ImageUploaderForm form={form} />
-
+            <ImageUploaderForm
+              fileRef={fileRef}
+              previewUrl={previewUrl}
+              setPreviewUrl={setPreviewUrl}
+              imageInfo={imageInfo}
+              setImageInfo={setImageInfo}
+            />
             <div className="flex items-center gap-3 justify-end">
-              {location.pathname === '/quickedit' && (
-                <CleanBtn onClick={() => reset()} />
-              )}
+              <CleanBtn onClick={() => reset()} />
 
               <CategorySelectField
                 control={form.control}

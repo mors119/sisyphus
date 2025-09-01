@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { ForwardRefExoticComponent, RefAttributes } from 'react';
 
-export interface SidenavItem {
+interface SidenavItem {
   title: string;
   url: string;
   icon: ForwardRefExoticComponent<
@@ -32,6 +32,12 @@ export const SIDENAV_ITEMS: SidenavItem[] = [
     roles: ['ALL', 'USER', 'ADMIN'],
   },
   {
+    title: 'item.view',
+    url: '/' + PATHS.VIEW,
+    icon: BookOpen,
+    roles: ['USER', 'ADMIN'],
+  },
+  {
     title: 'item.quick',
     url: '/' + PATHS.QUICKEDIT,
     icon: LayoutDashboard,
@@ -41,12 +47,6 @@ export const SIDENAV_ITEMS: SidenavItem[] = [
     title: 'item.add',
     url: '/' + PATHS.ADD,
     icon: ClipboardPlus,
-    roles: ['USER', 'ADMIN'],
-  },
-  {
-    title: 'item.view',
-    url: '/' + PATHS.VIEW,
-    icon: BookOpen,
     roles: ['USER', 'ADMIN'],
   },
   {
@@ -65,7 +65,7 @@ export const SIDENAV_ITEMS: SidenavItem[] = [
     title: 'item.require',
     url: '/' + PATHS.REQUIRE,
     icon: SquarePen,
-    roles: ['ADMIN'],
+    roles: ['ADMIN', 'USER'],
   },
   {
     title: 'item.notice',
@@ -80,4 +80,4 @@ export const SIDENAV_ITEMS: SidenavItem[] = [
     roles: ['ADMIN'], // 관리자 전용
   },
 ];
-// TODO: Require(user) notice(all, user) 권한 주기
+// TODO: notice(all, user) 권한 주기

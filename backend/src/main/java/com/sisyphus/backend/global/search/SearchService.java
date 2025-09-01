@@ -6,7 +6,6 @@ import com.sisyphus.backend.note.repository.NoteRepository;
 import com.sisyphus.backend.tag.repository.TagRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

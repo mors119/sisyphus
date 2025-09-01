@@ -35,9 +35,8 @@ const TagPage = () => {
   };
 
   useEffect(() => {
-    console.log('DB tags', tagsFromDB);
     if (tagsFromDB) setTags(tagsFromDB);
-  }, [tagsFromDB]);
+  }, [tagsFromDB, setTags]);
 
   /** 제출 → tempTags를 TagRequest[] 형태로 변환 후 전송 */
   const onSubmit = (e: React.FormEvent) => {
@@ -94,7 +93,7 @@ const TagPage = () => {
     );
   };
   return (
-    <div className="max-w-3xl mx-auto space-y-6 p-4">
+    <div className=" mx-auto space-y-6 p-4">
       {/* DB 태그 카드 */}
       <section className="bg-white dark:bg-neutral-900 rounded-xl shadow p-6">
         <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">

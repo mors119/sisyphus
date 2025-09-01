@@ -33,7 +33,7 @@ export const ViewSheet = ({
   return (
     <div
       ref={sheetRef}
-      className="w-full h-full p-6 bg-white dark:bg-black dark:border border-gray-600 shadow-lg rounded-lg space-y-6 relative">
+      className="w-full h-full p-6 overflow-auto bg-white dark:bg-black dark:border border-gray-600 shadow-lg rounded-lg space-y-6 relative">
       <CloseBtn
         className="absolute right-5"
         onClick={() => {

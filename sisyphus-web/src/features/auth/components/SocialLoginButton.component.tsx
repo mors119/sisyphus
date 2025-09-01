@@ -5,7 +5,6 @@ import {
 } from '@/components/ui/tooltip';
 
 import { useAuthStore } from '../auth.store';
-import { OAUTH_URL } from '../auth.constants';
 
 type AuthType = {
   id: string;
@@ -20,7 +19,7 @@ export const SocialLoginButton = ({ item }: { item: AuthType }) => {
   const handleLogin = (ItemId: string) => {
     useAuthStore.getState().clear();
     localStorage.removeItem('auth-storage');
-    window.location.href = `${OAUTH_URL}/${ItemId}`;
+    window.location.href = `/api/auth/${ItemId}`;
   };
 
   return (

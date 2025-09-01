@@ -19,10 +19,6 @@ public class PageResponse<T> {
     private boolean last;
 
     public static <T> PageResponse<T> from(Page<T> page) {
-        System.out.println("페이지 정보: page=" + page.getNumber() +
-                ", size=" + page.getSize() +
-                ", totalPages=" + page.getTotalPages() +
-                ", last=" + page.isLast());
 
         return new PageResponse<>(
                 page.getContent(),

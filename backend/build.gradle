@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.sisyphus'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.1'
 
 java {
     toolchain {
@@ -29,20 +29,22 @@ dependencies {
     // redis
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
 
-    // JPA + DB
+    // JPA + DB + flayway
+    implementation "org.flywaydb:flyway-core:11.11.2"
+    implementation "org.flywaydb:flyway-database-postgresql:11.11.2"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.projectlombok:lombok"
     annotationProcessor "org.projectlombok:lombok"
-//    runtimeOnly "org.postgresql:postgresql"
+    runtimeOnly "org.postgresql:postgresql"
 
     // H2
-    runtimeOnly "com.h2database:h2"
+//    implementation "com.h2database:h2"   // runtimeOnly -> implementation 로 변경
 
     // Security & JWT
     implementation "org.springframework.boot:spring-boot-starter-security"
-    implementation "io.jsonwebtoken:jjwt-api:0.11.5"
-    runtimeOnly "io.jsonwebtoken:jjwt-impl:0.11.5"
-    runtimeOnly "io.jsonwebtoken:jjwt-jackson:0.11.5"
+    implementation "io.jsonwebtoken:jjwt-api:0.12.5"
+    runtimeOnly   "io.jsonwebtoken:jjwt-impl:0.12.5"
+    runtimeOnly   "io.jsonwebtoken:jjwt-jackson:0.12.5"
 
     // 검증 (DTO @Valid 등)
     implementation "org.springframework.boot:spring-boot-starter-validation"
@@ -55,6 +57,9 @@ dependencies {
 
     // oAuth 관련
     implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
+
+    // actuator health
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
 
     // dotenv
 //    implementation "me.paulschwarz:spring-dotenv:3.0.0"

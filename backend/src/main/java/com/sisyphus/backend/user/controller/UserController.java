@@ -1,14 +1,17 @@
 package com.sisyphus.backend.user.controller;
 
 import com.sisyphus.backend.auth.jwt.JwtTokenHandler;
+import com.sisyphus.backend.user.dto.CountsResponse;
 import com.sisyphus.backend.user.dto.UserNameRequest;
 import com.sisyphus.backend.user.dto.UserResponse;
 import com.sisyphus.backend.user.dto.UserWithAccountResponse;
 import com.sisyphus.backend.user.entity.User;
+import com.sisyphus.backend.user.service.AccountService;
 import com.sisyphus.backend.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/api/user")
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final AccountService accountService;
     private final JwtTokenHandler jwtTokenHandler ;
 
     // user 정보 가져오기
@@ -56,5 +60,11 @@ public class UserController {
         userService.updateUser(userId, userRequest);
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/count")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CountsResponse> getAllRequireStatus() {
+        return ResponseEntity.ok(accountService.getUserCount());
     }
 }

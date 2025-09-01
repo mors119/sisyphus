@@ -19,9 +19,6 @@ export const useUserHydration = () => {
 
   const { data, isLoading } = useUserQuery();
 
-  // console.log('[useUserHydration] Zustand user:', user);
-  // console.log('[useUserHydration] React Query data:', data);
-
   useEffect(() => {
     setHydrated(true);
   }, []);
@@ -34,11 +31,9 @@ export const useUserHydration = () => {
     if (data && hydrated && !user && accessToken) {
       setUser(data); // user가 없을 때만 설정
     }
-  }, [data, hydrated, user, setUser, accessToken]);
+  }, [data, hydrated, user, setUser, accessToken, clear]);
 
   const finalUser = data ?? user ?? null;
-
-  // console.log('[useUserHydration] Final user:', finalUser);
 
   return {
     accessToken,

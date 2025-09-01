@@ -1,10 +1,10 @@
 import { QueryClient } from '@tanstack/react-query';
 
-interface RemoveQueryOptions {
-  queryKey: unknown[];
-  exact?: boolean; // 정확히 일치하는 쿼리 (false일 경우 모든 쿼리 키)
-  // 필요하면 다른 옵션 추가 가능
-}
+// interface RemoveQueryOptions {
+//   queryKey: unknown[];
+//   exact?: boolean; // 정확히 일치하는 쿼리 (false일 경우 모든 쿼리 키)
+//   // 필요하면 다른 옵션 추가 가능
+// }
 
 // 1. 전역에서 공유할 QueryClient 인스턴스
 export const queryClient = new QueryClient({
@@ -28,14 +28,14 @@ export function removeQuery(key: unknown[]) {
   return queryClient.removeQueries({ queryKey: key });
 }
 
-export function removeOptionsQuery(options: RemoveQueryOptions) {
-  return queryClient.removeQueries(options);
-}
+// function removeOptionsQuery(options: RemoveQueryOptions) {
+//   return queryClient.removeQueries(options);
+// }
 
-// 4. 특정 쿼리 프리패치 (미리 데이터 요청)
-export function prefetchQuery<T>(key: unknown[], fetcher: () => Promise<T>) {
-  return queryClient.prefetchQuery({ queryKey: key, queryFn: fetcher });
-}
+// // 4. 특정 쿼리 프리패치 (미리 데이터 요청)
+// function prefetchQuery<T>(key: unknown[], fetcher: () => Promise<T>) {
+//   return queryClient.prefetchQuery({ queryKey: key, queryFn: fetcher });
+// }
 
 // 5. 전 캐시 초기화 (로그아웃 등)
 // 모든 쿼리와 뮤테이션 캐시를 전부 삭제
@@ -55,7 +55,7 @@ export function refetchQuery(key: unknown[]) {
 }
 
 //  invalidate → refetch 를 연속적으로 확실히 실행하고 싶을 때 사용
-export async function invalidateAndRefetchQuery(key: unknown[]) {
-  await queryClient.invalidateQueries({ queryKey: key });
-  return queryClient.refetchQueries({ queryKey: key });
-}
+// async function invalidateAndRefetchQuery(key: unknown[]) {
+//   await queryClient.invalidateQueries({ queryKey: key });
+//   return queryClient.refetchQueries({ queryKey: key });
+// }

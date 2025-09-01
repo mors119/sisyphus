@@ -17,6 +17,7 @@ import { IdCard, Table } from 'lucide-react';
 import { CategorySelector } from './CategorySelector';
 import { CategorySummary } from '../category/category.types';
 import { useTranslation } from 'react-i18next';
+import { EmptyState } from '@/components/custom/Empty';
 
 const ViewPage = () => {
   const [mode, setMode] = useState(false);
@@ -86,7 +87,7 @@ const ViewPage = () => {
     }, 50); // 약간의 지연
 
     return () => clearTimeout(timeout);
-  }, [sortOption, categoryId, tagId, title, type, id]);
+  }, [sortOption, categoryId, tagId, title, type, id, page]);
 
   return (
     <CustomCard
@@ -95,7 +96,9 @@ const ViewPage = () => {
         <>
           {isLoading ? (
             <Loader />
-          ) : !data || error ? (
+          ) : !data ? (
+            <EmptyState />
+          ) : error ? (
             <ErrorState />
           ) : (
             <div>
@@ -119,8 +122,8 @@ const ViewPage = () => {
 
                 <div className="flex gap-2 items-center">
                   <span className="flex gap-1 items-center text-xs">
-                    <Table size={15} />
-                    {t('item.table')}
+                    <IdCard size={15} />
+                    {t('item.card')}
                   </span>
                   <Switch
                     onClick={() => {
@@ -128,8 +131,8 @@ const ViewPage = () => {
                     }}
                   />
                   <span className="flex gap-1 items-center text-xs">
-                    <IdCard size={15} />
-                    {t('item.card')}
+                    <Table size={15} />
+                    {t('item.table')}
                   </span>
                 </div>
               </div>
@@ -163,11 +166,13 @@ const ViewPage = () => {
                     setTagId={setTagId}
                   />
                 )}
-                <CustomPagination
-                  page={page}
-                  setPage={setPage}
-                  totalPages={totalPages}
-                />
+                {data && isLoading && (
+                  <CustomPagination
+                    page={page}
+                    setPage={setPage}
+                    totalPages={totalPages}
+                  />
+                )}
               </div>
             </div>
           )}
@@ -177,7 +182,7 @@ const ViewPage = () => {
               'absolute left-0 top-0 w-full h-full z-40 translate-x-full duration-300 flex justify-end',
               editNote.id !== 0 && openSheet && 'translate-x-0',
             )}>
-            <div className="w-3/4 h-full">
+            <div className="max-w-3/4 h-full w-full">
               <ViewSheet
                 openSheet={openSheet}
                 setAlertOpen={setAlertOpen}

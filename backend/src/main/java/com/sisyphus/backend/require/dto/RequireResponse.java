@@ -1,6 +1,7 @@
 package com.sisyphus.backend.require.dto;
 
 import com.sisyphus.backend.require.util.RequireStatus;
+import com.sisyphus.backend.require.util.RequireType;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -13,11 +14,12 @@ import java.util.List;
 @Builder
 public class RequireResponse {
     private Long id;
+    private RequireType requireType;
     private String title;
     private String userEmail;
     private String description;
     private RequireStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<CommentResponse> comments;
+//    private List<CommentResponse> comments;
 }

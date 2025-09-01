@@ -46,7 +46,6 @@ export const SearchDialog = ({ open, setOpen }: SearchDialogProps) => {
 
   const handleSelect = (t: string) => {
     const [type, id, title] = t.split(':::');
-    console.log({ type, id, title });
 
     navigate(`/view?type=${type}&id=${id}&title=${encodeURIComponent(title)}`);
     setOpen(false);

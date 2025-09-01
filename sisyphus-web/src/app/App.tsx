@@ -7,6 +7,7 @@ import { useInitTheme } from '@/features/theme/useInitTheme.hook';
 
 const App = () => {
   useInitTheme(); // 시작 시 다크 모드 설정
+
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     if (token) {

@@ -8,28 +8,35 @@ export enum RequireStatus {
   REJECTED = 'REJECTED', // 거절
 }
 
+export enum RequireCate {
+  Bug = 'BUG',
+  New = 'NEW',
+}
+
+export interface StatusCountResponse {
+  status: RequireStatus;
+  count: number;
+  month: number;
+}
+
+export interface RequireStatusRequest {
+  id: number;
+  status: RequireStatus;
+}
+
 export interface RequireResponse {
   id: number;
+  requireType: RequireCate;
   title: string;
   userEmail: string;
   description: string;
   status: RequireStatus;
   createdAt: string;
   updatedAt: string;
-  comments: RequireComment;
+  comments: RequireComment[];
 }
 
-// 페이징 응답 타입
-export interface PageResponse<T> {
-  content: T[];
-  page: number;
-  size: number;
-  totalPages: number;
-  totalElements: number;
-  last: boolean;
-}
-
-export interface RequireComment {
+interface RequireComment {
   id: number;
   content: string;
   userEmail: string;

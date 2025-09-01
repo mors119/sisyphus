@@ -13,6 +13,7 @@ export const useSignupForm = () => {
       email: '',
       password: '',
       passwordConfirm: '',
+      age: false,
       checkBox1: false,
       checkBox2: false,
     },

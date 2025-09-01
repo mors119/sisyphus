@@ -1,9 +1,5 @@
 import { z } from 'zod';
-import {
-  useEmailVerifySchema,
-  useSigninSchema,
-  useSignupSchema,
-} from './auth.schema';
+import { useSigninSchema, useSignupSchema } from './auth.schema';
 
 // role
 export type UserRole = 'ADMIN' | 'USER';
@@ -16,6 +12,3 @@ export type SigninForm = z.infer<ReturnType<typeof useSigninSchema>>;
 
 // 회원가입
 export type SignupForm = z.infer<ReturnType<typeof useSignupSchema>>;
-
-// 이메일 검증
-export type EmailVerifyForm = z.infer<ReturnType<typeof useEmailVerifySchema>>;

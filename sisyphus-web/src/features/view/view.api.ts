@@ -7,11 +7,7 @@ import {
 
 // 새로운 note 생성
 export const createNote = (data: NoteForm) => {
-  return api.post('/note/create', data, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  return api.post('/note/create', data);
 };
 
 // note 수정
@@ -44,8 +40,6 @@ export const fetchNotes = async (
     queryParams.set('categoryId', String(params.categoryId));
   if (params.tagId) queryParams.set('tagId', String(params.tagId));
   if (params.tit) queryParams.set('title', params.tit);
-
-  console.log(queryParams.toString());
 
   const res = await api.get(`/note/read/all?${queryParams.toString()}`);
   return res.data;

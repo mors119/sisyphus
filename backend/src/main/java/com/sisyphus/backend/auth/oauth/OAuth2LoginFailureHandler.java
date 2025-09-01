@@ -17,9 +17,6 @@ public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
                                         HttpServletResponse response,
                                         AuthenticationException exception) throws IOException {
 
-        System.out.println("OAuth2 로그인 실패: " + exception.getMessage());
-        exception.printStackTrace(); // 콘솔에 자세한 에러 로그 찍힘
-
         // 다시 로그인 페이지로 이동
         response.sendRedirect("/login?error");
     }

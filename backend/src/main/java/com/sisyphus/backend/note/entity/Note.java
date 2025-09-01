@@ -1,5 +1,6 @@
 package com.sisyphus.backend.note.entity;
 
+import com.sisyphus.backend.image.entity.NoteImage;
 import com.sisyphus.backend.category.entity.Category;
 import com.sisyphus.backend.note.tag.entity.NoteTag;
 import com.sisyphus.backend.tag.entity.Tag;
@@ -18,7 +19,7 @@ public class Note {
     @Id @GeneratedValue
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "title", nullable = false, columnDefinition = "text")
     private String title;
 
     @Column(name = "sub_title")
@@ -45,6 +46,9 @@ public class Note {
             cascade = CascadeType.ALL,
             orphanRemoval = true)
     private final Set<NoteTag> noteTags = new HashSet<>();
+
+    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final Set<NoteImage> images = new HashSet<>();
 
     /* ---------- JPA 라이프사이클 ---------- */
     @PrePersist
@@ -92,4 +96,24 @@ public class Note {
         }
         noteTags.clear(); // 현재 컬렉션 비우기
     }
+
+    /* ---------- 이미지 관리 ---------- */
+
+    public void addImage(NoteImage image) {
+        images.add(image);
+        image.setNote(this); // 양방향 연결
+    }
+
+    public NoteImage removeImage(NoteImage image) {
+        images.remove(image);
+        image.setNote(null); // 양방향 해제
+        return image;
+    }
+
+    public void clearImages() {
+        for (NoteImage image : new HashSet<>(images)) {
+            removeImage(image); // 개별 해제
+        }
+    }
+
 }

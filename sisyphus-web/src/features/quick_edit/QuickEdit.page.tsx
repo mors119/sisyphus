@@ -72,13 +72,11 @@ const QuickEditPage = () => {
     // 현재 값이 있고 타입이 category일 경우
     if (active.data.current?.type === 'category' && active.data.current) {
       const data = active.data.current as CategorySummary;
-      console.log('(1)', data);
       setActiveCategory(data); // active set에 CategoryAndLevel 타입의 값 넣기 (1)
     }
 
     if (active.data.current?.type === 'note' && active.data.current) {
       const data = active.data.current as NoteResponse; // note 정보를 noteResponse 타입으로 [1]
-      console.log('[1]', data);
       setEditNote(data); // edit note에 값 넣기
       setActiveSubmit(true); // active Submit 활성화
     }
@@ -94,11 +92,11 @@ const QuickEditPage = () => {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event; // event 찾기
     if (!over || active.id === over.id) return; // 영역에 도달하지 않거나 다른 요소면 return
-    console.log('type', active.data.current?.type);
+
     // active된 타입이 category이고 over된 id가 note form일 경우
     if (active.data.current?.type === 'category' && over.id === 'note-form') {
       const draggedCategory = active.data.current; // (2)
-      console.log('(2)', draggedCategory);
+
       if (!draggedCategory) return;
       setEditNote({
         ...editNote,
@@ -117,7 +115,7 @@ const QuickEditPage = () => {
     ) {
       // 한 줄에서 구조분해하지 말고 안전하게 복사 !!! 구조 분해하면 복사가 안됨.
       const categoryData = { ...over.data.current };
-      console.log('[2]', categoryData);
+
       // categoryData에 id가 없을 경우 return
       if (!categoryData?.id) {
         console.warn('over.data.current가 유효하지 않습니다.');
@@ -145,6 +143,7 @@ const QuickEditPage = () => {
           tags: [],
           createdAt: '',
           category: { id: 0, title: '', color: '' },
+          image: [],
         });
 
         onSubmit(responseToForm(nextNote));

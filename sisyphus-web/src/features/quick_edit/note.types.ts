@@ -2,12 +2,7 @@ import { z } from 'zod';
 import { CategorySummary } from '../category/category.types';
 import { TagResponse } from '../tag/tag.type';
 import { noteSchema } from '../view/view.schema';
-
-export interface NoteRequest {
-  title: string;
-  subTitle?: string;
-  description?: string;
-}
+import { ImageResponse } from '../image/image.type';
 
 export interface NoteResponse {
   id: number;
@@ -17,20 +12,7 @@ export interface NoteResponse {
   tags?: TagResponse[];
   category?: CategorySummary;
   createdAt: string;
-}
-
-export interface NoteAllRequest {
-  id: number;
-}
-
-// 다른 컴포넌트로 전달을 위한 타입
-export interface NoteParams {
-  id: number;
-  title: string;
-  subTitle?: string;
-  description?: string;
-  categoryId?: number | CategorySummary;
-  createdAt?: string;
+  image?: ImageResponse[];
 }
 
 // 무한 스크롤 페이지를 위한 타입 (backend에서 page<>타입으로 return 할 때)

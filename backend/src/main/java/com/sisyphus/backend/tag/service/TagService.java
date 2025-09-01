@@ -1,5 +1,7 @@
 package com.sisyphus.backend.tag.service;
 
+import com.sisyphus.backend.note.entity.Note;
+import com.sisyphus.backend.note.tag.entity.NoteTag;
 import com.sisyphus.backend.tag.dto.TagRequest;
 import com.sisyphus.backend.tag.entity.Tag;
 import com.sisyphus.backend.tag.repository.TagRepository;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -124,5 +127,38 @@ public class TagService {
 
         tagRepository.deleteAll(tags);
     }
+
+    @Transactional
+    public void syncTags(Note note, List<Tag> targetTags) {
+
+        /* -------------------------
+         * 1) 현재·목표 태그 집합 준비
+         * ------------------------- */
+        Set<Tag> current = note.getNoteTags().stream()
+                .map(NoteTag::getTag)
+                .collect(Collectors.toSet());
+        Set<Tag> target  = new HashSet<>(targetTags);
+
+        /* -------------------------
+         * 2) 제거 대상 = 현재 ∖ 목표
+         * ------------------------- */
+        current.stream()
+                .filter(tag -> !target.contains(tag))
+                .forEach(tag -> {
+                    /* NoteTag 찾기 */
+                    note.getNoteTags().stream()
+                            .filter(nt -> nt.getTag().equals(tag))
+                            .findFirst()
+                            .ifPresent(NoteTag::unlink);   // 양방향 제거
+                });
+
+        /* -------------------------
+         * 3) 추가 대상 = 목표 ∖ 현재
+         * ------------------------- */
+        target.stream()
+                .filter(tag -> !current.contains(tag))
+                .forEach(note::addTag);                 // 새 NoteTag 생성
+    }
+
 }
 

@@ -9,6 +9,7 @@ import {
 import { cn } from '@/lib/utils';
 
 interface CustomCardProps {
+  onClick?: () => void;
   className?: string;
   title?: React.ReactNode | string;
   description?: React.ReactNode | string;
@@ -17,6 +18,7 @@ interface CustomCardProps {
 }
 
 export const CustomCard = ({
+  onClick,
   className,
   title,
   description,
@@ -25,6 +27,7 @@ export const CustomCard = ({
 }: CustomCardProps) => {
   return (
     <Card
+      onClick={onClick}
       className={cn(
         'border-2 rounded-md h-full overflow-auto shadow dark:bg-black ',
         className,

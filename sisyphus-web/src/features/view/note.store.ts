@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { NoteResponse, SortOption } from '../quick_edit/note.types';
 
-export const createEmptyNote = (): NoteResponse => ({
+const createEmptyNote = (): NoteResponse => ({
   id: 0,
   title: '',
   subTitle: '',
@@ -9,6 +9,7 @@ export const createEmptyNote = (): NoteResponse => ({
   tags: [],
   createdAt: '',
   category: { id: 0, title: '', color: '' },
+  image: [],
 });
 
 interface NoteStore {

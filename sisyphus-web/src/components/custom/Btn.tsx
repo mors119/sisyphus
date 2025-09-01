@@ -13,6 +13,7 @@ interface ButtonProps {
   size?: number;
   tip?: boolean;
   location?: 'bottom' | 'top' | 'right' | 'left' | undefined;
+  disabled?: boolean;
 }
 export const EditBtn = ({
   className,
@@ -22,6 +23,7 @@ export const EditBtn = ({
   type = 'button',
   tip = true,
   location = 'bottom',
+  disabled = false,
 }: ButtonProps) => {
   const { t } = useTranslation();
   return (
@@ -31,6 +33,7 @@ export const EditBtn = ({
           type={type}
           variant="ghost"
           size="icon"
+          disabled={disabled}
           className={cn(
             'ml-auto text-blue-500 hover:text-white hover:bg-blue-500 p-1',
             className,
@@ -53,6 +56,7 @@ export const DeleteBtn = ({
   type = 'button',
   tip = true,
   location = 'bottom',
+  disabled = false,
 }: ButtonProps) => {
   const { t } = useTranslation();
 
@@ -63,6 +67,7 @@ export const DeleteBtn = ({
           type={type}
           variant="ghost"
           size="icon"
+          disabled={disabled}
           className={cn(
             'ml-auto text-red-500 hover:text-white hover:bg-red-500 p-1',
             className,
@@ -88,6 +93,7 @@ export const CloseBtn = ({
   type = 'button',
   tip = true,
   location = 'bottom',
+  disabled = false,
 }: ButtonProps) => {
   const { t } = useTranslation();
 
@@ -98,6 +104,7 @@ export const CloseBtn = ({
           type={type}
           variant="ghost"
           size="icon"
+          disabled={disabled}
           className={cn(
             'ml-auto text-black hover:text-white hover:bg-black p-1 dark:text-white dark:bg-none',
             className,
@@ -121,6 +128,7 @@ export const CleanBtn = ({
   type = 'button',
   tip = true,
   location = 'bottom',
+  disabled = false,
 }: ButtonProps) => {
   const { t } = useTranslation();
 
@@ -131,6 +139,7 @@ export const CleanBtn = ({
           type={type}
           variant="ghost"
           size="icon"
+          disabled={disabled}
           className={cn(
             'ml-auto text-black hover:text-blue-500 p-1 hover:bg-color-none duration-500 dark:text-white dark:hover:bg-gray-700',
             className,

@@ -1,31 +1,48 @@
-import { ImageUploaderForm } from '../view/ImageUploader.container';
+import RequireTop from './require-home/RequireTop.presenter';
+import { CustomCard } from '@/components/custom/customCard';
+import { RequireChart } from './require-home/RequireChart.container';
+import { useState } from 'react';
+import { RequireWrite } from './require-write/RequireWrite.widget';
+import { RequireCate } from './require.types';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../auth/auth.store';
 
-const RequirePage = () => {
-  // TODO: comment
-  // TODO: admin(status, ListAll, delete, update)
+const RequirePage: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [type, setType] = useState<RequireCate>(RequireCate.Bug);
+  const navigate = useNavigate();
+  const { user } = useAuthStore();
+
   return (
-    // <CustomCard
-    //   title={
-    //     <div className="flex justify-between">
-    //       <h1>요청사항</h1>
-    //       <Button onClick={() => setFormOpen(!formOpen)}>
-    //         <Plus />
-    //         요청하기
-    //       </Button>
-    //     </div>
-    //   }
-    //   description={
-    //     '요청사항을 편안하게 작성해주세요. 빠르게 더 좋은 컨텐츠로 답해드리겠습니다.'
-    //   }
-    //   content={
-    //     <div className="border-t mt-3 pt-3">
-    //       <RequireFormField formOpen={formOpen} />
-    //       <RequireField />
-    //     </div>
-    //   }
-    //   footer={<span className="w-full text-end">heesk0223@gmail.com</span>}
-    // />
-    <ImageUploaderForm />
+    <div>
+      <CustomCard
+        className="max-h-[calc(100vh - 56px)] h-full"
+        content={
+          <>
+            <RequireTop
+              onReportBug={() => {
+                setIsOpen(!isOpen);
+                setType(RequireCate.Bug);
+              }}
+              onRequestFeature={() => {
+                setIsOpen(!isOpen);
+                setType(RequireCate.New);
+              }}
+              onViewMyRequests={() =>
+                user !== null
+                  ? navigate(`/require/${user.id}`)
+                  : navigate('/auth/signin?alert=auth_required')
+              }
+              otherLinkHref="/contact"
+            />
+            <div className="w-full flex justify-center pt-4">
+              <RequireChart />
+            </div>
+          </>
+        }
+      />
+      <RequireWrite isOpen={isOpen} setIsOpen={setIsOpen} type={type} />
+    </div>
   );
 };
 

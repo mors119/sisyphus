@@ -60,9 +60,11 @@ const Signup = () => {
 
   const checkBox1 = form.watch('checkBox1');
   const checkBox2 = form.watch('checkBox2');
+  const age = form.watch('age');
   const { msg } = useSignupValidationMessage(
     confirm,
     emailChecked,
+    age,
     checkBox1,
     checkBox2,
   );
@@ -255,6 +257,36 @@ const Signup = () => {
                 </FormItem>
               )}
             />
+
+            {/* 만 14세  */}
+            <FormField
+              control={form.control}
+              name="age"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-2 shadow">
+                  <FormControl>
+                    <Checkbox
+                      id="age14"
+                      className="mr-1"
+                      checked={field.value}
+                      disabled={isLoading}
+                      onCheckedChange={(checked) =>
+                        field.onChange(checked === true)
+                      }
+                    />
+                  </FormControl>
+
+                  <div className="space-y-1 leading-none">
+                    {/* 라벨을 체크박스와 연결 */}
+                    <FormLabel htmlFor="age14">
+                      {t('signup.age14Label')}
+                    </FormLabel>
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            {/* 이용약관 */}
             <FormField
               control={form.control}
               name="checkBox1"
@@ -288,6 +320,8 @@ const Signup = () => {
                 </FormItem>
               )}
             />
+
+            {/* 개인정보 수집 */}
             <FormField
               control={form.control}
               name="checkBox2"

@@ -28,7 +28,3 @@ export const AUTH_TYPE = [
     bgColor: 'bg-[#f9e000]',
   },
 ];
-
-// Backend Oauth Url
-// TODO: 배포 시 변경
-export const OAUTH_URL = `${import.meta.env.VITE_BACKEND_URL}/api/auth`;

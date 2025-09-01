@@ -15,4 +15,5 @@ public class NoteRequest {
     private String description;
     private List<Tag> tags;
     private Long categoryId;
+    private Long imageId;
 }

@@ -57,6 +57,7 @@ public class User {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
+        if (role == null) role = Role.USER;
     }
 
     public void updateName(UserNameRequest req) {

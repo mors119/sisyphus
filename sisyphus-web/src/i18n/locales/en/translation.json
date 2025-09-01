@@ -23,6 +23,10 @@
   },
   "signup": {
     "signup": "Sign up",
+    "age14Label": "I am 14 years of age or older. (Required)",
+    "age14Desc": "You must confirm your age to use the service.",
+    "age14View": "View details",
+    "age14Error": "Please confirm that you are 14 or older.",
     "personalInfo": "Consent for collecting and using personal information",
     "agreeInfo": "I agree to collect and use personal information. (Required)",
     "terms": "Terms and Conditions of Use",
@@ -276,5 +280,72 @@
   "search": {
     "place": "Type search...",
     "no_result": "No results found."
-  }
+  },
+  "require": {
+    "home": {
+      "tit": "Requests / Reports",
+      "span": "Your one-line feedback",
+      "sub": "makes us better.",
+      "sub2": "Please spare 1–2 minutes. It’s the fastest way to improve quality.",
+      "text": "Bug reports and feature requests are the most direct way to improve the service’s usability.",
+      "bug": "Report a bug",
+      "req": "Request a feature",
+      "my": "View my requests",
+      "ex": "Please be as specific as possible. Example: “Tags aren’t saved (Chrome 139, macOS 10.15.7), around 10 AM, network normal.”"
+    },
+    "view": {
+      "bug": "Report a bug",
+      "req": "Feature request"
+    },
+    "sheet": {
+      "detail": "View details",
+      "desc": "Processing usually takes about 1–2 weeks.",
+      "update": "Status has been updated.",
+      "false": "Status update failed",
+      "no": "Status not set",
+      "admin": "Only administrators can change the status.",
+      "click": "Each click cycles through the statuses in order. If you pause for 2 seconds, it will be saved to the server.",
+      "black": "You do not have permission to change the status.",
+      "date": "Created date",
+      "edit": "Edit request",
+      "user": "Author"
+    },
+    "form": {
+      "editAlert": "❌ Invalid input.",
+      "editAlert2": "✅ Update completed.",
+      "createAlert": "✅ Your request has been submitted successfully.",
+      "editFalse": "❌ Update failed",
+      "createFalse": "❌ Request submission failed",
+      "waitMsg": "Please try again in a moment.",
+      "editing": "Editing…",
+      "edit": "Edit",
+      "creating": "Submitting…",
+      "create": "Submit",
+      "exPlace": "e.g., Please build a Chrome extension.",
+      "exPlace2": "Please enter the details of your request.",
+      "cancel": "Cancel"
+    },
+    "write": {
+      "desc": "Your",
+      "desc2": " feedback is the foundation that helps Sisyphus become a more useful and enjoyable service. Even a short comment can make a big difference."
+    },
+    "query": {
+      "tit": "Enter a title",
+      "desc": "Enter content"
+    },
+    "status": {
+      "received": "Received",
+      "inProgress": "In Progress",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    },
+    "field": {
+      "noneReq": "No requests."
+    }
+  },
+  "policy": {
+    "termsAPolicy": "Privacy Policy & Terms of Service",
+    "title": "Personal Information Processing Policy"
+  },
+  "terms": "Terms and Conditions"
 }

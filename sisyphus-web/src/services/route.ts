@@ -21,7 +21,7 @@ interface CustomInternalAxiosRequestConfig extends InternalAxiosRequestConfig {
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
     const token = useAuthStore.getState().accessToken;
-    // console.log('axios 인터셉터에서 헤더에 추가하는 토큰:', token);
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`; // 헤더에 Bearer 토큰 삽입
     }

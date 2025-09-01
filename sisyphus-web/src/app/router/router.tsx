@@ -52,13 +52,18 @@ const RequirePage = lazy(() =>
     default: mod.default as React.FC,
   })),
 );
-const RequireDetailPage = lazy(() =>
-  import('@/features/require/RequireDetail.page').then((mod) => ({
+const RequireViewPage = lazy(() =>
+  import('@/features/require/require-view/RequireView.page').then((mod) => ({
     default: mod.default as React.FC,
   })),
 );
 const DashboardPage = lazy(() =>
   import('@/features/dashboard/Dashboard.page').then((mod) => ({
+    default: mod.default as React.FC,
+  })),
+);
+const PolicyPage = lazy(() =>
+  import('@/features/policy/Policy.page').then((mod) => ({
     default: mod.default as React.FC,
   })),
 );
@@ -86,6 +91,10 @@ export const router = createBrowserRouter([
   {
     path: PATHS.LINK,
     element: <LinkHandlerPage />,
+  },
+  {
+    path: PATHS.POLICY,
+    element: <PolicyPage />,
   },
   {
     path: PATHS.HOME,
@@ -148,7 +157,7 @@ export const router = createBrowserRouter([
         path: PATHS.REQUIRE + '/:id',
         element: (
           <ProtectedRoute>
-            <RequireDetailPage />
+            <RequireViewPage />
           </ProtectedRoute>
         ),
       },
@@ -168,6 +177,7 @@ export const router = createBrowserRouter([
           </ProtectedRoute>
         ),
       },
+
       {
         path: '*',
         element: <NotFoundPage />,
