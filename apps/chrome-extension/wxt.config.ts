@@ -17,7 +17,7 @@ export default defineConfig({
       ? {
           content_security_policy: {
             extension_pages:
-              "script-src 'self' http://localhost:3000; object-src 'self'; connect-src https://sisyphus.mors.world;",
+              "script-src 'self' http://localhost:3000; object-src 'self'; connect-src http://localhost:8080 https://sisyphus.mors.world;",
           },
         }
       : {
