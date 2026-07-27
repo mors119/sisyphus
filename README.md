@@ -271,10 +271,34 @@ Sisyphus Academy v0.1 is defined as:
 ## Execution
 
 ```bash
+cd apps/api
 ./gradlew clean build
 ./gradlew test
 ./gradlew bootRun
 ```
+
+---
+
+## Backend test strategy
+
+The API suite is split by responsibility:
+
+* unit tests protect domain normalization and service rules without a Spring context
+* MVC slice tests verify routes, serialization, validation, status codes, and the shared error contract while mocking only services
+* JPA tests verify repository queries, ownership filters, relationships, and database constraints using the existing deterministic H2 test profile
+* integration tests exercise representative request-to-database lifecycles without live network services
+
+Run the complete verification locally:
+
+```bash
+cd apps/api
+./gradlew clean check
+```
+
+JaCoCo HTML and XML reports are generated under `apps/api/build/reports/jacoco/test/`.
+The initial whole-backend baseline is enforced at 30% line coverage and 15% branch coverage. These conservative thresholds reflect the first measured suite (32.6% line and 17.9% branch coverage) and must only move upward as behavior is covered; tests should not be added solely to increase percentages.
+
+CI runs the same `clean check` task for API changes and publishes the JUnit and JaCoCo reports as the `api-test-reports` artifact.
 
 ---
 
