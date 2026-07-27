@@ -96,7 +96,7 @@ export const ViewCardList = ({
                         e.stopPropagation();
                         setTagId(tag.id);
                       }}
-                      className="text-xs px-2 py-0.5 bg-blue-100 dark:bg-blue-800/40 text-blue-800 dark:text-blue-100 rounded-full border">
+                      className="rounded-full border bg-brand-primary-subtle px-2 py-0.5 text-xs text-info">
                       # {tag.name}
                     </span>
                   ))}

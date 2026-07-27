@@ -10,8 +10,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
-  --point-y: #ffcd49;
-  --point-b: #1186ce;
 }
 
 a {
@@ -61,7 +59,7 @@ button:focus-visible {
     background-color: #ffffff;
   }
   a:hover {
-    color: #747bff;
+    color: var(--color-action-primary);
   }
   button {
     background-color: #f9f9f9;

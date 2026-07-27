@@ -120,12 +120,14 @@ export function ImageUploaderForm({
           className={cn(
             'flex items-center justify-center rounded border-2 border-dashed cursor-pointer',
             isFull ? 'w-80 h-80' : 'w-20 h-16',
-            isDragActive ? 'border-blue-400 bg-blue-50' : 'border-gray-300',
+            isDragActive
+              ? 'border-brand-primary bg-brand-primary-subtle'
+              : 'border-gray-300',
           )}>
           <div
             className={cn(
               'flex items-center gap-1 text-xs',
-              isDragActive && 'text-blue-500',
+              isDragActive && 'text-info',
             )}>
             <span>image</span>
             <Plus size={14} />

@@ -15,20 +15,22 @@ export const ThemeToggle = ({ open }: { open: boolean }) => {
       <div className="flex gap-2 dark:bg-black md:dark:bg-none">
         <Moon size={20} />
         <Switch
+          aria-label={t('tooltip.theme')}
           checked={theme === 'dark'}
           onCheckedChange={toggleTheme}
           className="data-[state=checked]:bg-neutral-700"
         />
-        <Sun size={20} color="#ffcd49" />
+        <Sun size={20} className="text-brand-accent" />
       </div>
     );
   return (
     <CustomTooltip content={t('tooltip.theme')} location="right">
       <Button
         variant="ghost"
+        aria-label={t('tooltip.theme')}
         className="ml-[-4px] dark:bg-black md:dark:bg-none"
         onClick={toggleTheme}>
-        {theme === 'light' ? <Sun /> : <Moon color="#ffcd49" />}
+        {theme === 'light' ? <Sun /> : <Moon className="text-brand-accent" />}
       </Button>
     </CustomTooltip>
   );

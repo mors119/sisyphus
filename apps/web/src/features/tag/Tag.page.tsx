@@ -143,7 +143,7 @@ const TagPage = () => {
                     `px-3 py-1 rounded-full text-sm cursor-pointer flex items-center justify-center`,
                     delTags.includes(tag.id)
                       ? 'bg-red-200 text-red-800 dark:bg-red-900/40 dark:text-red-200'
-                      : 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-200',
+                      : 'bg-brand-primary-subtle text-info',
                   )}>
                   # {tag.name}
                 </span>
@@ -166,7 +166,7 @@ const TagPage = () => {
 
           <button
             type="submit"
-            className="w-full py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors disabled:opacity-50"
+            className="w-full rounded-md bg-action-primary py-2 font-medium text-on-brand-primary transition-colors hover:bg-action-primary-hover disabled:opacity-50"
             disabled={isLoading || tempTags.length === 0}>
             {t('save')}
           </button>

@@ -29,10 +29,10 @@ type Props = {
 };
 
 const statusLabels: Record<RequireStatus, { label: string; cls: string }> = {
-  RECEIVED: { label: '접수', cls: 'bg-gray-400 text-white' },
-  IN_PROGRESS: { label: '처리 중', cls: 'bg-green-400 text-white' },
-  COMPLETED: { label: '완료', cls: 'bg-blue-400 text-white' },
-  REJECTED: { label: '거절', cls: 'bg-rose-400 text-white' },
+  RECEIVED: { label: '접수', cls: 'bg-warning text-white' },
+  IN_PROGRESS: { label: '처리 중', cls: 'bg-info text-white' },
+  COMPLETED: { label: '완료', cls: 'bg-success text-white' },
+  REJECTED: { label: '거절', cls: 'bg-danger text-white' },
 };
 
 export function RequireStatusSelect({

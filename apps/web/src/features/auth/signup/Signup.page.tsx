@@ -311,7 +311,7 @@ const Signup = () => {
                           toggleAgreeForm('1');
                           setIsLoading(true);
                         }}
-                        className="ml-1  text-blue-400 hover:underline duration-150">
+                        className="ml-1 text-info duration-[var(--motion-fast)] hover:underline">
                         {t('signup.view')}
                       </span>
                     </FormDescription>
@@ -346,7 +346,7 @@ const Signup = () => {
                           toggleAgreeForm('2');
                           setIsLoading(true);
                         }}
-                        className="ml-1  text-blue-400 hover:underline duration-150">
+                        className="ml-1 text-info duration-[var(--motion-fast)] hover:underline">
                         {t('signup.view')}
                       </span>
                     </FormDescription>

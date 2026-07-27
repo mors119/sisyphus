@@ -14,7 +14,7 @@ export const SearchBar = () => {
       className={cn(
         'flex items-center border rounded-md w-full h-9 px-3 gap-2',
         'max-w-[720px] min-w-[120px]',
-        'bg-white hover:border-[#1186ce] transition',
+        'bg-white transition hover:border-brand-primary',
         open ? 'border-2 border-sis' : 'border-gray-300',
       )}>
       <Search className={cn('w-4 h-4 text-gray-400', open && 'text-sis')} />
@@ -27,7 +27,7 @@ export const SearchBar = () => {
         placeholder="Search"
         className={cn(
           'w-full bg-transparent outline-none border-none focus:ring-0 text-sm placeholder:text-gray-400',
-          open && 'placeholder:text-[#1186ce]',
+          open && 'placeholder:text-info',
         )}
       />
       <SearchDialog open={open} setOpen={setOpen} />

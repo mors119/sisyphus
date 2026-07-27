@@ -95,16 +95,16 @@ export const HomeBanner = () => {
                 }
                 openExternalNewTab(extensionUrl);
               }}
-              className="bg-sis hover:bg-sis/90 text-white font-bold text-lg px-8 py-6 group">
+              className="group bg-action-primary px-8 py-6 text-lg font-bold text-on-brand-primary hover:bg-action-primary-hover">
               {t('home.banner.download')}
-              <ChevronRight className="w-5 h-5 -translate-x-1 transform transition-transform duration-500 group-hover:translate-x-1 group-hover:scale-110" />
+              <ChevronRight className="h-5 w-5 -translate-x-1 transform transition-transform duration-[var(--motion-standard)] group-hover:translate-x-1 group-hover:scale-110" />
             </Button>
 
             <Button
               size="lg"
               onClick={handleClick}
               variant="outline"
-              className="text-sis border-sis bg-black hover:bg-neutral-300 dark:bg-accent-foreground hover:border-neutral-300 hover:-translate-y-0.5 hover:text-black dark:hover:bg-sisy dark:hover:border-sisy font-bold text-lg px-8 py-6 duration-300">
+              className="border-brand-primary bg-black px-8 py-6 text-lg font-bold text-info duration-[var(--motion-standard)] hover:-translate-y-0.5 hover:border-neutral-300 hover:bg-neutral-300 hover:text-black dark:bg-accent-foreground dark:hover:border-brand-accent dark:hover:bg-brand-accent">
               {t('home.banner.howToUse')}
             </Button>
           </div>

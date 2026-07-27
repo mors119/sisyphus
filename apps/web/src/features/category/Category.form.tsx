@@ -26,6 +26,7 @@ import { useCategoryStore } from './category.store';
 import { CategoryForm } from './category.types';
 import { useCategorySchema } from './category.schema';
 import { useTranslation } from 'react-i18next';
+import { BRAND_ACCENT_HEX } from '@/styles/tokens';
 
 export const CategoryFormUnified = () => {
   const { alertMessage } = useAlert();
@@ -39,7 +40,7 @@ export const CategoryFormUnified = () => {
     resolver: zodResolver(categorySchema),
     defaultValues: categoryData ?? {
       title: '',
-      color: '#ffcd49',
+      color: BRAND_ACCENT_HEX,
     },
   });
 
@@ -54,7 +55,7 @@ export const CategoryFormUnified = () => {
         await createMutation.mutateAsync(values);
       }
       onDone();
-      if (!isEdit) form.reset({ title: '', color: '#ffcd49' });
+      if (!isEdit) form.reset({ title: '', color: BRAND_ACCENT_HEX });
     } catch (err) {
       void err;
       alertMessage(t('category.msg.submit.error'));

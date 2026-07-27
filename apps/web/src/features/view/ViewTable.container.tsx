@@ -170,7 +170,7 @@ export const ViewTable = ({
                               setTagId(tag.id);
                             }}
                             key={tag.id}
-                            className="flex items-center max-w-20  truncate px-3 py-1 text-sm rounded-full border border-neutral-300 dark:border-neutral-700 bg-blue-50 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200">
+                            className="flex max-w-20 items-center truncate rounded-full border border-neutral-300 bg-brand-primary-subtle px-3 py-1 text-sm text-info dark:border-neutral-700">
                             # {tag.name}
                           </span>
                         ))}
