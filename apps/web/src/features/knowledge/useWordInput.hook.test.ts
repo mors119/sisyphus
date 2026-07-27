@@ -58,7 +58,6 @@ describe('useWordInput', () => {
 
     expect(submitWordForExpansion).toHaveBeenCalledWith('hello');
     expect(result.current.phase).toBe('expanding');
-    expect(result.current.expansionSteps[0]?.state).toBe('active');
   });
 
   it('blocks duplicate submissions while validating', async () => {

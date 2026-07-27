@@ -7,6 +7,7 @@ export type ProgressListItem = {
   title: React.ReactNode;
   description?: React.ReactNode;
   state: StepState;
+  action?: React.ReactNode;
 };
 
 type ProgressListProps = {
@@ -30,6 +31,7 @@ export function ProgressList({
           title={item.title}
           description={item.description}
           state={item.state}
+          action={item.action}
         />
       ))}
     </ol>

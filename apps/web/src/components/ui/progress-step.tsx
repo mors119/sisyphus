@@ -20,7 +20,7 @@ const stepIcons: Record<StepState, React.ReactNode> = {
   pending: <Circle className="size-4 text-muted-foreground" aria-hidden="true" />,
   active: (
     <Loader2
-      className="size-4 animate-spin text-info"
+      className="size-4 motion-reduce:animate-none animate-spin text-info"
       aria-hidden="true"
     />
   ),
@@ -37,6 +37,7 @@ type ProgressStepProps = {
   title: React.ReactNode;
   description?: React.ReactNode;
   state: StepState;
+  action?: React.ReactNode;
   className?: string;
 };
 
@@ -44,6 +45,7 @@ export function ProgressStep({
   title,
   description,
   state,
+  action,
   className,
 }: ProgressStepProps) {
   return (
@@ -56,11 +58,12 @@ export function ProgressStep({
         className,
       )}>
       <span className="mt-0.5 shrink-0">{stepIcons[state]}</span>
-      <div className="min-w-0 space-y-1">
+      <div className="min-w-0 flex-1 space-y-1">
         <p className="text-sm font-medium text-foreground">{title}</p>
         {description ? (
           <p className="text-sm text-muted-foreground">{description}</p>
         ) : null}
+        {action ? <div>{action}</div> : null}
         <p className="sr-only">{stateLabel(state)}</p>
       </div>
     </li>
