@@ -12,7 +12,7 @@ export const SocialLoginButtons = () => {
           {t('signin.socialLogin')}
         </span>
       </Separator>
-      <div className="flex gap-3 justify-center">
+      <div className="w-full">
         {AUTH_TYPE.map((item) => (
           <SocialLoginButton key={item.id} item={item} />
         ))}
