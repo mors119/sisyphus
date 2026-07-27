@@ -18,7 +18,6 @@ export function useKnowledgeReview(word: string, enabled: boolean) {
   const [editingSection, setEditingSection] = useState<ReviewSectionId | null>(
     null,
   );
-  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!enabled || !word) return;
@@ -270,8 +269,6 @@ export function useKnowledgeReview(word: string, enabled: boolean) {
   return {
     review,
     editingSection,
-    isSaving,
-    setIsSaving,
     updateDraft,
     startEdit,
     finishEdit,

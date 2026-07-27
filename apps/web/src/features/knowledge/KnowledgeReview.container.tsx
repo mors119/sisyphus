@@ -1,55 +1,47 @@
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ErrorNotice } from '@/components/custom/Error';
 import { Button } from '@/components/ui/button';
 import { SectionHeader } from '@/components/ui/section-header';
 import { PageHeader } from '@/features/layout';
-import { useAlert } from '@/hooks/useAlert';
-import { invalidateQuery } from '@/lib/react-query';
-import { useCreateNoteMutation } from '../view/useView.mutation';
 
 import { GeneratedField } from './GeneratedField.container';
+import { CreatedKnowledgeNote } from './persistence.types';
 import { REVIEW_SECTION_ORDER } from './review.constants';
+import { useKnowledgePersistence } from './useKnowledgePersistence.hook';
 import { useKnowledgeReview } from './useKnowledgeReview.hook';
 
 type KnowledgeReviewProps = {
   word: string;
   enabled: boolean;
-  onSaved: () => void;
+  onCompleted: (note: CreatedKnowledgeNote) => void;
 };
 
 export const KnowledgeReview = ({
   word,
   enabled,
-  onSaved,
+  onCompleted,
 }: KnowledgeReviewProps) => {
   const { t } = useTranslation();
-  const { alertMessage } = useAlert();
-  const createMutation = useCreateNoteMutation();
+  const persistence = useKnowledgePersistence();
   const reviewWorkspace = useKnowledgeReview(word, enabled);
   const { review, editingSection, persistencePayload } = reviewWorkspace;
+  const saveErrorRef = useRef<HTMLDivElement>(null);
 
   const handleSave = async () => {
-    if (!persistencePayload) return;
+    if (!persistencePayload || persistence.isSaving) return;
 
-    reviewWorkspace.setIsSaving(true);
-    try {
-      await createMutation.mutateAsync({
-        title: persistencePayload.title,
-        subTitle: persistencePayload.subTitle,
-        description: persistencePayload.description,
-        tags: persistencePayload.tags,
-        categoryId: undefined,
-        imageId: persistencePayload.imageId,
-      });
-      await invalidateQuery(['notes']);
-      alertMessage(t('knowledge.review.save.success'));
-      onSaved();
-    } catch {
-      alertMessage(t('knowledge.review.save.error'));
-    } finally {
-      reviewWorkspace.setIsSaving(false);
+    const savedNote = await persistence.save(persistencePayload);
+    if (savedNote) {
+      onCompleted(savedNote);
     }
   };
+
+  useEffect(() => {
+    if (persistence.phase !== 'error') return;
+    saveErrorRef.current?.focus();
+  }, [persistence.phase]);
 
   if (!review) return null;
 
@@ -102,14 +94,42 @@ export const KnowledgeReview = ({
           />
         ))}
 
+        {persistence.phase === 'error' ? (
+          <div ref={saveErrorRef} tabIndex={-1} className="outline-none">
+            <ErrorNotice
+              title={persistence.errorMessage}
+              description={t('knowledge.completion.errors.preserved')}
+              action={
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  disabled={persistence.isSaving}
+                  onClick={() => void handleSave()}>
+                  {t('knowledge.completion.actions.retrySave')}
+                </Button>
+              }
+            />
+          </div>
+        ) : null}
+
+        <div
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only">
+          {persistence.isSaving
+            ? t('knowledge.review.actions.saving')
+            : null}
+        </div>
+
         <div className="sticky bottom-0 flex justify-end border-t border-border bg-background/95 pt-4 backdrop-blur">
           <Button
             type="button"
             variant="primary"
             size="lg"
-            loading={reviewWorkspace.isSaving || createMutation.isPending}
+            loading={persistence.isSaving}
             loadingLabel={t('knowledge.review.actions.saving')}
-            disabled={!persistencePayload?.title.trim()}
+            disabled={!persistencePayload?.title.trim() || persistence.isSaving}
             onClick={() => void handleSave()}>
             {t('knowledge.review.actions.addToKnowledge')}
           </Button>

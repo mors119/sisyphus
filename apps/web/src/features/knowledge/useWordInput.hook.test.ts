@@ -112,4 +112,31 @@ describe('useWordInput', () => {
     expect(result.current.pageError).toBe('duplicate');
     expect(result.current.word).toBe('hello');
   });
+
+  it('enters completion with the created note without resetting review edits early', () => {
+    const { result } = renderHook(() => useWordInput());
+
+    act(() => {
+      result.current.setWord('hello');
+      result.current.enterCompletion({ id: 7, title: 'hello' });
+    });
+
+    expect(result.current.phase).toBe('completed');
+    expect(result.current.createdNote).toEqual({ id: 7, title: 'hello' });
+    expect(result.current.word).not.toBe('');
+  });
+
+  it('resets the workspace only after an explicit reset action', () => {
+    const { result } = renderHook(() => useWordInput());
+
+    act(() => {
+      result.current.setWord('hello');
+      result.current.enterCompletion({ id: 7, title: 'hello' });
+      result.current.reset();
+    });
+
+    expect(result.current.phase).toBe('idle');
+    expect(result.current.word).toBe('');
+    expect(result.current.createdNote).toBeNull();
+  });
 });

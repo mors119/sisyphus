@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { PageContent, PageLayout } from '@/features/layout';
@@ -23,9 +23,13 @@ import { useNotesInfiniteQuery, useNotesQuery } from './useView.query';
 import { Button } from '@/components/ui/button';
 import { useLocalStorageBoolean } from './view.hook';
 import { useViewSheet } from './useViewSheet.hook';
+import { NoteResponse } from '../quick_edit/note.types';
 
 const ViewPage = () => {
   const [mode, setMode] = useLocalStorageBoolean('mode', false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const openedFromNavigationRef = useRef(false);
 
   const [cateOpen, setCateOpen] = useState(false);
 
@@ -49,6 +53,20 @@ const ViewPage = () => {
       resetEditNote();
     };
   }, [resetEditNote]);
+
+  useEffect(() => {
+    if (openedFromNavigationRef.current) return;
+
+    const state = location.state as { openNote?: NoteResponse } | null;
+    if (!state?.openNote?.id) return;
+
+    openedFromNavigationRef.current = true;
+    viewSheet.openDetail(state.openNote);
+    navigate(
+      { pathname: location.pathname, search: location.search },
+      { replace: true, state: null },
+    );
+  }, [location, navigate, viewSheet]);
 
   // URL params
   const type = searchParams.get('type');

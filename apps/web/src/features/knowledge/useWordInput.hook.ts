@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { submitWordForExpansion } from './word.api';
 import { parseWordInput } from './wordInput.schema';
+import { CreatedKnowledgeNote } from './persistence.types';
 import {
   WordInputError,
   WordInputErrorCode,
@@ -16,10 +17,19 @@ export function useWordInput(): WordInputWorkspace {
   const [phase, setPhase] = useState<WordInputPhase>('idle');
   const [fieldError, setFieldError] = useState<string | null>(null);
   const [pageError, setPageError] = useState<WordInputErrorCode | null>(null);
+  const [createdNote, setCreatedNote] = useState<CreatedKnowledgeNote | null>(
+    null,
+  );
   const inFlightRef = useRef(false);
 
   const submit = useCallback(async () => {
-    if (inFlightRef.current || phase === 'validating' || phase === 'expanding' || phase === 'reviewing') {
+    if (
+      inFlightRef.current ||
+      phase === 'validating' ||
+      phase === 'expanding' ||
+      phase === 'reviewing' ||
+      phase === 'completed'
+    ) {
       return;
     }
 
@@ -63,11 +73,17 @@ export function useWordInput(): WordInputWorkspace {
     setPhase('reviewing');
   }, []);
 
+  const enterCompletion = useCallback((note: CreatedKnowledgeNote) => {
+    setCreatedNote(note);
+    setPhase('completed');
+  }, []);
+
   const reset = useCallback(() => {
     setWord('');
     setPhase('idle');
     setFieldError(null);
     setPageError(null);
+    setCreatedNote(null);
   }, []);
 
   const isSubmitting = phase === 'validating';
@@ -82,6 +98,8 @@ export function useWordInput(): WordInputWorkspace {
     submit,
     retry,
     enterReview,
+    enterCompletion,
     reset,
+    createdNote,
   };
 }
