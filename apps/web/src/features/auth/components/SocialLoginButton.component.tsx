@@ -20,7 +20,7 @@ export const SocialLoginButton = ({ item }: { item: AuthType }) => {
     <Button
       type="button"
       variant="outline"
-      className={`w-full rounded-none ${item.bgColor}`}
+      className={`w-full rounded-md ${item.bgColor}`}
       onClick={() => handleLogin(item.id)}>
       <item.icon size={item.size} color={item.color} />
       <span>{item.label}</span>
