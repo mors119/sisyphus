@@ -454,6 +454,19 @@
         "success": "Added to your knowledge.",
         "error": "Could not save. Your edits remain on this screen."
       }
+    },
+    "completion": {
+      "heading": "Added to your knowledge",
+      "description": "{{word}} has been added to your knowledge.",
+      "actions": {
+        "addAnother": "Add another word",
+        "viewCreated": "View added knowledge",
+        "retrySave": "Save again"
+      },
+      "errors": {
+        "saveFailed": "Could not save your knowledge.",
+        "preserved": "Your review edits remain on this screen."
+      }
     }
   }
 }

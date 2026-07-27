@@ -6,8 +6,9 @@ import {
 } from '../quick_edit/note.types';
 
 // 새로운 note 생성
-export const createNote = (data: NoteForm) => {
-  return api.post('/note/create', data);
+export const createNote = async (data: NoteForm): Promise<number> => {
+  const res = await api.post<number>('/note/create', data);
+  return res.data;
 };
 
 // note 수정

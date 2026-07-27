@@ -450,6 +450,19 @@
         "success": "지식에 추가했습니다.",
         "error": "저장하지 못했습니다. 수정 내용은 이 화면에 남아 있습니다."
       }
+    },
+    "completion": {
+      "heading": "지식에 추가했습니다",
+      "description": "{{word}}을(를) 지식에 추가했습니다.",
+      "actions": {
+        "addAnother": "새 단어 추가",
+        "viewCreated": "추가한 지식 보기",
+        "retrySave": "다시 저장"
+      },
+      "errors": {
+        "saveFailed": "저장하지 못했습니다.",
+        "preserved": "검토 화면의 수정 내용은 그대로 유지됩니다."
+      }
     }
   }
 }
