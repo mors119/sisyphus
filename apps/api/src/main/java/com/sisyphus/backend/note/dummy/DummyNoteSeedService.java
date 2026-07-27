@@ -16,7 +16,6 @@ import com.sisyphus.backend.user.repository.UserRepository;
 import com.sisyphus.backend.global.exception.UnauthorizedException;
 import com.sisyphus.backend.security.principal.UserPrincipal;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
