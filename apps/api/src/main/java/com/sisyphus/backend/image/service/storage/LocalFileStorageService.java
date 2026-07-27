@@ -4,7 +4,6 @@ import com.sisyphus.backend.global.props.AppProps;
 import com.sisyphus.backend.global.props.FileProps;
 import com.sisyphus.backend.image.service.ImageUrlFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -77,10 +76,11 @@ public class LocalFileStorageService implements FileStorageService {
         }
 
         try {
-            // 5) 상위 디렉터리 생성
-            Files.createDirectories(dest.getParent());
+            Path parent = dest.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
 
-            // 6) 저장
             Files.copy(input, dest);
 
             // 7) 공개 URL: publicBase + "/2025/12/uuid.webp"

@@ -2,16 +2,24 @@ name: API CI
 
 on:
   pull_request:
+    branches:
+      - main
     paths:
       - 'apps/api/**'
       - '.github/workflows/backend.yml'
+      - 'codecov.yml'
   push:
     branches:
       - main
     paths:
       - 'apps/api/**'
       - '.github/workflows/backend.yml'
+      - 'codecov.yml'
   workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
 
 jobs:
   build:
@@ -31,16 +39,31 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
-      - name: Run API checks
-        run: ./gradlew clean check
+      - name: Run backend quality checks
+        run: ./gradlew clean check build
 
-      - name: Publish API test and coverage reports
+      - name: Verify JaCoCo XML report exists
+        run: test -s build/reports/jacoco/test/jacocoTestReport.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: apps/api/build/reports/jacoco/test/jacocoTestReport.xml
+          flags: backend
+          name: backend
+          fail_ci_if_error: true
+          verbose: true
+          use_oidc: true
+
+      - name: Publish API test and quality reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: api-test-reports
+          name: api-quality-reports
           path: |
             apps/api/build/reports/tests/test
             apps/api/build/reports/jacoco/test
+            apps/api/build/reports/checkstyle
+            apps/api/build/reports/spotbugs
             apps/api/build/generated/openapi/openapi.json
           if-no-files-found: warn

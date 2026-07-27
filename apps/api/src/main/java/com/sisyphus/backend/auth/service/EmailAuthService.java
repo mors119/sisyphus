@@ -3,6 +3,7 @@ package com.sisyphus.backend.auth.service;
 import com.sisyphus.backend.auth.exception.EmailDeliveryException;
 import com.sisyphus.backend.auth.exception.EmailVerificationConflictException;
 import com.sisyphus.backend.global.props.MailProps;
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Objects;
@@ -93,7 +95,7 @@ public class EmailAuthService {
             helper.setText(buildHtml(code), true);
 
             mailSender.send(message);
-        } catch (Exception e) {
+        } catch (MessagingException | UnsupportedEncodingException e) {
             throw new EmailDeliveryException();
         }
     }

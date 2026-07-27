@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!--
+      JPA entities expose mutable collections for bidirectional mapping inside the persistence context.
+      Getters/setters are generated or written for Hibernate, not public API surface.
+    -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Package name="~com\.sisyphus\.backend\..*\.entity"/>
+    </Match>
+
+    <!--
+      Request/response DTOs and records carry mutable lists for JSON binding and mapping layers.
+    -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Package name="~com\.sisyphus\.backend\..*\.dto"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Package name="~com\.sisyphus\.backend\.global\.(dto|error|props)"/>
+    </Match>
+
+    <!--
+      Spring @RequiredArgsConstructor stores final dependency references.
+      These fields are not mutated after construction.
+    -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+        <Package name="~com\.sisyphus\.backend\..*\.(service|controller|config|oauth|handler|jwt|token|scheduler|dummy)"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+        <Class name="com.sisyphus.backend.security.principal.UserPrincipal"/>
+    </Match>
+
+    <!-- HTML templates intentionally use literal newlines, not platform line separators. -->
+    <Match>
+        <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/>
+        <Class name="com.sisyphus.backend.auth.service.EmailAuthService"/>
+        <Method name="buildHtml"/>
+    </Match>
+    <Match>
+        <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/>
+        <Class name="com.sisyphus.backend.note.dummy.DummyTextTemplates"/>
+        <Method name="description"/>
+    </Match>
+
+    <!-- avatar is populated by JPA/Hibernate; SpotBugs does not observe ORM field writes. -->
+    <Match>
+        <Bug pattern="UWF_UNWRITTEN_FIELD"/>
+        <Class name="com.sisyphus.backend.user.entity.User"/>
+        <Field name="avatar"/>
+    </Match>
+    <!-- Dev-only seed JSON records mirror external fixture structure. -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+        <Class name="~com\.sisyphus\.backend\.note\.dummy\.SeedNotesSpec.*"/>
+    </Match>
+
+    <!-- Spring Security exposes an unmodifiable authority list through the principal contract. -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+        <Class name="com.sisyphus.backend.security.principal.UserPrincipal"/>
+        <Method name="getAuthorities"/>
+    </Match>
+</FindBugsFilter>
