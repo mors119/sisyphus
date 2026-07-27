@@ -1,4 +1,3 @@
-import { PATHS } from '@/app/router/paths.constants';
 import { useAuthStore } from '@/features/auth/auth.store';
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 
@@ -77,7 +76,9 @@ api.interceptors.response.use(
     const skipRefresh =
       originalRequest.url?.includes('/auth/login') ||
       originalRequest.url?.includes('/auth/signup') ||
-      originalRequest.url?.includes('/auth/refresh');
+      originalRequest.url?.includes('/auth/refresh') ||
+      originalRequest.url?.includes('/auth/logout') ||
+      originalRequest.url?.includes('/auth/extension/token');
 
     if (skipRefresh) {
       return Promise.reject(err);
@@ -135,8 +136,6 @@ api.interceptors.response.use(
 
         // 리프레시 실패 시: 스토어 초기화 및 로그인 페이지로 리디렉션
         useAuthStore.getState().clear(); // 상태 초기화
-        localStorage.removeItem('auth-storage'); // Zustand persist 사용 시 로컬 스토리지도 정리
-        window.location.href = PATHS.HOME; // 로그인 페이지로 강제 이동
 
         return Promise.reject(refreshErr); // 에러 반환
       } finally {

@@ -15,12 +15,16 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Import;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -74,6 +78,51 @@ class AuthControllerTest {
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"));
+    }
+
+    @Test
+    void refreshBootstrapsSessionFromValidCookie() throws Exception {
+        when(jwtTokenProvider.validateToken("valid-refresh")).thenReturn(true);
+        when(jwtTokenProvider.getUserId("valid-refresh")).thenReturn(7L);
+        when(refreshTokenService.isValid(7L, "valid-refresh")).thenReturn(true);
+        when(authService.refreshAccessToken("valid-refresh")).thenReturn("new-access");
+
+        mockMvc.perform(post("/api/auth/refresh")
+                        .cookie(new jakarta.servlet.http.Cookie("refreshToken", "valid-refresh")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value("new-access"));
+    }
+
+    @Test
+    void refreshWithoutCookieFailsSafely() throws Exception {
+        mockMvc.perform(post("/api/auth/refresh"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void refreshWithInvalidCookieFailsSafely() throws Exception {
+        when(jwtTokenProvider.validateToken("invalid-refresh")).thenReturn(false);
+
+        mockMvc.perform(post("/api/auth/refresh")
+                        .cookie(new jakarta.servlet.http.Cookie("refreshToken", "invalid-refresh")))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void logoutInvalidatesRefreshStateAndExpiresCookie() throws Exception {
+        when(jwtTokenProvider.getUserId("valid-refresh")).thenReturn(7L);
+        when(jwtTokenProvider.deleteRefreshTokenCookie())
+                .thenReturn(ResponseCookie.from("refreshToken", "")
+                        .path("/")
+                        .maxAge(0)
+                        .build());
+
+        mockMvc.perform(post("/api/auth/logout")
+                        .cookie(new jakarta.servlet.http.Cookie("refreshToken", "valid-refresh")))
+                .andExpect(status().isNoContent())
+                .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("Max-Age=0")));
+
+        verify(refreshTokenService).delete(7L);
     }
 
     @TestConfiguration

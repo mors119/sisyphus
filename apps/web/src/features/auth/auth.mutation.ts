@@ -24,8 +24,6 @@ export const useLogoutMutation = () => {
 
       clear();
 
-      localStorage.removeItem('auth-storage');
-
       navigate(PATHS.HOME);
     },
   });

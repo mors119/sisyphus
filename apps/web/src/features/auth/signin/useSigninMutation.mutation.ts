@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
 import { useAlert } from '@/hooks/useAlert';
 import { loginApi } from '../auth.api';
 import { useAuthStore } from '../auth.store';
@@ -28,8 +27,6 @@ export const useSigninMutation = (
       }
 
       setAccessToken(accessToken);
-
-      axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
       alertMessage(t('auth.success'), { duration: 2000 });
       onSuccessRedirect();

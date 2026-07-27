@@ -2,6 +2,7 @@ package com.sisyphus.backend.unit;
 
 import com.sisyphus.backend.auth.dto.LoginRequest;
 import com.sisyphus.backend.auth.service.AuthService;
+import com.sisyphus.backend.auth.token.ExtensionAuthorizationCodeService;
 import com.sisyphus.backend.auth.token.RefreshTokenService;
 import com.sisyphus.backend.auth.dto.TokenWithRefresh;
 import com.sisyphus.backend.security.jwt.JwtTokenProvider;
@@ -52,6 +53,9 @@ class AuthServiceTest {
     @Mock
     AccountRepository accountRepository;
 
+    @Mock
+    ExtensionAuthorizationCodeService extensionAuthorizationCodeService;
+
     @InjectMocks
     AuthService authService;
 
@@ -87,5 +91,24 @@ class AuthServiceTest {
         assertThat(result.getRefreshCookie()).isEqualTo(refreshCookie);
         verify(refreshTokenService).save(eq(1L), eq("refresh-token"), eq(7L * 24 * 60 * 60));
         verify(passwordEncoder, never()).encode(anyString());
+    }
+
+    @Test
+    void extensionLoginIssuesNoRefreshCredential() {
+        LoginRequest request = new LoginRequest("user@example.com", "password", Provider.CAMUS);
+        User user = new User("user@example.com", "tester", Role.USER);
+        ReflectionTestUtils.setField(user, "id", 1L);
+        Account account = Account.ofLocal("user@example.com", "tester", "encoded-password");
+        account.linkToUser(user);
+
+        when(accountRepository.findByEmailAndProviderFetchUser("user@example.com", Provider.CAMUS))
+                .thenReturn(Optional.of(account));
+        when(passwordEncoder.matches("password", "encoded-password")).thenReturn(true);
+        when(jwtTokenProvider.createAccessToken(eq(1L), eq("user@example.com"), eq(java.util.List.of("USER"))))
+                .thenReturn("access-token");
+
+        assertThat(authService.loginExtension(request)).isEqualTo("access-token");
+        verify(jwtTokenProvider, never()).createRefreshToken(anyLong());
+        verify(refreshTokenService, never()).save(anyLong(), anyString(), anyLong());
     }
 }

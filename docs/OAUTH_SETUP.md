@@ -82,3 +82,16 @@ Do not:
 - Store OAuth credentials in source code
 
 Always use environment variables.
+
+## Chrome Extension OAuth
+
+Set `APP_EXTENSION_HOST` to the installed extension origin:
+
+```env
+APP_EXTENSION_HOST=chrome-extension://<extension-id>
+```
+
+The backend derives and exclusively permits the matching
+`https://<extension-id>.chromiumapp.org` identity callback. Extension OAuth uses
+a 60-second, single-use authorization code and S256 PKCE; bearer tokens are
+never returned in redirect URLs.

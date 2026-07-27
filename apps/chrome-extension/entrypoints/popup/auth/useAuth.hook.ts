@@ -30,9 +30,6 @@ export const useAuthHook = () => {
         reset();
       }
     },
-    onError: (err) => {
-      console.error('서버 에러:', err);
-    },
   });
 
   const onSubmit = (req: AuthRequest) => {

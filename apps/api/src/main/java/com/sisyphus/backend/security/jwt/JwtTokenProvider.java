@@ -1,6 +1,7 @@
 package com.sisyphus.backend.security.jwt;
 
 import com.sisyphus.backend.security.principal.UserPrincipal;
+import com.sisyphus.backend.global.props.AppProps;
 import com.sisyphus.backend.global.props.JwtProps;
 import com.sisyphus.backend.global.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
 
     private final JwtProps jwt;
+    private final AppProps appProps;
 
     /** HTTP 쿠키 이름: refresh token 저장용 */
     public static final String REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
@@ -188,24 +190,33 @@ public class JwtTokenProvider {
     /** RefreshToken을 Set-Cookie로 내려줄 때 사용 (SameSite=None → secure true 필수) */
     public ResponseCookie createRefreshTokenCookie(String refreshToken) {
         int maxAgeSec = (int) Math.min(jwt.refreshExpiration() / 1000L, Integer.MAX_VALUE);
-        return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
+        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
                 .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
+                .secure(appProps.cookie().secure())
+                .sameSite(appProps.cookie().samesite())
                 .path("/")
-                .maxAge(maxAgeSec) // ms → sec 변환
-                .build();
+                .maxAge(maxAgeSec);
+        applyCookieDomain(builder);
+        return builder.build();
     }
 
     /** RefreshToken 쿠키 삭제 */
     public ResponseCookie deleteRefreshTokenCookie() {
-        return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, "")
+        ResponseCookie.ResponseCookieBuilder builder = ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, "")
                 .httpOnly(true)
-                .secure(true)
-                .sameSite("None")
+                .secure(appProps.cookie().secure())
+                .sameSite(appProps.cookie().samesite())
                 .path("/")
-                .maxAge(0) // 즉시 만료
-                .build();
+                .maxAge(0);
+        applyCookieDomain(builder);
+        return builder.build();
+    }
+
+    private void applyCookieDomain(ResponseCookie.ResponseCookieBuilder builder) {
+        String domain = appProps.cookie().domain();
+        if (domain != null && !domain.isBlank()) {
+            builder.domain(domain);
+        }
     }
 
     // ---------------------------------------------------

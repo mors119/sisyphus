@@ -13,7 +13,7 @@
 
 ## 2. Items Collected · Purpose · Retention Period (Required)
 
-- **Items Collected**: Email address, password (provider-specific identifier for social login), word-saving/review records, authentication tokens (cookies/local storage)
+- **Items Collected**: Email address, password (provider-specific identifier for social login), word-saving/review records, authentication tokens (secure cookies/temporary memory)
 - **Purpose of Use**: User identification and authentication, vocabulary features and synchronization, account management, prevention of fraudulent use
 - **Retention Period**: Deleted immediately upon account deletion (may be retained for a certain period if required by applicable laws)
 

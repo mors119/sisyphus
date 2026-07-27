@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-import axios from 'axios';
 import { useAuthStore } from '@/features/auth/auth.store';
 import { PATHS } from '@/app/router/paths.constants';
 import { Loader } from '@/components/custom/Loader';
@@ -9,21 +8,16 @@ import { Loader } from '@/components/custom/Loader';
 // Oauth 리다이렉트 지점
 export default function OauthSuccessPage() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { setAccessToken } = useAuthStore();
+  const status = useAuthStore((state) => state.status);
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const token = params.get('token');
-
-    if (token) {
-      setAccessToken(token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      navigate(PATHS.HOME);
-    } else {
-      navigate(PATHS.AUTH);
+    if (status === 'authenticated') {
+      navigate(PATHS.HOME, { replace: true });
     }
-  }, [location.search, navigate, setAccessToken]);
+    if (status === 'unauthenticated') {
+      navigate(PATHS.AUTH, { replace: true });
+    }
+  }, [navigate, status]);
 
   return (
     <div className="h-screen flex justify-center items-center">

@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { logoutApi } from './auth/auth.api';
 import { useAuthStore } from './auth/auth.store';
 import { useMessageStore } from './message.store';
 
@@ -9,15 +8,9 @@ export const useFooterHook = () => {
   const { setMsg } = useMessageStore();
   const { t } = useTranslation();
 
-  const logoutHandler = async () => {
-    try {
-      await logoutApi();
-      setMsg(t('footer.logout_suc'));
-      clear();
-    } catch (err) {
-      setMsg(t('footer.logout_err'));
-      console.error(err);
-    }
+  const logoutHandler = () => {
+    clear();
+    setMsg(t('footer.logout_suc'));
   };
 
   return { accessToken, logoutHandler };

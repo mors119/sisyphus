@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 type AuthState = {
   accessToken: string | null;
@@ -7,21 +6,17 @@ type AuthState = {
   clear: () => void;
 };
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      accessToken: null,
-      setAccessToken: (token) => {
-        set({ accessToken: token });
-        chrome.storage.local.set({ accessToken: token });
-      },
-      clear: () => {
-        set({ accessToken: null });
-        chrome.storage.local.remove('accessToken');
-      },
-    }),
-    {
-      name: 'auth-storage', // 로컬 스토리지 또는 스토리지 엔진에 저장될 key 이름
-    },
-  ),
-);
+export const clearLegacyAuthStorage = () => {
+  localStorage.removeItem('auth-storage');
+  localStorage.removeItem('accessToken');
+  void chrome.storage.local.remove(['accessToken', 'auth-storage']);
+};
+
+export const useAuthStore = create<AuthState>()((set) => ({
+  accessToken: null,
+  setAccessToken: (token) => set({ accessToken: token }),
+  clear: () => {
+    set({ accessToken: null });
+    clearLegacyAuthStorage();
+  },
+}));
