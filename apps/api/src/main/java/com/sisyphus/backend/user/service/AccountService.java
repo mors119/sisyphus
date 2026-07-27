@@ -3,8 +3,8 @@ package com.sisyphus.backend.user.service;
 import com.sisyphus.backend.category.entity.Category;
 import com.sisyphus.backend.category.repository.CategoryRepository;
 import com.sisyphus.backend.global.exception.OAuthAccountAlreadyLinkedException;
+import com.sisyphus.backend.user.dto.AccountUserSnapshot;
 import com.sisyphus.backend.user.dto.CountsResponse;
-import com.sisyphus.backend.user.dto.UserRequest;
 import com.sisyphus.backend.user.entity.Account;
 import com.sisyphus.backend.user.entity.User;
 import com.sisyphus.backend.user.exception.UserNotFoundException;
@@ -13,6 +13,7 @@ import com.sisyphus.backend.user.repository.UserRepository;
 import com.sisyphus.backend.user.util.Provider;
 import com.sisyphus.backend.user.util.Role;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * OAuth2 로그인 또는 연동 시 사용자의 이메일, 공급자(provider)를 기준으로
@@ -38,11 +40,11 @@ public class AccountService {
      * @param email    OAuth 공급자로부터 받은 사용자 이메일
      * @param name     사용자 이름 (프로필 이름)
      * @param provider OAuth 공급자 이름 (예: "google", "naver", "kakao")
-     * @return {@link UserRequest} 응답 객체 (연동된 사용자 정보 포함)
+     * @return 연동된 사용자 정보
      * @throws UserNotFoundException 해당 Account에 연결된 User가 없을 경우
      */
     @Transactional
-    public UserRequest saveOrGetAccount(String email, String name, Provider provider) {
+    public AccountUserSnapshot saveOrGetAccount(String email, String name, Provider provider) {
         // 1. 이메일 + 공급자(provider)로 기존 Account를 먼저 조회
         Optional<Account> existing = accountRepository.findByEmailAndProvider(email, provider);
 
@@ -54,48 +56,37 @@ public class AccountService {
             User user = Optional.ofNullable(account.getUser())
                     .orElseThrow(UserNotFoundException::new);
 
-            // 응답용 DTO 구성
-            UserRequest userRequest = new UserRequest();
-            userRequest.setId(user.getId());
-            userRequest.setEmail(user.getEmail());
-            userRequest.setRole(user.getRole());
-
-            if (user.getRole() == null) {
-                userRequest.setRole(Role.USER);
-            }
-            return userRequest;
+            return AccountUserSnapshot.from(user);
         }
 
         // 3. Account가 존재하지 않으면 → 새 User 또는 기존 User와 연결
 
-        // 최초 사용자라면 ADMIN 권한 부여
-        boolean isFirstUser = userRepository.count() == 0;
-        Role role = isFirstUser ? Role.ADMIN : Role.USER;
-
-        // 이메일로 기존 User 있는지 확인 → 없으면 새로 생성
-        User user = userRepository.findByEmail(email)
-                .orElseGet(() -> {
-                    User newUser = new User(email, name, role); // password는 null
-                    User savedUser = userRepository.save(newUser);
-
-                    // 기본 태그 자동 생성
-                    List<Category> defaultCategories = Category.createDefaultCategories(savedUser);
-                    categoryRepository.saveAll(defaultCategories);
-
-                    return savedUser;
-                });
+        User user = findOrCreateUser(email, name);
 
         // 4. Account 생성 및 User 연동
         Account account = Account.ofOauth(email, name, provider); // 정적 팩토리 메서드 사용
         account.linkToUser(user); // 핵심: Account → User 연결
         accountRepository.save(account);
 
-        // 5. 응답 객체 생성
-        UserRequest userRequest = new UserRequest();
-        userRequest.setId(user.getId());
-        userRequest.setEmail(user.getEmail());
+        return AccountUserSnapshot.from(user);
+    }
 
-        return userRequest;
+    @Transactional
+    public AccountUserSnapshot saveOrGetLocalAccount(
+            String email,
+            String name,
+            String password
+    ) {
+        Optional<Account> existing = accountRepository.findByEmailAndProvider(email, Provider.CAMUS);
+        if (existing.isPresent()) {
+            return AccountUserSnapshot.from(requireUser(existing.get()));
+        }
+
+        User user = findOrCreateUser(email, name);
+        Account account = Account.ofLocal(email, name, passwordEncoder.encode(password));
+        account.linkToUser(user);
+        accountRepository.save(account);
+        return AccountUserSnapshot.from(user);
     }
 
     @Transactional
@@ -119,5 +110,18 @@ public class AccountService {
     @Transactional(readOnly = true)
     public CountsResponse getUserCount() {
         return new CountsResponse(accountRepository.count(), userRepository.count());
+    }
+
+    private User findOrCreateUser(String email, String name) {
+        return userRepository.findByEmail(email).orElseGet(() -> {
+            Role role = userRepository.count() == 0 ? Role.ADMIN : Role.USER;
+            User savedUser = userRepository.save(new User(email, name, role));
+            categoryRepository.saveAll(Category.createDefaultCategories(savedUser));
+            return savedUser;
+        });
+    }
+
+    private User requireUser(Account account) {
+        return Optional.ofNullable(account.getUser()).orElseThrow(UserNotFoundException::new);
     }
 }

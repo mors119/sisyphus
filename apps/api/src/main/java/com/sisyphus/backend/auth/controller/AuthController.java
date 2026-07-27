@@ -4,11 +4,7 @@ import com.sisyphus.backend.auth.dto.*;
 import com.sisyphus.backend.security.jwt.JwtTokenProvider;
 import com.sisyphus.backend.auth.service.AuthService;
 import com.sisyphus.backend.auth.service.EmailAuthService;
-import com.sisyphus.backend.auth.token.RefreshTokenService;
 import com.sisyphus.backend.auth.token.TokenResponse;
-import com.sisyphus.backend.global.exception.UnauthorizedException;
-import com.sisyphus.backend.user.entity.Account;
-import com.sisyphus.backend.user.entity.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,17 +12,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Locale;
-
-@Slf4j
 @Tag(name = "Auth", description = "인증/회원가입/토큰(Access/Refresh) 및 이메일 인증 API")
 @RequestMapping("/api/auth")
 @RestController
@@ -34,8 +24,6 @@ import java.util.Locale;
 public class AuthController {
 
     private final AuthService authService;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final RefreshTokenService refreshTokenService;
     private final EmailAuthService emailAuthService;
 
     @Operation(
@@ -55,27 +43,11 @@ public class AuthController {
     public ResponseEntity<TokenResponse> signup(
             @Valid @RequestBody RegisterRequest request // request: 회원가입 요청 DTO
     ) {
-        Account account = authService.saveOrLinkAccount(request);
-        User user = account.getUser();
-        if (user == null) {
-            throw new UnauthorizedException("연결된 사용자 정보가 없습니다.");
-        }
-
-        // access token: 바디로 반환
-        String accessToken = jwtTokenProvider.createAccessToken(
-                user.getId(),                 // userId: 토큰 subject
-                user.getEmail(),              // email: claim
-                List.of(user.getRole().name())// roles: claim
-        );
-
-        // refresh token: 쿠키로 반환
-        String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
-        refreshTokenService.save(user.getId(), refreshToken, 7L * 24 * 60 * 60);
-        ResponseCookie refreshCookie = jwtTokenProvider.createRefreshTokenCookie(refreshToken);
+        TokenWithRefresh signupResult = authService.signup(request);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .body(new TokenResponse(accessToken));
+                .header(HttpHeaders.SET_COOKIE, signupResult.getRefreshCookie().toString())
+                .body(new TokenResponse(signupResult.getAccessToken()));
     }
 
     @Operation(
@@ -132,19 +104,6 @@ public class AuthController {
             @CookieValue(name = JwtTokenProvider.REFRESH_TOKEN_COOKIE_NAME, required = false)
             String refreshToken // refreshToken: HttpOnly Cookie 값
     ) {
-        if (refreshToken == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        if (!jwtTokenProvider.validateToken(refreshToken)) {
-            throw new UnauthorizedException("Refresh token invalid or expired");
-        }
-
-        Long userId = jwtTokenProvider.getUserId(refreshToken);
-
-        if (!refreshTokenService.isValid(userId, refreshToken)) {
-            throw new UnauthorizedException("Refresh token invalid or expired");
-        }
-
         String newAccessToken = authService.refreshAccessToken(refreshToken);
         return ResponseEntity.ok(new TokenResponse(newAccessToken));
     }
@@ -180,16 +139,7 @@ public class AuthController {
             @CookieValue(name = JwtTokenProvider.REFRESH_TOKEN_COOKIE_NAME, required = false)
             String refreshToken // refreshToken: HttpOnly Cookie 값(없을 수도 있음)
     ) {
-        if (refreshToken != null) {
-            try {
-                Long userId = jwtTokenProvider.getUserId(refreshToken);
-                refreshTokenService.delete(userId);
-            } catch (Exception e) {
-                log.warn("Invalid refresh token during logout: {}", e.getMessage());
-            }
-        }
-
-        ResponseCookie deleteCookie = jwtTokenProvider.deleteRefreshTokenCookie();
+        ResponseCookie deleteCookie = authService.logout(refreshToken);
 
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())

@@ -4,8 +4,9 @@ import com.sisyphus.backend.auth.token.ExtensionAuthorizationCodeService;
 import com.sisyphus.backend.auth.token.RefreshTokenService;
 import com.sisyphus.backend.global.props.AppProps;
 import com.sisyphus.backend.security.jwt.JwtTokenProvider;
-import com.sisyphus.backend.user.dto.UserRequest;
+import com.sisyphus.backend.user.dto.AccountUserSnapshot;
 import com.sisyphus.backend.user.service.AccountService;
+import com.sisyphus.backend.user.util.Role;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -52,7 +53,7 @@ class OAuth2LoginSuccessHandlerTest {
     OAuth2User oauthUser;
 
     private OAuth2LoginSuccessHandler handler;
-    private UserRequest user;
+    private AccountUserSnapshot user;
 
     @BeforeEach
     void setUp() {
@@ -63,9 +64,7 @@ class OAuth2LoginSuccessHandlerTest {
                 accountService,
                 appProps
         );
-        user = new UserRequest();
-        user.setId(1L);
-        user.setEmail("user@example.com");
+        user = new AccountUserSnapshot(1L, "user@example.com", Role.USER);
 
         when(request.getSession()).thenReturn(session);
         when(authentication.getPrincipal()).thenReturn(oauthUser);
@@ -110,7 +109,7 @@ class OAuth2LoginSuccessHandlerTest {
         );
         verify(jwtTokenProvider, never()).createAccessToken(anyLong(), any(), any());
         verify(jwtTokenProvider, never()).createRefreshToken(anyLong());
-        verify(refreshTokenService, never()).save(anyLong(), any(), anyLong());
+        verify(refreshTokenService, never()).save(anyLong(), any());
         assertThat("https://extension.chromiumapp.org?code=one-time-code")
                 .doesNotContain("token=", "access_token=", "refresh_token=");
     }

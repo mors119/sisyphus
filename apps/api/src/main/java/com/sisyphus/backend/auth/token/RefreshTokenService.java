@@ -1,5 +1,6 @@
 package com.sisyphus.backend.auth.token;
 
+import com.sisyphus.backend.global.props.JwtProps;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -11,14 +12,15 @@ import java.time.Duration;
 public class RefreshTokenService {
 
     private final RedisTemplate<String, String> redisTemplate;
+    private final JwtProps jwtProps;
     private static final String PREFIX = "refresh:";
 
     // 저장
-    public void save(Long userId, String refreshToken, long expirationSeconds) {
+    public void save(Long userId, String refreshToken) {
         redisTemplate.opsForValue().set(
                 PREFIX + userId,
                 refreshToken,
-                Duration.ofSeconds(expirationSeconds)
+                Duration.ofMillis(jwtProps.refreshExpiration())
         );
     }
 

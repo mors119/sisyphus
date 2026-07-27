@@ -3,11 +3,13 @@ package com.sisyphus.backend.tag.service;
 import com.sisyphus.backend.note.entity.Note;
 import com.sisyphus.backend.tag.entity.NoteTag;
 import com.sisyphus.backend.tag.dto.TagRequest;
+import com.sisyphus.backend.tag.dto.TagResponse;
 import com.sisyphus.backend.tag.entity.Tag;
+import com.sisyphus.backend.tag.exception.TagNotFoundException;
 import com.sisyphus.backend.tag.repository.TagRepository;
+import com.sisyphus.backend.global.exception.ForbiddenException;
 import com.sisyphus.backend.user.entity.User;
 import com.sisyphus.backend.user.service.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,8 +36,10 @@ public class TagService {
      * 모든 태그 목록 조회
      */
     @Transactional(readOnly = true)
-    public List<Tag> list(Long userId) {
-        return tagRepository.findAllByUserId(userId);
+    public List<TagResponse> list(Long userId) {
+        return tagRepository.findAllByUserId(userId).stream()
+                .map(TagResponse::fromEntity)
+                .toList();
     }
 
     /**
@@ -94,16 +98,16 @@ public class TagService {
      * 태그 이름 수정
      */
     @Transactional
-    public Tag update(Long id, String newName, Long userId) {
+    public TagResponse update(Long id, String newName, Long userId) {
         Tag tag = tagRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("태그를 찾을 수 없습니다"));
+                .orElseThrow(TagNotFoundException::new);
 
         if (!tag.getUser().getId().equals(userId)) {
-            throw new SecurityException("권한이 없습니다");
+            throw new ForbiddenException("해당 태그에 접근할 권한이 없습니다.");
         }
 
         tag.changeName(newName);
-        return tag;
+        return TagResponse.fromEntity(tag);
     }
 
     /**
@@ -119,7 +123,7 @@ public class TagService {
 
         for (Tag tag : tags) {
             if (!tag.getUser().getId().equals(userId)) {
-                throw new SecurityException(
+                throw new ForbiddenException(
                         String.format("사용자 %d는 태그 ID %d에 대한 삭제 권한이 없습니다.", userId, tag.getId())
                 );
             }

@@ -3,10 +3,9 @@ package com.sisyphus.backend.slice;
 import com.sisyphus.backend.auth.controller.AuthController;
 import com.sisyphus.backend.auth.service.AuthService;
 import com.sisyphus.backend.auth.service.EmailAuthService;
-import com.sisyphus.backend.auth.token.RefreshTokenService;
+import com.sisyphus.backend.global.exception.UnauthorizedException;
 import com.sisyphus.backend.global.props.AppProps;
 import com.sisyphus.backend.global.props.FileProps;
-import com.sisyphus.backend.security.jwt.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -57,12 +56,6 @@ class AuthControllerTest {
     AuthService authService;
 
     @MockBean
-    JwtTokenProvider jwtTokenProvider;
-
-    @MockBean
-    RefreshTokenService refreshTokenService;
-
-    @MockBean
     EmailAuthService emailAuthService;
 
     @Test
@@ -81,10 +74,23 @@ class AuthControllerTest {
     }
 
     @Test
+    void validationErrorsUseSharedContract() throws Exception {
+        mockMvc.perform(post("/api/auth/check")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "email": "not-an-email"
+                                }
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.path").value("/api/auth/check"))
+                .andExpect(jsonPath("$.fieldErrors[0].field").value("email"));
+    }
+
+    @Test
     void refreshBootstrapsSessionFromValidCookie() throws Exception {
-        when(jwtTokenProvider.validateToken("valid-refresh")).thenReturn(true);
-        when(jwtTokenProvider.getUserId("valid-refresh")).thenReturn(7L);
-        when(refreshTokenService.isValid(7L, "valid-refresh")).thenReturn(true);
         when(authService.refreshAccessToken("valid-refresh")).thenReturn("new-access");
 
         mockMvc.perform(post("/api/auth/refresh")
@@ -95,13 +101,19 @@ class AuthControllerTest {
 
     @Test
     void refreshWithoutCookieFailsSafely() throws Exception {
+        when(authService.refreshAccessToken(null))
+                .thenThrow(new UnauthorizedException("Refresh token invalid or expired"));
+
         mockMvc.perform(post("/api/auth/refresh"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"))
+                .andExpect(jsonPath("$.fieldErrors").isArray());
     }
 
     @Test
     void refreshWithInvalidCookieFailsSafely() throws Exception {
-        when(jwtTokenProvider.validateToken("invalid-refresh")).thenReturn(false);
+        when(authService.refreshAccessToken("invalid-refresh"))
+                .thenThrow(new UnauthorizedException("Refresh token invalid or expired"));
 
         mockMvc.perform(post("/api/auth/refresh")
                         .cookie(new jakarta.servlet.http.Cookie("refreshToken", "invalid-refresh")))
@@ -110,8 +122,7 @@ class AuthControllerTest {
 
     @Test
     void logoutInvalidatesRefreshStateAndExpiresCookie() throws Exception {
-        when(jwtTokenProvider.getUserId("valid-refresh")).thenReturn(7L);
-        when(jwtTokenProvider.deleteRefreshTokenCookie())
+        when(authService.logout("valid-refresh"))
                 .thenReturn(ResponseCookie.from("refreshToken", "")
                         .path("/")
                         .maxAge(0)
@@ -122,7 +133,7 @@ class AuthControllerTest {
                 .andExpect(status().isNoContent())
                 .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("Max-Age=0")));
 
-        verify(refreshTokenService).delete(7L);
+        verify(authService).logout("valid-refresh");
     }
 
     @TestConfiguration

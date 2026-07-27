@@ -1,12 +1,11 @@
 package com.sisyphus.backend.image.service;
 
-import com.sisyphus.backend.global.exception.BaseException;
+import com.sisyphus.backend.image.dto.ImageUploadResponse;
 import com.sisyphus.backend.image.entity.Image;
 import com.sisyphus.backend.image.entity.NoteImage;
 import com.sisyphus.backend.image.exception.NotFoundImageException;
 import com.sisyphus.backend.image.repository.ImageRepository;
 import com.sisyphus.backend.image.service.storage.FileStorageService;
-import com.sisyphus.backend.note.service.NoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +29,7 @@ public class ImageService {
     private final FileStorageService fileStorageService;
 
     @Transactional
-    public Image store(MultipartFile file) {
+    public ImageUploadResponse store(MultipartFile file) {
         // 원본 파일명은 UI표시용(신뢰 X, 하지만 메타로 저장)
         String originName = Objects.requireNonNull(file.getOriginalFilename(), "원본 파일명이 없습니다.");
         String extension = extractExtension(originName);
@@ -40,7 +39,7 @@ public class ImageService {
         String publicUrl = fileStorageService.save(file);
 
         Image image = new NoteImage(publicUrl, originName, extension, size);
-        return imageRepository.save(image);
+        return ImageUploadResponse.from(imageRepository.save(image));
     }
 
     @Transactional
@@ -59,7 +58,7 @@ public class ImageService {
     }
 
     @Transactional
-    public Image replace(Long id, MultipartFile newFile) {
+    public ImageUploadResponse replace(Long id, MultipartFile newFile) {
         Image image = imageRepository.findById(id)
                 .orElseThrow(NotFoundImageException::new);
 
@@ -78,7 +77,7 @@ public class ImageService {
         // 기존 파일 삭제 (새 저장 + DB 갱신 성공 이후)
         fileStorageService.delete(oldUrl);
 
-        return image;
+        return ImageUploadResponse.from(image);
     }
 
     /**

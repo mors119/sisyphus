@@ -5,7 +5,7 @@ import com.sisyphus.backend.auth.token.RefreshTokenService;
 import com.sisyphus.backend.global.exception.OAuthAccountAlreadyLinkedException;
 import com.sisyphus.backend.global.props.AppProps;
 import com.sisyphus.backend.security.jwt.JwtTokenProvider;
-import com.sisyphus.backend.user.dto.UserRequest;
+import com.sisyphus.backend.user.dto.AccountUserSnapshot;
 import com.sisyphus.backend.user.service.AccountService;
 import com.sisyphus.backend.user.util.Provider;
 import jakarta.servlet.http.HttpServletRequest;
@@ -70,7 +70,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         }
 
         // 2. 사용자 DB 저장 or 조회
-        UserRequest userRequest = accountService.saveOrGetAccount(email, name, provider);
+        AccountUserSnapshot user = accountService.saveOrGetAccount(email, name, provider);
 
         if ("extension".equals(mode)) {
             if (redirectedUri == null || codeChallenge == null) {
@@ -79,7 +79,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                 return;
             }
             String code = extensionAuthorizationCodeService.issue(
-                    userRequest.getId(),
+                    user.id(),
                     redirectedUri,
                     codeChallenge
             );
@@ -93,8 +93,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             return;
         }
 
-        String refreshToken = jwtTokenProvider.createRefreshToken(userRequest.getId());
-        refreshTokenService.save(userRequest.getId(), refreshToken, 7L * 24 * 60 * 60);
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.id());
+        refreshTokenService.save(user.id(), refreshToken);
 
         ResponseCookie cookie = jwtTokenProvider.createRefreshTokenCookie(refreshToken);
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());

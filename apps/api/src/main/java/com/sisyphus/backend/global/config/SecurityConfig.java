@@ -8,7 +8,6 @@ import com.sisyphus.backend.auth.oauth.OAuth2LoginFailureHandler;
 import com.sisyphus.backend.auth.oauth.OAuth2LoginSuccessHandler;
 import com.sisyphus.backend.security.handler.JwtAccessDeniedHandler;
 import com.sisyphus.backend.security.handler.JwtAuthenticationEntryPoint;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -111,13 +110,6 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 /* 세션 정책: 무상태(stateless)로 설정 (JWT 기반 인증) / 세션 저장 안 함 (JWT 기반 무상태 인증) (Spring Security 세션 저장 금지) */
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                /* 예외 핸들링 설정 → 401, 403 명확하게 커스터마이징 가능 / 로그인 정보 없을 때, /login 으로 redirect 시키는 것 막기 (401오류로 대체) */
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authException) ->
-                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
-                        /* 403 JSON 응답 */
-                        .accessDeniedHandler((req, res, ex) -> res.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden"))
-                )
                 /* 경로 권한 설정 */
                 .authorizeHttpRequests(auth -> {
                     // 항상 허용: 인증/리프레시 & 헬스/인포

@@ -1,13 +1,13 @@
 package com.sisyphus.backend.category.controller;
 
-import com.sisyphus.backend.security.jwt.JwtTokenProvider;
 import com.sisyphus.backend.category.dto.CategoryRequest;
 import com.sisyphus.backend.category.dto.CategoryResponse;
-import com.sisyphus.backend.category.entity.Category;
 import com.sisyphus.backend.category.service.CategoryService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.sisyphus.backend.security.principal.UserPrincipal;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,21 +17,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryController {
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final CategoryService categoryService;
 
     @GetMapping("/all")
-    public ResponseEntity<List<CategoryResponse>> getAllCategories(HttpServletRequest request) {
-        Long userId = jwtTokenProvider.getUserId(jwtTokenProvider.resolveToken(request));
-        List<Category> categories = categoryService.getAllCategories(userId);
-        List<CategoryResponse> response = categories.stream().map(CategoryResponse::fromEntity).toList();
-        return ResponseEntity.ok(response);
+    public ResponseEntity<List<CategoryResponse>> getAllCategories(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        return ResponseEntity.ok(categoryService.getAllCategories(principal.getId()));
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Void> createCategory(@RequestBody CategoryRequest categoryRequest, HttpServletRequest request) {
-        Long userId = jwtTokenProvider.getUserId(jwtTokenProvider.resolveToken(request));
-        categoryService.createCategory(categoryRequest, userId);
+    public ResponseEntity<Void> createCategory(
+            @RequestBody @Valid CategoryRequest categoryRequest,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        categoryService.createCategory(categoryRequest, principal.getId());
         return ResponseEntity.ok().build(); // status(201).build()
     }
 
@@ -39,23 +39,21 @@ public class CategoryController {
 //    1. note의 CATEGORY 값은 비우기 또는 2.note도 삭제, 3. 하위 CATEGORY parentId 비우기 또는 4.. 하위 CATEGORY도 삭제
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
-        try {
-            categoryService.deleteCategory(id);
-            return ResponseEntity.noContent().build(); // 204 No Content
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.notFound().build(); // 404 Not Found
-        }
+    public ResponseEntity<Void> deleteCategory(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        categoryService.deleteCategory(id, principal.getId());
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Void> updateCategory(
             @PathVariable Long id,
-            @RequestBody CategoryRequest request,
-            HttpServletRequest httpRequest
+            @RequestBody @Valid CategoryRequest request,
+            @AuthenticationPrincipal UserPrincipal principal
     ) {
-        Long userId = jwtTokenProvider.getUserId(jwtTokenProvider.resolveToken(httpRequest));
-        categoryService.updateCategory(id, request, userId);
+        categoryService.updateCategory(id, request, principal.getId());
         return ResponseEntity.ok().build();
     }
 

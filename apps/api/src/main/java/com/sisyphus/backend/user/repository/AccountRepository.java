@@ -13,16 +13,8 @@ import java.util.Optional;
 
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
-    // email 확인
-    boolean existsByEmail(String email);
-
     // email과 provider로 찾기
     Optional<Account> findByEmailAndProvider(@NotBlank(message = "{auth.email.blank}") @Email(message = "{auth.email.invalid}") String email, Provider provider);
-
-    // 같은 이메일과 프로바이더로 가입 방지
-    @Query("SELECT a FROM Account a WHERE a.email = :email AND a.provider = :provider")
-    Optional<Account> findExact(@Param("email") String email, @Param("provider") Provider provider);
-
 
     // 일반 로그인 시 지연 오류 방지 : LazyInitializationException 방지
     @Query("SELECT a FROM Account a JOIN FETCH a.user WHERE a.email = :email AND a.provider = :provider")

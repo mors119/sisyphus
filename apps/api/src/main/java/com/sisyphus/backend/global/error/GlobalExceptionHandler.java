@@ -3,6 +3,7 @@ package com.sisyphus.backend.global.error;
 import com.sisyphus.backend.global.exception.BaseException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -10,81 +11,129 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.List;
+
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 400: 잘못된 파라미터/요청
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(
             IllegalArgumentException ex,
             HttpServletRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(400, "INVALID_ARGUMENT", ex.getMessage(), request.getRequestURI()));
+        return expected(
+                HttpStatus.BAD_REQUEST,
+                ApiErrorCode.INVALID_ARGUMENT,
+                ex.getMessage(),
+                request,
+                List.of()
+        );
     }
 
-    // 400: @Valid DTO 검증 실패 (예: title 누락)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgNotValid(
             MethodArgumentNotValidException ex,
             HttpServletRequest request
     ) {
-        String msg = ex.getBindingResult().getFieldErrors().isEmpty()
+        List<ErrorResponse.FieldError> fieldErrors = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> new ErrorResponse.FieldError(error.getField(), error.getDefaultMessage()))
+                .toList();
+        String message = fieldErrors.isEmpty()
                 ? "요청 값이 올바르지 않습니다."
-                : ex.getBindingResult().getFieldErrors().get(0).getField() + ": " +
-                ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
+                : fieldErrors.getFirst().field() + ": " + fieldErrors.getFirst().message();
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(400, "VALIDATION_ERROR", msg, request.getRequestURI()));
+        return expected(
+                HttpStatus.BAD_REQUEST,
+                ApiErrorCode.VALIDATION_ERROR,
+                message,
+                request,
+                fieldErrors
+        );
     }
 
-    // 400: @RequestParam / @PathVariable 검증 실패 등
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolation(
             ConstraintViolationException ex,
             HttpServletRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(400, "VALIDATION_ERROR", ex.getMessage(), request.getRequestURI()));
+        List<ErrorResponse.FieldError> fieldErrors = ex.getConstraintViolations().stream()
+                .map(violation -> new ErrorResponse.FieldError(
+                        leafName(violation.getPropertyPath().toString()),
+                        violation.getMessage()
+                ))
+                .toList();
+
+        return expected(
+                HttpStatus.BAD_REQUEST,
+                ApiErrorCode.VALIDATION_ERROR,
+                ex.getMessage(),
+                request,
+                fieldErrors
+        );
     }
 
-    // 403: 권한 없음 (예: ADMIN만 가능한데 USER가 호출)
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(
             AccessDeniedException ex,
             HttpServletRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(ErrorResponse.of(403, "FORBIDDEN", "접근 권한이 없습니다.", request.getRequestURI()));
+        return expected(
+                HttpStatus.FORBIDDEN,
+                ApiErrorCode.FORBIDDEN,
+                "접근 권한이 없습니다.",
+                request,
+                List.of()
+        );
     }
 
-    // 500: 나머지 전부
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleUnexpected(
-            Exception ex,
-            HttpServletRequest request
-    ) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ErrorResponse.of(500, "INTERNAL_SERVER_ERROR", "서버 오류가 발생했습니다.", request.getRequestURI()));
-    }
-
-    // BaseException 관련 예외 처리
-    //    UnauthorizedException → 401 + code=UNAUTHORIZED
-    //    NotFoundException → 404 + code=NOT_FOUND
-    //    ConflictException → 409 + code=CONFLICT
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<ErrorResponse> handleBaseException(
             BaseException ex,
             HttpServletRequest request
     ) {
-        int status = ex.getStatus().value();
-        return ResponseEntity.status(ex.getStatus())
+        return expected(ex.getStatus(), ex.getCode(), ex.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnexpected(
+            Exception ex,
+            HttpServletRequest request
+    ) {
+        String path = request.getRequestURI();
+        log.error("Unexpected API failure: path={}", path, ex);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of(
-                        status,
-                        ex.getCode().name(),
-                        ex.getMessage(),
-                        request.getRequestURI()
+                        HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        ApiErrorCode.INTERNAL_SERVER_ERROR.name(),
+                        "서버 오류가 발생했습니다.",
+                        path
                 ));
     }
 
+    private ResponseEntity<ErrorResponse> expected(
+            HttpStatus status,
+            ApiErrorCode code,
+            String message,
+            HttpServletRequest request,
+            List<ErrorResponse.FieldError> fieldErrors
+    ) {
+        String path = request.getRequestURI();
+        log.warn(
+                "API request failed: status={}, code={}, path={}, message={}",
+                status.value(),
+                code,
+                path,
+                message
+        );
+
+        return ResponseEntity.status(status)
+                .body(ErrorResponse.of(status.value(), code.name(), message, path, fieldErrors));
+    }
+
+    private String leafName(String propertyPath) {
+        int separator = propertyPath.lastIndexOf('.');
+        return separator < 0 ? propertyPath : propertyPath.substring(separator + 1);
+    }
 }
