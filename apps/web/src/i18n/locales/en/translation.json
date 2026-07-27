@@ -383,13 +383,34 @@
     "expansion": {
       "heading": "Expanding your word",
       "description": "Generating knowledge for {{word}}.",
+      "wordLabel": "Submitted word",
       "label": "Expansion progress",
-      "loading": "Preparing expansion",
-      "loadingDescription": "Please wait a moment.",
-      "steps": {
-        "analyze": "Analyze word",
-        "generate": "Generate fields",
-        "review": "Prepare review"
+      "actions": {
+        "retry": "Retry",
+        "continue": "Continue"
+      },
+      "status": {
+        "skipped": "This stage was skipped."
+      },
+      "announcements": {
+        "active": "Running the {{stage}} stage.",
+        "completed": "All expansion stages are complete.",
+        "partial": "Expansion completed after skipping optional stages.",
+        "failed": "A problem occurred during expansion."
+      },
+      "stages": {
+        "verifyWord": "Verify word",
+        "definition": "Generate definitions",
+        "image": "Find images",
+        "metadata": "Build metadata",
+        "persistPrep": "Prepare save"
+      },
+      "errors": {
+        "definition": "Definitions could not be generated.",
+        "image": "No image could be resolved.",
+        "metadata": "Metadata could not be built.",
+        "timeout": "The request timed out.",
+        "server": "An unexpected server error occurred."
       }
     }
   }
