@@ -49,7 +49,7 @@ class OpenApiDocumentationTest {
         assertThat(document.path("openapi").asText()).startsWith("3.");
         assertThat(parsedSpecification.getPaths()).isNotEmpty();
         assertThat(document.at("/info/title").asText()).isEqualTo("Sisyphus Academy API");
-        assertThat(document.at("/info/version").asText()).isEqualTo("0.1");
+        assertThat(document.at("/info/version").asText()).isEqualTo("0.0.1");
         assertThat(document.at("/info/license/name").asText()).isEqualTo("Apache License 2.0");
         assertThat(document.at("/components/securitySchemes/bearerAuth/scheme").asText())
                 .isEqualTo("bearer");

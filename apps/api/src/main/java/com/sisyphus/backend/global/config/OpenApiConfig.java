@@ -30,7 +30,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Sisyphus Academy API")
                         .description("Public HTTP contract for Sisyphus Academy clients.")
-                        .version("0.1")
+                        .version("0.0.1")
                         .contact(new Contact()
                                 .name("Sisyphus Academy")
                                 .url("https://github.com/FrilLab/sisyphus-academy"))
