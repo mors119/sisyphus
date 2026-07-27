@@ -412,6 +412,48 @@
         "timeout": "The request timed out.",
         "server": "An unexpected server error occurred."
       }
+    },
+    "review": {
+      "heading": "Review generated knowledge",
+      "description": "Review and adjust the generated results for {{word}}.",
+      "panelTitle": "Review workspace",
+      "panelDescription": "Edit or exclude sections before adding them to your knowledge.",
+      "optional": "Optional",
+      "empty": "No content",
+      "excludedMessage": "This section will be omitted from the final save.",
+      "sections": {
+        "word": "Word",
+        "pronunciation": "Pronunciation",
+        "definitions": "Definitions",
+        "image": "Image",
+        "example": "Example sentence",
+        "tags": "Tags",
+        "difficulty": "Difficulty"
+      },
+      "status": {
+        "generated": "Generated",
+        "edited": "Edited",
+        "excluded": "Excluded",
+        "failed": "Failed",
+        "regenerating": "Regenerating"
+      },
+      "actions": {
+        "regenerate": "Regenerate",
+        "regenerating": "Regenerating",
+        "exclude": "Exclude",
+        "restore": "Restore",
+        "applyEdit": "Apply edit",
+        "addToKnowledge": "Add to knowledge",
+        "saving": "Saving"
+      },
+      "errors": {
+        "section": "This section could not be generated.",
+        "preserved": "Edits in other sections are preserved."
+      },
+      "save": {
+        "success": "Added to your knowledge.",
+        "error": "Could not save. Your edits remain on this screen."
+      }
     }
   }
 }

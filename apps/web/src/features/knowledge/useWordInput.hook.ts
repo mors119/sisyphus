@@ -19,7 +19,7 @@ export function useWordInput(): WordInputWorkspace {
   const inFlightRef = useRef(false);
 
   const submit = useCallback(async () => {
-    if (inFlightRef.current || phase === 'validating' || phase === 'expanding') {
+    if (inFlightRef.current || phase === 'validating' || phase === 'expanding' || phase === 'reviewing') {
       return;
     }
 
@@ -59,6 +59,17 @@ export function useWordInput(): WordInputWorkspace {
     await submit();
   }, [submit]);
 
+  const enterReview = useCallback(() => {
+    setPhase('reviewing');
+  }, []);
+
+  const reset = useCallback(() => {
+    setWord('');
+    setPhase('idle');
+    setFieldError(null);
+    setPageError(null);
+  }, []);
+
   const isSubmitting = phase === 'validating';
 
   return {
@@ -70,5 +81,7 @@ export function useWordInput(): WordInputWorkspace {
     isSubmitting,
     submit,
     retry,
+    enterReview,
+    reset,
   };
 }
