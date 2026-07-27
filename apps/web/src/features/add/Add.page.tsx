@@ -1,24 +1,22 @@
-import { useEffect } from 'react';
-import { CustomCard } from '@/components/custom/customCard';
+import { ExpansionProgress } from '../knowledge/ExpansionProgress.container';
+import { useWordInput } from '../knowledge/useWordInput.hook';
+import { WordInput } from '../knowledge/WordInput.container';
 import { PageContent, PageLayout } from '@/features/layout';
-import { ViewFormField } from '../view/ViewForm.container';
-import { useNoteStore } from '../view/note.store';
-import { useViewForm } from '../view/useViewForm.hook';
 
 const AddPage = () => {
-  const resetEditNote = useNoteStore((s) => s.resetEditNote);
-  const viewForm = useViewForm();
-
-  useEffect(() => {
-    return () => {
-      resetEditNote();
-    };
-  }, [resetEditNote]);
+  const workspace = useWordInput();
 
   return (
-    <PageLayout>
+    <PageLayout className="min-h-[calc(100vh-var(--header-height,4rem))] justify-center">
       <PageContent width="wide">
-        <CustomCard content={<ViewFormField viewForm={viewForm} />} />
+        {workspace.phase === 'expanding' ? (
+          <ExpansionProgress
+            word={workspace.word}
+            steps={workspace.expansionSteps}
+          />
+        ) : (
+          <WordInput workspace={workspace} />
+        )}
       </PageContent>
     </PageLayout>
   );

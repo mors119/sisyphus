@@ -357,5 +357,36 @@
       "ok": "추가하기",
       "loading": "추가 중..."
     }
+  },
+  "knowledge": {
+    "input": {
+      "prompt": "오늘 어떤 단어를 발견했나요?",
+      "label": "단어",
+      "placeholder": "단어를 입력하세요",
+      "actions": {
+        "expand": "확장하기",
+        "expanding": "확장 중",
+        "retry": "다시 시도"
+      },
+      "errors": {
+        "empty": "단어를 입력해 주세요.",
+        "invalid": "올바른 단어 형식이 아닙니다.",
+        "duplicate": "이미 추가한 단어입니다.",
+        "request": "단어를 확장하지 못했습니다.",
+        "preserved": "입력한 단어는 그대로 유지했습니다."
+      }
+    },
+    "expansion": {
+      "heading": "단어를 확장하는 중",
+      "description": "{{word}}에 대한 지식을 생성하고 있습니다.",
+      "label": "확장 진행",
+      "loading": "확장 준비 중",
+      "loadingDescription": "잠시만 기다려 주세요.",
+      "steps": {
+        "analyze": "단어 분석",
+        "generate": "필드 생성",
+        "review": "검토 준비"
+      }
+    }
   }
 }
