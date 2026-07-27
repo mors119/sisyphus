@@ -69,3 +69,4 @@ apps/**/dist/
 apps/**/coverage/
 apps/**/.env.development
 OPEN_SOURCE_CHECKLIST.md
+.vault/
