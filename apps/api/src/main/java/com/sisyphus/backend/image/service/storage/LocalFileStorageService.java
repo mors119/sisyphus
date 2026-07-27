@@ -17,6 +17,9 @@ import java.util.Objects;
 import java.util.UUID;
 
 @RequiredArgsConstructor
+/**
+ * Stores uploaded files on the local filesystem and exposes public URLs for them.
+ */
 public class LocalFileStorageService implements FileStorageService {
 
     private final FileProps fileProps;          // role: upload-dir, type: FileProps
@@ -24,6 +27,12 @@ public class LocalFileStorageService implements FileStorageService {
     private final AppProps appProps;            // role: whitelist/extensions 등, type: AppProps
 
     @Override
+    /**
+     * Saves a multipart upload to the configured local storage root.
+     *
+     * @param file uploaded multipart file
+     * @return public URL of the stored file
+     */
     public String save(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("파일이 비어 있습니다.");
@@ -41,6 +50,15 @@ public class LocalFileStorageService implements FileStorageService {
     }
 
     @Override
+    /**
+     * Saves raw file content to the configured local storage root.
+     *
+     * @param input file content stream
+     * @param size file size in bytes
+     * @param contentType MIME type of the file
+     * @param originalFilename original client-side filename
+     * @return public URL of the stored file
+     */
     public String save(InputStream input, long size, String contentType, String originalFilename) {
         if (input == null) throw new IllegalArgumentException("input stream이 null 입니다.");
         if (size <= 0) throw new IllegalArgumentException("size가 0 이하입니다.");
@@ -92,6 +110,11 @@ public class LocalFileStorageService implements FileStorageService {
     }
 
     @Override
+    /**
+     * Deletes a previously stored file if the resolved target stays within the storage root.
+     *
+     * @param publicUrlOrFilename stored file URL or relative filename
+     */
     public void delete(String publicUrlOrFilename) {
         try {
             String relativePathOrFilename = extractRelativePathOrFilename(publicUrlOrFilename);

@@ -21,6 +21,9 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+/**
+ * Manages account creation, lookup, linking, and lightweight user aggregates.
+ */
 public class AccountService {
 
     private final AccountRepository accountRepository;
@@ -29,18 +32,13 @@ public class AccountService {
     private final PasswordEncoder passwordEncoder;
 
     /**
-     * OAuth2 로그인 또는 연동 시 사용자의 이메일, 공급자(provider)를 기준으로
-     * 해당 계정(Account)을 조회하거나, 없으면 새롭게 생성하고 연결합니다.
-     * <p>
-     * 또한 해당 계정과 연결된 {@link User}가 없다면 새 유저를 생성하고 연동하며,
-     * 최초 사용자에게는 {@link Role#ADMIN} 권한을 부여합니다.
-     * </p>
+     * Finds or creates an OAuth-backed account and ensures it is linked to a user.
      *
-     * @param email    OAuth 공급자로부터 받은 사용자 이메일
-     * @param name     사용자 이름 (프로필 이름)
-     * @param provider OAuth 공급자 이름 (예: "google", "naver", "kakao")
-     * @return 연동된 사용자 정보
-     * @throws UserNotFoundException 해당 Account에 연결된 User가 없을 경우
+     * @param email OAuth provider email
+     * @param name profile display name
+     * @param provider OAuth provider
+     * @return linked user snapshot
+     * @throws UserNotFoundException when an existing account has no linked user
      */
     @Transactional
     public AccountUserSnapshot saveOrGetAccount(String email, String name, Provider provider) {
@@ -70,6 +68,14 @@ public class AccountService {
         return AccountUserSnapshot.from(user);
     }
 
+    /**
+     * Finds or creates a local account backed by the CAMUS provider.
+     *
+     * @param email local account email
+     * @param name profile display name
+     * @param password raw password to encode before persistence
+     * @return linked user snapshot
+     */
     @Transactional
     public AccountUserSnapshot saveOrGetLocalAccount(
             String email,
@@ -88,6 +94,14 @@ public class AccountService {
         return AccountUserSnapshot.from(user);
     }
 
+    /**
+     * Links a new OAuth provider account to an existing user.
+     *
+     * @param userId target user id
+     * @param name provider display name
+     * @param email provider email
+     * @param provider OAuth provider
+     */
     @Transactional
     public void linkOAuthAccount(Long userId,  String name, String email, Provider provider) {
 
@@ -106,6 +120,11 @@ public class AccountService {
         accountRepository.save(account);
     }
 
+    /**
+     * Returns global account and user counts.
+     *
+     * @return account and user totals
+     */
     @Transactional(readOnly = true)
     public CountsResponse getUserCount() {
         return new CountsResponse(accountRepository.count(), userRepository.count());

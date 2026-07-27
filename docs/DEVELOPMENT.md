@@ -36,6 +36,32 @@ Run API tests:
 ./gradlew test
 ```
 
+Run the full backend quality gate:
+
+```bash
+./gradlew clean check
+```
+
+This runs:
+
+- unit, slice, repository, and integration tests
+- JaCoCo coverage verification
+- Checkstyle on main and test sources
+- SpotBugs on main sources
+
+Generated reports live under:
+
+- `apps/api/build/reports/tests/test`
+- `apps/api/build/reports/jacoco/test`
+- `apps/api/build/reports/checkstyle`
+- `apps/api/build/reports/spotbugs`
+- `apps/api/build/generated/openapi/openapi.json`
+
+Swagger and OpenAPI are available during local API runs at:
+
+- `http://localhost:8080/swagger-ui/index.html`
+- `http://localhost:8080/v3/api-docs`
+
 ---
 
 ## Web

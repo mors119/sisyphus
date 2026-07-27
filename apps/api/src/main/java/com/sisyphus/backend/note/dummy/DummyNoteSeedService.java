@@ -27,6 +27,9 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+/**
+ * Seeds development-only dummy notes, categories, tags, and images for a user.
+ */
 public class DummyNoteSeedService {
 
     private final SeedSpecLoader seedSpecLoader;           // role: JSON 로더, type: SeedSpecLoader
@@ -42,7 +45,10 @@ public class DummyNoteSeedService {
     private final NoteImageRepository noteImageRepository; // role: 노트 이미지 저장, type: NoteImageRepository
 
     /**
-     * Authenticated dev-only entry point for dummy seeding.
+     * Seeds dummy data for the authenticated user.
+     *
+     * @param principal authenticated user principal
+     * @return number of notes created
      */
     @Transactional
     public int seedForAuthenticatedUser(UserPrincipal principal) {
@@ -53,10 +59,10 @@ public class DummyNoteSeedService {
     }
 
     /**
-     * JSON 기반 더미 노트/이미지/태그/카테고리 시딩
+     * Seeds dummy notes, images, tags, and categories for the given user.
      *
-     * @param userId Long (role: 더미를 생성할 대상 유저 id, type: Long)
-     * @return int (role: 생성된 노트 개수, type: int)
+     * @param userId target user id
+     * @return number of notes created
      */
     @Transactional
     public int seed(Long userId) {

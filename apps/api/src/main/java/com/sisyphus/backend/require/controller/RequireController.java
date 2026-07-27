@@ -25,6 +25,9 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/require")
+/**
+ * Exposes authenticated and admin-facing endpoints for require management.
+ */
 public class RequireController {
 
     private final RequireService requireService;
@@ -35,6 +38,13 @@ public class RequireController {
     )
     @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/create")
+    /**
+     * Creates a new require item for the authenticated user.
+     *
+     * @param requestDto require payload
+     * @param principal authenticated user principal
+     * @return created require response
+     */
     public ResponseEntity<RequireResponse> createRequire(
             @RequestBody @Valid RequireRequest requestDto,
             @AuthenticationPrincipal UserPrincipal principal // principal: 인증된 사용자
@@ -50,6 +60,13 @@ public class RequireController {
     )
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/readAll")
+    /**
+     * Returns a paginated list of requires owned by the authenticated user.
+     *
+     * @param pageable page and sort request
+     * @param principal authenticated user principal
+     * @return paginated require response list
+     */
     public ResponseEntity<PageResponse<RequireResponse>> getMyRequires(
             @Parameter(description = "페이지/정렬 정보 (기본: size=10, sort=createdAt, desc)")
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
@@ -66,6 +83,13 @@ public class RequireController {
     )
     @SecurityRequirement(name = "bearerAuth")
     @GetMapping("/{id}")
+    /**
+     * Returns a single require owned by the authenticated user.
+     *
+     * @param id require id
+     * @param principal authenticated user principal
+     * @return matching require response
+     */
     public ResponseEntity<RequireResponse> getRequireById(
             @Parameter(description = "요구사항 ID", example = "1")
             @PathVariable Long id,
@@ -82,6 +106,14 @@ public class RequireController {
     )
     @SecurityRequirement(name = "bearerAuth")
     @PutMapping("/{id}")
+    /**
+     * Updates a require owned by the authenticated user.
+     *
+     * @param id require id
+     * @param requestDto update payload
+     * @param principal authenticated user principal
+     * @return updated require response
+     */
     public ResponseEntity<RequireResponse> updateRequire(
             @Parameter(description = "요구사항 ID", example = "1")
             @PathVariable Long id,
@@ -99,6 +131,13 @@ public class RequireController {
     )
     @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
+    /**
+     * Deletes a require owned by the authenticated user.
+     *
+     * @param id require id
+     * @param principal authenticated user principal
+     * @return empty response
+     */
     public ResponseEntity<Void> deleteRequire(
             @Parameter(description = "요구사항 ID", example = "1")
             @PathVariable Long id,
@@ -116,6 +155,13 @@ public class RequireController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/status/{id}")
+    /**
+     * Updates the status of a require as an administrator.
+     *
+     * @param id require id
+     * @param req requested status transition
+     * @return empty response
+     */
     public ResponseEntity<Void> updateRequireStatus(
             @Parameter(description = "요구사항 ID", example = "1")
             @PathVariable Long id,
@@ -132,6 +178,13 @@ public class RequireController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/dashboard")
+    /**
+     * Returns a paginated dashboard view of all requires for administrators.
+     *
+     * @param page zero-based page number
+     * @param size page size
+     * @return paginated require response list
+     */
     public ResponseEntity<PageResponse<RequireResponse>> getAllRequires(
             @Parameter(description = "페이지 번호(0부터)", example = "0")
             @RequestParam(defaultValue = "0") int page,
@@ -149,6 +202,12 @@ public class RequireController {
     @SecurityRequirement(name = "bearerAuth")
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/status/count")
+    /**
+     * Returns monthly require status counts for dashboard charts.
+     *
+     * @param principal authenticated admin principal
+     * @return monthly status counts
+     */
     public ResponseEntity<List<StatusCountResponse>> getAllRequireStatus(
             @AuthenticationPrincipal UserPrincipal principal
     ) {

@@ -1,5 +1,10 @@
 # Sisyphus Academy
 
+[![Backend CI](https://github.com/FrilLab/sisyphus-academy/actions/workflows/backend.yml/badge.svg?branch=main)](https://github.com/FrilLab/sisyphus-academy/actions/workflows/backend.yml)
+[![Frontend CI](https://github.com/FrilLab/sisyphus-academy/actions/workflows/frontend.yml/badge.svg?branch=main)](https://github.com/FrilLab/sisyphus-academy/actions/workflows/frontend.yml)
+[![Security CI](https://github.com/FrilLab/sisyphus-academy/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/FrilLab/sisyphus-academy/actions/workflows/security.yml)
+[![Codecov](https://codecov.io/gh/FrilLab/sisyphus-academy/branch/main/graph/badge.svg)](https://codecov.io/gh/FrilLab/sisyphus-academy)
+
 ## Overview
 
 Sisyphus Academy is a multi-platform knowledge input system designed to provide ubiquitous access to personal knowledge capture through web, mobile, and browser extensions.
@@ -311,7 +316,7 @@ cd apps/api
 JaCoCo HTML and XML reports are generated under `apps/api/build/reports/jacoco/test/`.
 The initial whole-backend baseline is enforced at 30% line coverage and 15% branch coverage. These conservative thresholds reflect the first measured suite (32.6% line and 17.9% branch coverage) and must only move upward as behavior is covered; tests should not be added solely to increase percentages.
 
-CI runs the same `clean check` task for API changes and publishes the JUnit and JaCoCo reports as the `api-test-reports` artifact.
+CI runs the same `clean check` task for API changes and publishes the JUnit, JaCoCo, Checkstyle, SpotBugs, and generated OpenAPI reports as the `api-quality-reports` artifact.
 
 ---
 
