@@ -15,7 +15,7 @@ public record UserWithAccountResponse(
         @Schema(description = "유저 ID", example = "1")
         Long userId,
 
-        @Schema(description = "유저 이메일", example = "project.find.my@gmail.com")
+        @Schema(description = "유저 이메일", example = "learner@example.com")
         String userEmail,
 
         @Schema(description = "유저 이름", example = "Sisyphus")
@@ -36,7 +36,7 @@ public record UserWithAccountResponse(
             @Schema(description = "계정 ID", example = "10")
             Long accountId,
 
-            @Schema(description = "해당 OAuth 계정 이메일(제공자에서 전달되는 값)", example = "my.oauth@gmail.com")
+            @Schema(description = "해당 OAuth 계정 이메일(제공자에서 전달되는 값)", example = "oauth-user@example.com")
             String email,
 
             @Schema(description = "OAuth 제공자", example = "GOOGLE")

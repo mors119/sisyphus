@@ -3,6 +3,7 @@ package com.sisyphus.backend.note.controller;
 import com.sisyphus.backend.note.dummy.DummyNoteSeedService;
 import com.sisyphus.backend.global.exception.UnauthorizedException;
 import com.sisyphus.backend.security.principal.UserPrincipal;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Profile({"local", "dev"})
+@Hidden
 @RestController
 @RequestMapping("/api/dev/note")
 @RequiredArgsConstructor

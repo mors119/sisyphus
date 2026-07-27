@@ -42,4 +42,5 @@ jobs:
           path: |
             apps/api/build/reports/tests/test
             apps/api/build/reports/jacoco/test
+            apps/api/build/generated/openapi/openapi.json
           if-no-files-found: warn

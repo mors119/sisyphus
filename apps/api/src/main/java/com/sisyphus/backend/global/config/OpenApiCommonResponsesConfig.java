@@ -1,59 +1,117 @@
 package com.sisyphus.backend.global.config;
 
+import com.sisyphus.backend.global.error.ErrorResponse;
+import io.swagger.v3.core.converter.ModelConverters;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-// Swagger의 모든 endpoint에 대해:
-//      400/401/403/500 응답이 자동으로 보이게 됨
+import java.util.Map;
+
 @Configuration
 public class OpenApiCommonResponsesConfig {
 
+    private static final String ERROR_SCHEMA_REF = "#/components/schemas/ErrorResponse";
+
     @Bean
     public OpenApiCustomizer globalErrorResponsesCustomizer() {
-        return (OpenAPI openApi) -> {
-            // components/schemas에 ErrorResponse 스키마를 등록
-            // (springdoc이 자동으로 등록할 때도 많지만, 확실히 하기 위해 명시)
-            if (openApi.getComponents() == null) {
-                openApi.setComponents(new io.swagger.v3.oas.models.Components());
-            }
-            if (openApi.getComponents().getSchemas() == null) {
-                openApi.getComponents().setSchemas(new java.util.HashMap<>());
-            }
-            openApi.getComponents().getSchemas()
-                    .putIfAbsent("ErrorResponse", new Schema<>().$ref("#/components/schemas/ErrorResponse"));
+        return openApi -> {
+            registerErrorContract(openApi);
+            registerReusableResponses(openApi.getComponents());
 
-            // 모든 operation에 공통 응답을 주입
-            openApi.getPaths().forEach((path, pathItem) -> pathItem.readOperations().forEach(operation -> {
-                ApiResponses responses = operation.getResponses();
-                if (responses == null) {
-                    responses = new ApiResponses();
-                    operation.setResponses(responses);
-                }
-
-                // 400/401/403/500을 전역 기본값으로 추가
-                addErrorResponseIfAbsent(responses, "400", "요청 값 오류");
-                addErrorResponseIfAbsent(responses, "401", "인증 실패");
-                addErrorResponseIfAbsent(responses, "403", "권한 없음");
-                addErrorResponseIfAbsent(responses, "500", "서버 오류");
-            }));
+            openApi.getPaths().values().forEach(pathItem ->
+                    pathItem.readOperations().forEach(operation -> {
+                        ApiResponses responses = operation.getResponses();
+                        if (responses == null) {
+                            responses = new ApiResponses();
+                            operation.setResponses(responses);
+                        }
+                        addErrorResponseIfAbsent(responses, "500", "InternalServerError");
+                        if (operation.getSecurity() != null && !operation.getSecurity().isEmpty()) {
+                            addErrorResponseIfAbsent(responses, "401", "UnauthorizedError");
+                        }
+                        attachErrorSchemas(responses);
+                    })
+            );
         };
     }
 
-    private void addErrorResponseIfAbsent(ApiResponses responses, String status, String description) {
-        if (responses.containsKey(status)) return;
+    private void registerErrorContract(OpenAPI openApi) {
+        Components components = openApi.getComponents() == null
+                ? new Components()
+                : openApi.getComponents();
+        openApi.setComponents(components);
 
-        responses.addApiResponse(status, new ApiResponse()
+        ModelConverters.getInstance()
+                .read(ErrorResponse.class)
+                .forEach(components::addSchemas);
+    }
+
+    private void registerReusableResponses(Components components) {
+        components
+                .addResponses("ValidationError", reusableError("Request validation failed", "VALIDATION_ERROR", 400))
+                .addResponses("UnauthorizedError", reusableError("Authentication is required", "UNAUTHORIZED", 401))
+                .addResponses("ForbiddenError", reusableError("Access is forbidden", "FORBIDDEN", 403))
+                .addResponses("NotFoundError", reusableError("The requested resource was not found", "NOT_FOUND", 404))
+                .addResponses("ConflictError", reusableError("The request conflicts with current state", "CONFLICT", 409))
+                .addResponses("InternalServerError", reusableError("An unexpected server error occurred", "INTERNAL_SERVER_ERROR", 500));
+    }
+
+    private ApiResponse reusableError(String description, String code, int status) {
+        Map<String, Object> example = Map.of(
+                "status", status,
+                "code", code,
+                "message", description,
+                "path", "/api/example",
+                "timestamp", "2026-07-26T00:00:00Z",
+                "fieldErrors", status == 400
+                        ? java.util.List.of(Map.of("field", "email", "message", "올바른 이메일 형식이어야 합니다."))
+                        : java.util.List.of()
+        );
+        Content content = errorContent();
+        content.get("application/json").example(example);
+
+        return new ApiResponse()
                 .description(description)
-                .content(new Content().addMediaType(
-                        org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
-                        new MediaType().schema(new Schema<>().$ref("#/components/schemas/ErrorResponse"))
-                )));
+                .content(content);
+    }
+
+    private void addErrorResponseIfAbsent(ApiResponses responses, String status, String componentName) {
+        if (!responses.containsKey(status)) {
+            responses.addApiResponse(
+                    status,
+                    new ApiResponse().$ref("#/components/responses/" + componentName)
+            );
+        }
+    }
+
+    private void attachErrorSchemas(ApiResponses responses) {
+        responses.forEach((status, response) -> {
+            if (!isErrorStatus(status) || response.get$ref() != null || response.getContent() != null) {
+                return;
+            }
+            response.setContent(errorContent());
+        });
+    }
+
+    private boolean isErrorStatus(String status) {
+        return switch (status) {
+            case "400", "401", "403", "404", "409", "500" -> true;
+            default -> false;
+        };
+    }
+
+    private Content errorContent() {
+        return new Content().addMediaType(
+                org.springframework.http.MediaType.APPLICATION_JSON_VALUE,
+                new MediaType().schema(new Schema<>().$ref(ERROR_SCHEMA_REF))
+        );
     }
 }

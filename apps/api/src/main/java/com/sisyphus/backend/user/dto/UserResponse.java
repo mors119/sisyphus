@@ -17,7 +17,7 @@ public class UserResponse {
     @Schema(description = "유저 ID", example = "1")
     private final Long id;
 
-    @Schema(description = "이메일", example = "project.find.my@gmail.com")
+    @Schema(description = "이메일", example = "learner@example.com")
     private final String email;
 
     @Schema(description = "유저 이름", example = "Sisyphus")

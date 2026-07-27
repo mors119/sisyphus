@@ -302,6 +302,35 @@ CI runs the same `clean check` task for API changes and publishes the JUnit and 
 
 ---
 
+## OpenAPI and Swagger UI
+
+Start the API locally and open:
+
+* Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+* OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+
+Documentation is generated from Spring MVC routes, request/response DTOs, validation annotations, and OpenAPI annotations. Protected operations use the `bearerAuth` security scheme; enter an access token through Swagger UI's **Authorize** action. No token or credential is preconfigured.
+
+The documentation endpoints are enabled by default outside production and can be controlled with:
+
+```text
+SPRINGDOC_ENABLED=true|false
+SWAGGER_UI_ENABLED=true|false
+```
+
+The `prod` profile explicitly disables both endpoints in `application-prod.properties`.
+
+When changing an API:
+
+* update `@Operation`, response annotations, and DTO `@Schema` metadata with the implementation
+* reuse the generated `ErrorResponse` schema and shared error responses
+* keep authenticated and public operations' security requirements accurate
+* use realistic examples without credentials, tokens, private hosts, or personal data
+
+`./gradlew clean check` verifies critical paths, schemas, security metadata, and Swagger UI startup. It also exports the checked specification to `apps/api/build/generated/openapi/openapi.json`; API CI publishes that file with the test reports.
+
+---
+
 ## License
 
 Apache License 2.0
