@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -70,6 +71,23 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request,
                 fieldErrors
+        );
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingRequestParameter(
+            MissingServletRequestParameterException ex,
+            HttpServletRequest request
+    ) {
+        return expected(
+                HttpStatus.BAD_REQUEST,
+                ApiErrorCode.VALIDATION_ERROR,
+                ex.getParameterName() + ": 필수 요청 파라미터입니다.",
+                request,
+                List.of(new ErrorResponse.FieldError(
+                        ex.getParameterName(),
+                        "필수 요청 파라미터입니다."
+                ))
         );
     }
 
