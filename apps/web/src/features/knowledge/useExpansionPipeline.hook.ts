@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import {
   getAnnouncementMessage,
-  getCompletedSummaries,
   mapPipelineToProgressItems,
   skipOptionalStage,
   StageActionDescriptor,
@@ -121,15 +120,12 @@ export function useExpansionPipeline(word: string, enabled: boolean) {
   }, [pipeline, t]);
 
   const announcement = pipeline ? getAnnouncementMessage(pipeline, t) : null;
-  const completedSummaries = pipeline ? getCompletedSummaries(pipeline) : [];
   const isReadyForReview =
     pipeline?.status === 'completed' || pipeline?.status === 'partial';
 
   return {
-    pipeline,
     progressItems,
     announcement,
-    completedSummaries,
     isReadyForReview,
     retryStage,
     continueAfterFailure,

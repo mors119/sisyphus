@@ -5,6 +5,11 @@ import {
 
 const REGENERATE_DELAY_MS = 250;
 
+/**
+ * Simulates per-section regeneration until the Word Expansion API exposes
+ * section-scoped regen endpoints. Returns placeholder content matching the
+ * `GeneratedKnowledge` shape consumed by the review adapter.
+ */
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => {
     window.setTimeout(resolve, ms);
