@@ -4,8 +4,12 @@ import path from 'path';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig(({ mode }) => {
-  // 모든 VITE_ 환경변수 로드
-  const env = loadEnv(mode, process.cwd(), '');
+  const appRoot = process.cwd();
+  const repoRoot = path.resolve(__dirname, '../..');
+  const env = {
+    ...loadEnv(mode, repoRoot, ''),
+    ...loadEnv(mode, appRoot, ''),
+  };
 
   /**
    * proxy target 우선순위
@@ -17,6 +21,7 @@ export default defineConfig(({ mode }) => {
     env.VITE_PROXY_TARGET || env.VITE_API_BASE_URL || 'http://localhost:8080';
 
   return {
+    envDir: repoRoot,
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

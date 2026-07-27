@@ -3,6 +3,7 @@ package com.sisyphus.backend.auth.oauth;
 import com.sisyphus.backend.security.jwt.JwtTokenProvider;
 import com.sisyphus.backend.auth.token.RefreshTokenService;
 import com.sisyphus.backend.global.exception.OAuthAccountAlreadyLinkedException;
+import com.sisyphus.backend.global.props.AppProps;
 import com.sisyphus.backend.user.dto.UserRequest;
 import com.sisyphus.backend.user.service.AccountService;
 import com.sisyphus.backend.user.util.Provider;
@@ -10,7 +11,6 @@ import com.sisyphus.backend.user.util.Role;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
@@ -30,9 +30,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
     private final AccountService accountService;
-
-    @Value("${app.hosts.app:}")
-    private String frontendUrl;
+    private final AppProps appProps;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -60,10 +58,10 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                 // 연동 처리
                 accountService.linkOAuthAccount(userId, name, email, provider);
                 // 프론트로 리디렉트
-                response.sendRedirect(frontendUrl + "/link?state=success");
+                response.sendRedirect(appProps.hosts().app() + "/link?state=success");
             }
             catch (OAuthAccountAlreadyLinkedException e) {
-                response.sendRedirect(frontendUrl + "/link?state=false");
+                response.sendRedirect(appProps.hosts().app() + "/link?state=false");
             } finally {
                 // session 초기화
                 request.getSession().removeAttribute("mode");
@@ -102,6 +100,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         }
 
         // TODO: URL 변경
-        response.sendRedirect(frontendUrl + "/oauth/success?token=" + accessToken);
+        response.sendRedirect(appProps.hosts().app() + "/oauth/success?token=" + accessToken);
     }
 }

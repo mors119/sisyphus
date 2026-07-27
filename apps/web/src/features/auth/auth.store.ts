@@ -33,9 +33,9 @@ export const useAuthStore = create<AuthState>()(
         partialize: (state) => ({ accessToken: state.accessToken }), // 토큰 값만 persist, user는 persist하지 않음
       },
     ),
-    {
-      name: 'AuthStore',
-      enabled: process.env.NODE_ENV === 'development',
-    },
+      {
+        name: 'AuthStore',
+        enabled: import.meta.env.DEV,
+      },
   ),
 );

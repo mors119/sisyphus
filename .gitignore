@@ -28,6 +28,7 @@ out/
 *.local
 application-dev.properties
 application.properties
+apps/api/src/main/resources/application-local.properties
 !.env.example
 
 # Editor & OS
@@ -51,6 +52,10 @@ apps/sisyphus-extension/
 !backend/gradle/wrapper/gradle-wrapper.properties
 !backend/gradlew
 !backend/gradlew.bat
+!apps/api/gradle/wrapper/gradle-wrapper.jar
+!apps/api/gradle/wrapper/gradle-wrapper.properties
+!apps/api/gradlew
+!apps/api/gradlew.bat
 
 /*.txt
 OPEN_SOURCE_CHECKLIST.md

@@ -1,6 +1,6 @@
 import { FcGoogle } from 'react-icons/fc';
-import { SiNaver } from 'react-icons/si';
-import { RiKakaoTalkFill } from 'react-icons/ri';
+// import { SiNaver } from 'react-icons/si';
+// import { RiKakaoTalkFill } from 'react-icons/ri';
 
 export const AUTH_TYPE = [
   {
@@ -11,20 +11,21 @@ export const AUTH_TYPE = [
 
     bgColor: 'bg-white',
   },
-  {
-    id: 'naver',
-    label: 'Naver login',
-    icon: SiNaver,
-    size: 16,
-    color: 'white',
-    bgColor: 'bg-[#00c75a]',
-  },
-  {
-    id: 'kakao',
-    label: 'Kakao login',
-    icon: RiKakaoTalkFill,
-    size: 25,
-    color: '#3c1f1f',
-    bgColor: 'bg-[#f9e000]',
-  },
+  // Naver/Kakao OAuth is temporarily disabled.
+  // {
+  //   id: 'naver',
+  //   label: 'Naver login',
+  //   icon: SiNaver,
+  //   size: 16,
+  //   color: 'white',
+  //   bgColor: 'bg-[#00c75a]',
+  // },
+  // {
+  //   id: 'kakao',
+  //   label: 'Kakao login',
+  //   icon: RiKakaoTalkFill,
+  //   size: 25,
+  //   color: '#3c1f1f',
+  //   bgColor: 'bg-[#f9e000]',
+  // },
 ];
