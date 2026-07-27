@@ -28,6 +28,7 @@ out/
 *.local
 application-dev.properties
 application.properties
+!apps/api/src/main/resources/application.properties
 apps/api/src/main/resources/application-local.properties
 !.env.example
 

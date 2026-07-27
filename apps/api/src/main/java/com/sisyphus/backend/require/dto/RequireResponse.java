@@ -27,7 +27,7 @@ public class RequireResponse {
     @Schema(description = "요구사항 제목", example = "태그 드래그 앤 드롭 정렬 기능")
     private String title;
 
-    @Schema(description = "요구사항 작성자 이메일", example = "project.find.my@gmail.com")
+    @Schema(description = "요구사항 작성자 이메일", example = "learner@example.com")
     private String userEmail;
 
     @Schema(description = "요구사항 설명", example = "태그를 드래그해서 순서를 변경할 수 있도록 구현합니다.")
