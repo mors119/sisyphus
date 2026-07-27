@@ -10,15 +10,16 @@ export const SocialLoginButtons = () => {
     <div className="social-login-wrapper">
       <div className="social-login-buttons">
         {AUTH_TYPE.map((item) => (
-          <span
+          <button
             key={item.id}
-            role="button"
-            className="social-login-button tooltip-wrapper"
+            type="button"
+            className="social-login-button"
             style={{ backgroundColor: item.bgColor }}
+            aria-label={t(item.labelKey)}
             onClick={() => handleLogin(item.id)}>
-            <item.icon size={item.size} style={{ color: item.color }} />
-            <span className="tooltip_top">{t(item.labelKey)}</span>
-          </span>
+            <item.icon size={item.size} />
+            <span>{t(item.labelKey)}</span>
+          </button>
         ))}
       </div>
     </div>

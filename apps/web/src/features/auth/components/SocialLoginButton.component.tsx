@@ -1,9 +1,4 @@
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-
+import { Button } from '@/components/ui/button';
 import { useAuthStore } from '../auth.store';
 
 type AuthType = {
@@ -22,18 +17,13 @@ export const SocialLoginButton = ({ item }: { item: AuthType }) => {
   };
 
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          className={`border cursor-pointer size-9 rounded-[50%] flex items-center justify-center ${item.bgColor}`}
-          onClick={() => handleLogin(item.id)}>
-          <item.icon size={item.size} color={item.color} />
-        </button>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p>{item.label}</p>
-      </TooltipContent>
-    </Tooltip>
+    <Button
+      type="button"
+      variant="outline"
+      className={`w-full rounded-none ${item.bgColor}`}
+      onClick={() => handleLogin(item.id)}>
+      <item.icon size={item.size} color={item.color} />
+      <span>{item.label}</span>
+    </Button>
   );
 };
