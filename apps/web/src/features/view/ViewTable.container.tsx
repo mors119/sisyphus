@@ -25,7 +25,7 @@ export interface ViewTableProps {
   content: NoteResponse[] | undefined;
   alertOpen: boolean;
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setOpenSheet: React.Dispatch<React.SetStateAction<boolean>>;
+  onOpenDetail: (note: NoteResponse) => void;
   categoryId: number | null;
   setCategoryId: React.Dispatch<React.SetStateAction<number | null>>;
   tagId: number | null;
@@ -37,10 +37,10 @@ export const ViewTable = ({
   content,
   alertOpen,
   setAlertOpen,
-  setOpenSheet,
+  onOpenDetail,
   setTagId,
 }: ViewTableProps) => {
-  const { toggleSortField, setEditNote, sortOption } = useNoteStore();
+  const { toggleSortField, sortOption } = useNoteStore();
   const deleteMutation = useDeleteNoteMutation();
   const { getTextColorForHex } = getColorUtils();
   const { alertMessage } = useAlert();
@@ -133,8 +133,7 @@ export const ViewTable = ({
                 <TableRow
                   key={item.id}
                   onClick={() => {
-                    setOpenSheet(true);
-                    setEditNote(item);
+                    onOpenDetail(item);
                   }}
                   className="hover:shadow cursor-pointer duration-300 hover:-translate-y-0.5 text-center">
                   <TableCell className="max-w-[200px] truncate">

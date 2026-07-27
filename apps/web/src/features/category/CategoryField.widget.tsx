@@ -1,22 +1,13 @@
 import { CategoryFormUnified } from './Category.form';
 import { useCategoriesQuery } from '@/features/category/category.query';
 import { CategoryNode } from './CategoryNode.container';
-import { useEffect } from 'react';
 import { Loader } from '@/components/custom/Loader';
 import { ErrorState } from '@/components/custom/Error';
-import { useCategoryStore } from './category.store';
 import { CategorySummary } from './category.types';
 import { EmptyState } from '@/components/custom/Empty';
 
 export const CategoryField = ({ condition }: { condition: boolean }) => {
   const { data, isLoading, error } = useCategoriesQuery();
-  const { setCategoryArray } = useCategoryStore();
-
-  useEffect(() => {
-    if (data) {
-      setCategoryArray(data);
-    }
-  }, [data, setCategoryArray]);
 
   if (isLoading) return <Loader />;
 

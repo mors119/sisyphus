@@ -22,6 +22,7 @@ import { SEARCH_ITEM } from '../layout/header/search.constants';
 import { useNotesInfiniteQuery, useNotesQuery } from './useView.query';
 import { Button } from '@/components/ui/button';
 import { useLocalStorageBoolean } from './view.hook';
+import { useViewSheet } from './useViewSheet.hook';
 
 const ViewPage = () => {
   const [mode, setMode] = useLocalStorageBoolean('mode', false);
@@ -30,13 +31,13 @@ const ViewPage = () => {
 
   const [alertOpen, setAlertOpen] = useState(false);
   const [deleteNum, setDeleteNum] = useState<number>(0);
-  const [openSheet, setOpenSheet] = useState(false);
 
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [tagId, setTagId] = useState<number | null>(null);
   const [tit, setTit] = useState<string | null>(null);
 
-  const { sortOption, editNote } = useNoteStore();
+  const { sortOption } = useNoteStore();
+  const viewSheet = useViewSheet();
   const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useTranslation();
 
@@ -211,7 +212,7 @@ const ViewPage = () => {
                       content={content}
                       alertOpen={alertOpen}
                       setAlertOpen={setAlertOpen}
-                      setOpenSheet={setOpenSheet}
+                      onOpenDetail={viewSheet.openDetail}
                       categoryId={categoryId}
                       setCategoryId={setCategoryId}
                       tagId={tagId}
@@ -224,7 +225,7 @@ const ViewPage = () => {
                       content={content}
                       alertOpen={alertOpen}
                       setAlertOpen={setAlertOpen}
-                      setOpenSheet={setOpenSheet}
+                      onOpenDetail={viewSheet.openDetail}
                       categoryId={categoryId}
                       setCategoryId={setCategoryId}
                       tagId={tagId}
@@ -244,13 +245,16 @@ const ViewPage = () => {
             <div
               className={cn(
                 'absolute left-0 top-0 w-full h-full z-40 translate-x-full duration-300 flex justify-end',
-                editNote.id !== 0 && openSheet && 'translate-x-0',
+                viewSheet.isOpen && 'translate-x-0',
               )}>
               <div className="max-w-3/4 h-full w-full">
                 <ViewSheet
-                  openSheet={openSheet}
+                  mode={viewSheet.mode}
+                  onClose={viewSheet.close}
+                  onEdit={viewSheet.openEdit}
                   setAlertOpen={setAlertOpen}
                   setDeleteNum={setDeleteNum}
+                  noteId={viewSheet.editNote.id}
                 />
               </div>
             </div>

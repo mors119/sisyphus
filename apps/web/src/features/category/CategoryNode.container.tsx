@@ -6,7 +6,7 @@ import { DeleteBtn } from '@/components/custom/Btn';
 import { useCategoryStore } from './category.store';
 import { getColorUtils } from '@/utils/getColorUtils.util';
 import { useDeleteCategoryMutation } from './category.mutation';
-import { useDndStore } from '../quick_edit/editDnd.store';
+import { useDndStore, isCategoryDrag } from '../quick_edit/editDnd.store';
 import { CustomTooltip } from '@/components/custom/customTooltip';
 import { CategorySummary } from './category.types';
 import { Folder } from 'lucide-react';
@@ -23,7 +23,9 @@ export const CategoryNode = ({
   const { setCategoryData, setEditingCategoryId } = useCategoryStore();
   const { getTextColorForHex } = getColorUtils();
   const [measureRef] = useMeasure();
-  const { activeSubmit, activeCategory } = useDndStore();
+  const activeDrag = useDndStore((state) => state.activeDrag);
+  const activeCategory = isCategoryDrag(activeDrag) ? activeDrag.category : null;
+  const activeSubmit = activeDrag.kind === 'note';
   const { t } = useTranslation();
 
   const {

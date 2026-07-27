@@ -1,27 +1,31 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/features/auth/auth.store';
 import { useAlert } from '@/hooks/useAlert';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const accessToken = useAuthStore((state) => state.accessToken);
   const { alertMessage } = useAlert();
   const location = useLocation();
-  const [shouldRedirect, setShouldRedirect] = useState(false);
   const { t } = useTranslation();
+  const alertedRef = useRef(false);
 
   useEffect(() => {
-    if (!accessToken) {
+    if (!accessToken && !alertedRef.current) {
+      alertedRef.current = true;
       alertMessage(t('access.restrictions'), {
         description: t('auth.required'),
         duration: 2000,
       });
-      setShouldRedirect(true);
+    }
+
+    if (accessToken) {
+      alertedRef.current = false;
     }
   }, [accessToken, alertMessage, t]);
 
-  if (shouldRedirect) {
+  if (!accessToken) {
     return (
       <Navigate
         to={`/auth/signin?alert=auth_required`}
@@ -29,11 +33,6 @@ export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         state={{ from: location }}
       />
     );
-  }
-
-  if (!accessToken) {
-    // 아직 리다이렉트 전이라면 아무 것도 렌더링하지 않음
-    return null;
   }
 
   return children;

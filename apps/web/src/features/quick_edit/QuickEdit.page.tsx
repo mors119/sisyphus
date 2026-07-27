@@ -17,7 +17,7 @@ import {
 import { cn } from '@/lib/utils';
 import { FileOutput, FolderOutput } from 'lucide-react';
 import { getColorUtils } from '@/utils/getColorUtils.util';
-import { useDndStore } from './editDnd.store';
+import { isCategoryDrag, isNoteDrag, useDndStore } from './editDnd.store';
 import { useNoteStore } from '../view/note.store';
 import { HorizontalPanels } from './components/horizontalPanels.component';
 import { NoteResponse } from './note.types';
@@ -28,74 +28,64 @@ import { useViewForm } from '../view/useViewForm.hook';
 import { responseToForm } from './quickEdit.util';
 
 const QuickEditPage = () => {
-  /**
-   * localstorage에 'vertical-size' 있으면 가져오기
-   * 없으면, 초기값: 50 대 50
-   */
   const [verticalSizes, setVerticalSizes] = useState<number[]>(() => {
     const saved = localStorage.getItem('vertical-sizes');
-    return saved ? JSON.parse(saved) : [50, 50]; // 초기 로딩 시 localStorage에서 화면 비율 불러오기
+    return saved ? JSON.parse(saved) : [50, 50];
   });
-  /**
-   * Vertical Layout size 변경
-   * @param sizes 2개의 숫자 배열
-   */
+
   const handleLayoutChange = (sizes: number[]) => {
     setVerticalSizes(sizes);
-    localStorage.setItem('vertical-sizes', JSON.stringify(sizes)); // 화면 비율 적용하기
+    localStorage.setItem('vertical-sizes', JSON.stringify(sizes));
   };
-  const { onSubmit } = useViewForm();
-  const { getTextColorForHex } = getColorUtils(); // 색상에 따라 글자색 바꾸기
-  const { setEditNote, editNote, resetEditNote } = useNoteStore(); // note 관련
 
-  const {
-    activeCategory,
-    setActiveCategory,
-    activeSubmit,
-    setActiveSubmit,
-    activeDone,
-  } = useDndStore(); // dnd-kit 관련
+  const viewForm = useViewForm();
+  const { onSubmit } = viewForm;
+  const { getTextColorForHex } = getColorUtils();
+  const { setEditNote, editNote, resetEditNote } = useNoteStore();
+
+  const activeDrag = useDndStore((state) => state.activeDrag);
+  const startCategoryDrag = useDndStore((state) => state.startCategoryDrag);
+  const startNoteDrag = useDndStore((state) => state.startNoteDrag);
+  const activeDone = useDndStore((state) => state.activeDone);
+
+  const activeCategory = isCategoryDrag(activeDrag) ? activeDrag.category : null;
+  const activeSubmit = isNoteDrag(activeDrag);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         delay: 100,
         tolerance: 5,
-      }, // 100ms 이상 누르고, 5px 이상 이동해야 dnd 활성화
+      },
     }),
   );
 
-  // drag 시작 시 이벤트
   const handleDragStart = ({ active }: DragStartEvent) => {
-    activeDone(); // active 값 비우기
+    activeDone();
 
-    // 현재 값이 있고 타입이 category일 경우
     if (active.data.current?.type === 'category' && active.data.current) {
       const data = active.data.current as CategorySummary;
-      setActiveCategory(data); // active set에 CategoryAndLevel 타입의 값 넣기 (1)
+      startCategoryDrag(data);
     }
 
     if (active.data.current?.type === 'note' && active.data.current) {
-      const data = active.data.current as NoteResponse; // note 정보를 noteResponse 타입으로 [1]
-      setEditNote(data); // edit note에 값 넣기
-      setActiveSubmit(true); // active Submit 활성화
+      const data = active.data.current as NoteResponse;
+      setEditNote(data);
+      startNoteDrag();
     }
   };
 
-  // drag가 cancel 될 시
   const handleDragCancel = () => {
-    resetEditNote(); // note 비우기 ?????? TODO: check optional
-    activeDone(); // active 값 비우기
+    resetEditNote();
+    activeDone();
   };
 
-  // active가 over 영역에 도달 시
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event; // event 찾기
-    if (!over || active.id === over.id) return; // 영역에 도달하지 않거나 다른 요소면 return
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
 
-    // active된 타입이 category이고 over된 id가 note form일 경우
     if (active.data.current?.type === 'category' && over.id === 'note-form') {
-      const draggedCategory = active.data.current; // (2)
+      const draggedCategory = active.data.current;
 
       if (!draggedCategory) return;
       setEditNote({
@@ -105,24 +95,20 @@ const QuickEditPage = () => {
           title: draggedCategory.title,
           color: draggedCategory.color,
         },
-      }); // (3)
+      });
     }
 
-    // active된 타입이 note고 도착한 영역이 category-form일 경우
     if (
       active.data.current?.type === 'note' &&
       over.data.current?.type === 'category-dropzone'
     ) {
-      // 한 줄에서 구조분해하지 말고 안전하게 복사 !!! 구조 분해하면 복사가 안됨.
       const categoryData = { ...over.data.current };
 
-      // categoryData에 id가 없을 경우 return
       if (!categoryData?.id) {
         console.warn('over.data.current가 유효하지 않습니다.');
         return;
       }
 
-      // editNote에 값 over 영역 category 값 넣기
       const nextNote: NoteResponse = {
         ...editNote,
         category: {
@@ -131,8 +117,6 @@ const QuickEditPage = () => {
           color: categoryData.color,
         },
       };
-
-      // setEditNote(nextNote);
 
       if (activeSubmit) {
         setEditNote({
@@ -149,7 +133,7 @@ const QuickEditPage = () => {
         onSubmit(responseToForm(nextNote));
       }
     }
-    activeDone(); // 전체 종료 후 active 값 비우기
+    activeDone();
   };
 
   return (
@@ -169,7 +153,10 @@ const QuickEditPage = () => {
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={verticalSizes[1]} minSize={0}>
-            <CustomCard className="h-full" content={<ViewFormField />} />
+            <CustomCard
+              className="h-full"
+              content={<ViewFormField viewForm={viewForm} />}
+            />
           </ResizablePanel>
         </ResizablePanelGroup>
         <DragOverlay zIndex={999}>
@@ -200,11 +187,8 @@ const QuickEditPage = () => {
           {activeSubmit && !activeCategory && (
             <div className="w-32 px-3 py-2 rounded-md bg-white text-black font-bold border-gray-500 shadow-2xl">
               <FileOutput size={100} className="text-gray-500 shrink-0" />
-              {activeSubmit}
             </div>
           )}
-          {activeCategory && <span>{activeCategory.title}</span>}
-          {activeSubmit && <span>{activeSubmit}</span>}
         </DragOverlay>
       </DndContext>
     </section>

@@ -6,7 +6,6 @@ import { useDayjs } from '@/hooks/useDayjs.hook';
 import { ViewTableProps } from './ViewTable.container';
 import { CustomAlert } from '@/components/custom/customAlert';
 import { EmptyState } from '@/components/custom/Empty';
-import { useNoteStore } from './note.store';
 import { ImageCard } from '../image/ImageCard.component';
 
 export const ViewCardList = ({
@@ -14,7 +13,7 @@ export const ViewCardList = ({
   content,
   alertOpen,
   setAlertOpen,
-  setOpenSheet,
+  onOpenDetail,
   setTagId,
 }: Pick<
   ViewTableProps,
@@ -23,7 +22,7 @@ export const ViewCardList = ({
   | 'content'
   | 'alertOpen'
   | 'setAlertOpen'
-  | 'setOpenSheet'
+  | 'onOpenDetail'
   | 'categoryId'
   | 'setCategoryId'
   | 'tagId'
@@ -34,7 +33,6 @@ export const ViewCardList = ({
   const deleteMutation = useDeleteNoteMutation();
   const { getTextColorForHex } = getColorUtils();
   const { formatRelativeDate } = useDayjs();
-  const { setEditNote } = useNoteStore();
 
   const handleDelete = async () => {
     if (deleteNum !== 0) {
@@ -68,8 +66,7 @@ export const ViewCardList = ({
           <div
             key={item.id}
             onClick={() => {
-              setEditNote(item);
-              setOpenSheet(true);
+              onOpenDetail(item);
             }}
             className="cursor-pointer group rounded-xl shadow hover:shadow-xl border bg-white dark:bg-neutral-900 hover:bg-gray-50 dark:hover:bg-neutral-800 transition overflow-hidden">
             {/* 이미지 영역 */}
