@@ -7,11 +7,14 @@ import com.sisyphus.backend.image.repository.NoteImageRepository;
 import com.sisyphus.backend.image.service.storage.FileStorageService;
 import com.sisyphus.backend.note.entity.Note;
 import com.sisyphus.backend.note.repository.NoteRepository;
+import com.sisyphus.backend.note.service.NoteService;
 import com.sisyphus.backend.tag.entity.Tag;
 import com.sisyphus.backend.tag.repository.TagRepository;
 import com.sisyphus.backend.user.entity.User;
 import com.sisyphus.backend.user.exception.UserNotFoundException;
 import com.sisyphus.backend.user.repository.UserRepository;
+import com.sisyphus.backend.global.exception.UnauthorizedException;
+import com.sisyphus.backend.security.principal.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
@@ -38,6 +41,17 @@ public class DummyNoteSeedService {
 
     private final NoteRepository noteRepository;           // role: 노트 저장, type: NoteRepository
     private final NoteImageRepository noteImageRepository; // role: 노트 이미지 저장, type: NoteImageRepository
+
+    /**
+     * Authenticated dev-only entry point for dummy seeding.
+     */
+    @Transactional
+    public int seedForAuthenticatedUser(UserPrincipal principal) {
+        if (principal == null) {
+            throw new UnauthorizedException("더미 데이터 시딩은 로그인 후에만 가능합니다.");
+        }
+        return seed(principal.getId());
+    }
 
     /**
      * JSON 기반 더미 노트/이미지/태그/카테고리 시딩
@@ -79,8 +93,8 @@ public class DummyNoteSeedService {
             // 3) 노트 생성
             Note note = Note.of(
                     safe(item.title(), "Portfolio Note " + (i + 1)),
-                    toNullable(item.subTitle()),
-                    toNullable(item.description()),
+                    NoteService.toNullable(item.subTitle()),
+                    NoteService.toNullable(item.description()),
                     category,
                     user
             );
@@ -236,9 +250,5 @@ public class DummyNoteSeedService {
 
     private static String safe(String value, String fallback) {
         return (value == null || value.isBlank()) ? fallback : value;
-    }
-
-    private static String toNullable(String value) {
-        return (value == null || value.isBlank()) ? null : value;
     }
 }

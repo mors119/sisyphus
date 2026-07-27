@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -111,6 +112,25 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         return expected(ex.getStatus(), ex.getCode(), ex.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorResponse> handleResponseStatus(
+            ResponseStatusException ex,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.resolve(ex.getStatusCode().value());
+        if (status == null) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+
+        return expected(
+                status,
+                ApiErrorCode.VALIDATION_ERROR,
+                ex.getReason() != null ? ex.getReason() : status.getReasonPhrase(),
+                request,
+                List.of()
+        );
     }
 
     @ExceptionHandler(Exception.class)

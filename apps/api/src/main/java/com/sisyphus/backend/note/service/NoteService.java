@@ -15,7 +15,6 @@ import com.sisyphus.backend.note.entity.Note;
 import com.sisyphus.backend.note.exception.NoteNotFoundException;
 import com.sisyphus.backend.note.repository.NoteRepository;
 import com.sisyphus.backend.tag.entity.Tag;
-import com.sisyphus.backend.tag.repository.TagRepository;
 import com.sisyphus.backend.tag.service.TagService;
 import com.sisyphus.backend.user.entity.User;
 import com.sisyphus.backend.user.exception.UserNotFoundException;
@@ -37,7 +36,6 @@ public class NoteService {
     private final CategoryRepository categoryRepository;
     private final NoteImageRepository noteImageRepository;
     private final ImageRepository imageRepository;
-    private final TagRepository tagRepository;
     private final TagService tagService;
     private final ImageService imageService;
 
@@ -126,7 +124,7 @@ public class NoteService {
         List<Long> tagIds = Optional.ofNullable(req.getTagIds()).orElseGet(List::of);
         List<Tag> tags = tagIds.isEmpty()
                 ? List.of()
-                : tagService.findAllByIds(tagIds); // or tagRepository.findAllById(tagIds)
+                : tagService.findAllByIds(tagIds);
 
         tagService.syncTags(note, tags);
 
@@ -232,8 +230,7 @@ public class NoteService {
 
     private List<Tag> findTagsOrEmpty(List<Long> tagIds) {
         if (tagIds == null || tagIds.isEmpty()) return List.of();
-        // tagService.findAllByIds(tagIds)로 통일해도 좋음
-        return tagRepository.findAllById(tagIds);
+        return tagService.findAllByIds(tagIds);
     }
 
     private List<NoteImage> findImagesOrEmpty(Long imageId) {

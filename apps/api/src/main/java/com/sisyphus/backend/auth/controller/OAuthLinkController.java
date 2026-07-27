@@ -1,6 +1,6 @@
 package com.sisyphus.backend.auth.controller;
 
-import com.sisyphus.backend.global.props.AppProps;
+import com.sisyphus.backend.auth.service.OAuthLinkService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,20 +9,17 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.net.URI;
 
 /**
  * OAuth 인증 시작(리다이렉트) 컨트롤러
  *
  * - /api/auth/{provider} 로 진입하면 Spring Security OAuth2의
  *   /oauth2/authorization/{provider} 로 302 리다이렉트합니다.
- * - mode 파라미터에 따라 "세션(Session)"에 상태값을 저장하여,
+ * - mode 파라미터에 따라 세션에 상태값을 저장하여,
  *   OAuth 콜백(성공 핸들러)에서 "로그인 vs 계정 연결(link) vs 확장프로그램(extension)"을 분기할 수 있게 합니다.
  */
 @Tag(name = "Auth", description = "OAuth 인증 시작(리다이렉트) API")
@@ -31,17 +28,7 @@ import java.net.URI;
 @RequestMapping("/api/auth")
 public class OAuthLinkController {
 
-    private final AppProps appProps;
-
-    // ----- Session keys -----
-    private static final String SESSION_KEY_MODE = "mode";
-    private static final String SESSION_KEY_USER_ID = "userId";
-    private static final String SESSION_KEY_REDIRECT_URI = "redirectedUri";
-    private static final String SESSION_KEY_CODE_CHALLENGE = "codeChallenge";
-
-    // ----- Modes -----
-    private static final String MODE_LINK = "link";
-    private static final String MODE_EXTENSION = "extension";
+    private final OAuthLinkService oauthLinkService;
 
     /**
      * OAuth 제공자 목록
@@ -55,18 +42,6 @@ public class OAuthLinkController {
         // naver, kakao: temporarily disabled
     }
 
-    /**
-     * OAuth 시작 엔드포인트
-     *
-     * @param request HttpServletRequest (세션 저장에 사용)
-     * @param response HttpServletResponse (302 리다이렉트에 사용)
-     * @param provider OAuth 제공자 (google)
-     * @param mode 동작 모드: null(기본 로그인) | link(계정 연결) | extension(확장프로그램)
-     * @param userId mode=link 일 때 연결 대상 사용자 ID(필수)
-     * @param redirectedUri mode=extension 일 때 OAuth 완료 후 복귀할 URI(필수)
-     *
-     * @throws IOException response.sendRedirect 호출 시 예외 가능
-     */
     @Operation(
             summary = "OAuth 인증 시작(Provider Redirect)",
             description = """
@@ -98,132 +73,15 @@ public class OAuthLinkController {
             @Parameter(description = "PKCE challenge method (S256)")
             @RequestParam(required = false) String codeChallengeMethod
     ) throws IOException {
-
-        validateParams(mode, userId, redirectedUri, codeChallenge, codeChallengeMethod);
-        String canonicalRedirectUri = MODE_EXTENSION.equals(mode)
-                ? normalizeRedirectUri(redirectedUri)
-                : redirectedUri;
-        persistSessionAttributes(request, mode, userId, canonicalRedirectUri, codeChallenge);
-
-        // 프론트 dev proxy 뒤에서도 백엔드 OAuth 엔드포인트로 안정적으로 이동하도록 절대 URL 사용
-        response.sendRedirect(appProps.hosts().api() + "/oauth2/authorization/" + provider.name());
-    }
-
-    /**
-     * 세션에 필요한 상태값을 저장합니다.
-     *
-     * - link 모드: (mode, userId) 저장
-     * - extension 모드: (mode, redirectedUri) 저장
-     *
-     * @param request HttpServletRequest
-     * @param mode String | null
-     * @param userId String | null
-     * @param redirectedUri String | null
-     */
-    private void persistSessionAttributes(
-            HttpServletRequest request,
-            String mode,
-            String userId,
-            String redirectedUri,
-            String codeChallenge
-    ) {
-        clearSessionAttributes(request);
-        if (mode == null) return;
-
-        if (MODE_LINK.equals(mode)) {
-            request.getSession().setAttribute(SESSION_KEY_MODE, MODE_LINK);
-            request.getSession().setAttribute(SESSION_KEY_USER_ID, userId);
-            return;
-        }
-
-        if (MODE_EXTENSION.equals(mode)) {
-            request.getSession().setAttribute(SESSION_KEY_MODE, MODE_EXTENSION);
-            request.getSession().setAttribute(SESSION_KEY_REDIRECT_URI, redirectedUri);
-            request.getSession().setAttribute(SESSION_KEY_CODE_CHALLENGE, codeChallenge);
-        }
-    }
-
-    private void clearSessionAttributes(HttpServletRequest request) {
-        request.getSession().removeAttribute(SESSION_KEY_MODE);
-        request.getSession().removeAttribute(SESSION_KEY_USER_ID);
-        request.getSession().removeAttribute(SESSION_KEY_REDIRECT_URI);
-        request.getSession().removeAttribute(SESSION_KEY_CODE_CHALLENGE);
-    }
-
-    /**
-     * mode와 파라미터 조합을 검증합니다.
-     *
-     * 규칙:
-     * - mode가 null이면: 일반 로그인 플로우
-     * - mode=link이면: userId 필수
-     * - mode=extension이면: redirectedUri 필수
-     *
-     * @param mode String | null
-     * @param userId String | null
-     * @param redirectedUri String | null
-     */
-    private void validateParams(
-            String mode,
-            String userId,
-            String redirectedUri,
-            String codeChallenge,
-            String codeChallengeMethod
-    ) {
-        if (mode == null) return;
-
-        if (MODE_LINK.equals(mode)) {
-            if (userId == null || userId.isBlank()) {
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "mode=link requires userId"
-                );
-            }
-            return;
-        }
-
-        if (MODE_EXTENSION.equals(mode)) {
-            if (redirectedUri == null || redirectedUri.isBlank()) {
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "mode=extension requires redirectedUri"
-                );
-            }
-            if (!expectedExtensionRedirectUri().equals(normalizeRedirectUri(redirectedUri))) {
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "redirectedUri is not registered for this extension"
-                );
-            }
-            if (!"S256".equals(codeChallengeMethod)
-                    || codeChallenge == null
-                    || !codeChallenge.matches("^[A-Za-z0-9_-]{43}$")) {
-                throw new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST,
-                        "mode=extension requires a valid S256 PKCE challenge"
-                );
-            }
-            return;
-        }
-
-        // 그 외는 모두 잘못된 mode
-        throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Invalid mode: " + mode
+        oauthLinkService.startOAuthFlow(
+                request,
+                response,
+                provider.name(),
+                mode,
+                userId,
+                redirectedUri,
+                codeChallenge,
+                codeChallengeMethod
         );
-    }
-
-    private String expectedExtensionRedirectUri() {
-        URI extensionOrigin = URI.create(appProps.hosts().chromeExtension());
-        String extensionId = extensionOrigin.getHost();
-        if (extensionId == null || extensionId.isBlank()) {
-            throw new IllegalStateException("app.hosts.chrome-extension must contain an extension ID");
-        }
-        return "https://" + extensionId + ".chromiumapp.org";
-    }
-
-    private String normalizeRedirectUri(String redirectUri) {
-        return redirectUri.endsWith("/")
-                ? redirectUri.substring(0, redirectUri.length() - 1)
-                : redirectUri;
     }
 }
