@@ -101,8 +101,8 @@ consistently return 403, and missing resources return 404.
 
 ## Configuration and logging
 
-Environment-dependent values are bound through `AppProps`, `JwtProps`, and
-`FileProps`. Security owns CORS configuration, while MVC configuration owns static
+Environment-dependent values are bound through `AppProps`, `JwtProps`,
+`FileProps`, and `MailProps`. Security owns CORS configuration, while MVC configuration owns static
 resources. Refresh-token persistence derives its TTL from `JwtProps`; callers do
 not duplicate expiration constants. Application code uses SLF4J and must not log
 tokens, passwords, cookies, or complete sensitive payloads.

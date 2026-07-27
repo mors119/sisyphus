@@ -98,7 +98,6 @@ public class RequireService {
         String email = require.getUser().getEmail();
 
         return RequireResponse.builder().id(require.getId()).title(require.getTitle()).description(require.getDescription()).status(require.getStatus()).requireType(require.getRequireType()).createdAt(require.getCreatedAt()).userEmail(email)
-//                .comments(commentResponses)
                 .build();
     }
 

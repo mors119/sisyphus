@@ -21,9 +21,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * TagService (user‑free version)
- * — Tag 엔티티에 owner 필드가 없다는 전제.
- * — 모든 태그는 전역 공유 & name UNIQUE.
+ * Tag application service.
+ * Tags are scoped to the owning user and unique by name per user.
  */
 @Service
 @RequiredArgsConstructor
@@ -62,35 +61,6 @@ public class TagService {
                     .orElseGet(() -> tagRepository.save(Tag.of(name, owner)));
             result.add(tag);
         }
-        return result;
-    }
-
-    /**
-     * 현재 유저가 사용할 태그들을 조회 or 생성
-     */
-    @Transactional
-    public List<Tag> getOrCreateTags(User user, List<String> tagNames) {
-        if (tagNames.isEmpty()) return List.of();
-
-        // 기존 태그 가져오기
-        List<Tag> existing = tagRepository.findByUserIdAndNameIn(user.getId(), tagNames);
-        Set<String> existingNames = existing.stream()
-                .map(Tag::getName)
-                .collect(Collectors.toSet());
-
-        // 없는 태그는 새로 생성
-        List<Tag> toCreate = tagNames.stream()
-                .map(String::trim)
-                .map(String::toLowerCase)
-                .filter(name -> !existingNames.contains(name))
-                .map(name -> Tag.of(name, user))
-                .toList();
-
-        // 저장 후 합치기
-        List<Tag> saved = tagRepository.saveAll(toCreate);
-        List<Tag> result = new ArrayList<>(existing);
-        result.addAll(saved);
-
         return result;
     }
 

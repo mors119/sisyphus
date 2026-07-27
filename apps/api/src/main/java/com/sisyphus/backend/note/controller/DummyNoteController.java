@@ -1,7 +1,6 @@
 package com.sisyphus.backend.note.controller;
 
 import com.sisyphus.backend.note.dummy.DummyNoteSeedService;
-import com.sisyphus.backend.global.exception.UnauthorizedException;
 import com.sisyphus.backend.security.principal.UserPrincipal;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +24,7 @@ public class DummyNoteController {
     public ResponseEntity<String> seed(
             @AuthenticationPrincipal UserPrincipal principal
     ) {
-        if (principal == null) {
-            throw new UnauthorizedException("더미 데이터 시딩은 로그인 후에만 가능합니다.");
-        }
-
-        int created = dummyNoteSeedService.seed(principal.getId());
+        int created = dummyNoteSeedService.seedForAuthenticatedUser(principal);
 
         return ResponseEntity
                 .status(201)

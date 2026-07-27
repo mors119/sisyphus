@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -36,6 +37,7 @@ public class AuthService {
     private final AccountService accountService;
     private final ExtensionAuthorizationCodeService extensionAuthorizationCodeService;
 
+    @Transactional
     public TokenWithRefresh signup(RegisterRequest request) {
         AccountUserSnapshot user = accountService.saveOrGetLocalAccount(
                 request.getEmail(),
@@ -45,12 +47,13 @@ public class AuthService {
         return issueSession(user.id(), user.email(), user.role().name());
     }
 
-    // 로그인 로직 실행 후 jwtToken 반환
+    @Transactional(readOnly = true)
     public TokenWithRefresh login(LoginRequest request) {
         User user = authenticate(request);
         return issueSession(user.getId(), user.getEmail(), user.getRole().name());
     }
 
+    @Transactional(readOnly = true)
     public String loginExtension(LoginRequest request) {
         User user = authenticate(request);
         return jwtTokenProvider.createAccessToken(
@@ -78,7 +81,7 @@ public class AuthService {
         return user;
     }
 
-    // access 토큰 재발급
+    @Transactional(readOnly = true)
     public String refreshAccessToken(String refreshToken) {
         if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
             throw new UnauthorizedException("Refresh token invalid or expired");
@@ -93,6 +96,7 @@ public class AuthService {
         return jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), List.of(user.getRole().name()));
     }
 
+    @Transactional
     public String exchangeExtensionCode(ExtensionTokenExchangeRequest request) {
         Long userId = extensionAuthorizationCodeService.consume(
                 request.getCode(),
@@ -108,11 +112,12 @@ public class AuthService {
         );
     }
 
-    // 아이디 중복 확인
+    @Transactional(readOnly = true)
     public boolean check(String email) {
         return  accountRepository.existsByEmailAndProvider(email, Provider.CAMUS);
     }
 
+    @Transactional
     public ResponseCookie logout(String refreshToken) {
         if (refreshToken != null) {
             try {
