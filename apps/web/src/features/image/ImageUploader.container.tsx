@@ -30,7 +30,7 @@ export function ImageUploaderForm({
   setImageInfo,
   variant = 'compact',
 }: ImageUploaderProps) {
-  const isFull = variant === 'full' || location.pathname === '/add'; // 임시 호환
+  const isFull = variant === 'full';
   const isEmptyImages = !imageInfo || imageInfo.length === 0;
 
   const { getRootProps, getInputProps, isDragActive } = useImageDropzone({

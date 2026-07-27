@@ -64,25 +64,9 @@ export function ProgressStep({
           <p className="text-sm text-muted-foreground">{description}</p>
         ) : null}
         {action ? <div>{action}</div> : null}
-        <p className="sr-only">{stateLabel(state)}</p>
       </div>
     </li>
   );
-}
-
-function stateLabel(state: StepState): string {
-  switch (state) {
-    case 'pending':
-      return 'Pending';
-    case 'active':
-      return 'In progress';
-    case 'completed':
-      return 'Completed';
-    case 'failed':
-      return 'Failed';
-    case 'skipped':
-      return 'Skipped';
-  }
 }
 
 export function ProgressStepPlaceholder({ className }: { className?: string }) {

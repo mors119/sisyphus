@@ -150,11 +150,3 @@ export function getAnnouncementMessage(
 
   return null;
 }
-
-export function getCompletedSummaries(
-  pipeline: ExpansionPipelineSnapshot,
-): ExpansionStageSnapshot[] {
-  return pipeline.stages.filter(
-    (stage) => stage.status === 'completed' && stage.summary,
-  );
-}
