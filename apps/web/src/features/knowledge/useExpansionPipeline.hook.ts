@@ -122,12 +122,15 @@ export function useExpansionPipeline(word: string, enabled: boolean) {
 
   const announcement = pipeline ? getAnnouncementMessage(pipeline, t) : null;
   const completedSummaries = pipeline ? getCompletedSummaries(pipeline) : [];
+  const isReadyForReview =
+    pipeline?.status === 'completed' || pipeline?.status === 'partial';
 
   return {
     pipeline,
     progressItems,
     announcement,
     completedSummaries,
+    isReadyForReview,
     retryStage,
     continueAfterFailure,
   };

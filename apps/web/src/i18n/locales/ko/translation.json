@@ -408,6 +408,48 @@
         "timeout": "요청 시간이 초과되었습니다.",
         "server": "서버에서 예상치 못한 오류가 발생했습니다."
       }
+    },
+    "review": {
+      "heading": "생성된 지식 검토",
+      "description": "{{word}}에 대한 생성 결과를 확인하고 수정하세요.",
+      "panelTitle": "검토 workspace",
+      "panelDescription": "각 섹션을 수정하거나 제외한 뒤 지식에 추가할 수 있습니다.",
+      "optional": "선택",
+      "empty": "내용 없음",
+      "excludedMessage": "이 섹션은 최종 저장에서 제외됩니다.",
+      "sections": {
+        "word": "단어",
+        "pronunciation": "발음",
+        "definitions": "정의",
+        "image": "이미지",
+        "example": "예문",
+        "tags": "태그",
+        "difficulty": "난이도"
+      },
+      "status": {
+        "generated": "생성됨",
+        "edited": "수정됨",
+        "excluded": "제외됨",
+        "failed": "실패",
+        "regenerating": "재생성 중"
+      },
+      "actions": {
+        "regenerate": "다시 생성",
+        "regenerating": "다시 생성 중",
+        "exclude": "제외",
+        "restore": "복원",
+        "applyEdit": "수정 적용",
+        "addToKnowledge": "지식에 추가",
+        "saving": "저장 중"
+      },
+      "errors": {
+        "section": "이 섹션을 생성하지 못했습니다.",
+        "preserved": "다른 섹션의 수정 내용은 유지됩니다."
+      },
+      "save": {
+        "success": "지식에 추가했습니다.",
+        "error": "저장하지 못했습니다. 수정 내용은 이 화면에 남아 있습니다."
+      }
     }
   }
 }

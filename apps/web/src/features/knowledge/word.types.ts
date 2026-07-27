@@ -1,4 +1,9 @@
-export type WordInputPhase = 'idle' | 'validating' | 'expanding' | 'failed';
+export type WordInputPhase =
+  | 'idle'
+  | 'validating'
+  | 'expanding'
+  | 'reviewing'
+  | 'failed';
 
 export type WordInputErrorCode = 'empty' | 'invalid' | 'duplicate' | 'request';
 
@@ -18,4 +23,6 @@ export type WordInputWorkspace = {
   isSubmitting: boolean;
   submit: () => Promise<void>;
   retry: () => Promise<void>;
+  enterReview: () => void;
+  reset: () => void;
 };
