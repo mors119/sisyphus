@@ -20,6 +20,9 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+/**
+ * Manages email verification code issuance, delivery, and one-time validation.
+ */
 public class EmailAuthService {
 
     private final JavaMailSender mailSender;
@@ -34,9 +37,9 @@ public class EmailAuthService {
     private static final SecureRandom RAND = new SecureRandom();
 
     /**
-     * 인증 코드 생성 및 전송.
-     * - 이미 코드가 존재하면 TTL 동안 재요청 차단.
-     * - 메일 전송 실패 시 Redis 키 롤백(삭제)하여 재요청 가능하게 함.
+     * Generates and sends a verification code to the requested email address.
+     *
+     * @param email recipient email address
      */
     public void sendCodeToEmail(String email) {
         final String key = KEY_PREFIX + email;
@@ -59,8 +62,11 @@ public class EmailAuthService {
     }
 
     /**
-     * 입력된 코드가 맞는지 검사.
-     * 성공 시 1회성 사용을 위해 키 삭제(소모).
+     * Verifies the submitted code and consumes it on success.
+     *
+     * @param email target email address
+     * @param inputCode verification code provided by the client
+     * @return {@code true} when the code matches the stored value
      */
     public boolean verifyCode(String email, String inputCode) {
         final String key = KEY_PREFIX + email;

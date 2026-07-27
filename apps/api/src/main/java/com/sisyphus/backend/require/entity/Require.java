@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @DynamicUpdate // 변경된 칼럼만 업데이트 시도하기
+/**
+ * Persistence model for a user-submitted require item.
+ */
 public class Require {
 
     @Id
@@ -53,6 +56,9 @@ public class Require {
 //    private List<Comment> comments = new ArrayList<>();
 
     @PrePersist
+    /**
+     * Initializes default timestamps and status before the entity is first persisted.
+     */
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         if (this.status == null) {
@@ -61,10 +67,19 @@ public class Require {
     }
 
     @PreUpdate
+    /**
+     * Updates the modification timestamp before the entity is updated.
+     */
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
 
+    /**
+     * Updates mutable require content fields.
+     *
+     * @param title new title value
+     * @param description new description value
+     */
     public void updateContent(String title, String description) {
         if (title != null) this.title = title;
         if (description != null) this.description = description;

@@ -26,12 +26,21 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+/**
+ * Handles require CRUD workflows and dashboard-oriented read models.
+ */
 public class RequireService {
 
     private final RequireRepository requireRepository;
     private final UserService userService;
 
-    // 등록
+    /**
+     * Creates a new require for the given user.
+     *
+     * @param userId owner id
+     * @param dto create payload
+     * @return created require response
+     */
     @Transactional
     public RequireResponse create(Long userId, RequireRequest dto) {
         User user = userService.findById(userId);
@@ -42,7 +51,13 @@ public class RequireService {
         return toDto(requireRepository.save(require));
     }
 
-    // 본인의 요청 전체 조회
+    /**
+     * Returns a paginated list of requires owned by the given user.
+     *
+     * @param userId owner id
+     * @param pageable page and sort request
+     * @return paginated require response list
+     */
     @Transactional(readOnly = true)
     public PageResponse<RequireResponse> getRequiresByUser(Long userId, Pageable pageable) {
         User user = userService.findById(userId);
@@ -54,7 +69,13 @@ public class RequireService {
         return PageResponse.of(page);
     }
 
-    // 본인의 특정 요청 단건 조회
+    /**
+     * Returns a single require owned by the given user.
+     *
+     * @param userId owner id
+     * @param id require id
+     * @return matching require response
+     */
     @Transactional(readOnly = true)
     public RequireResponse getRequireById(Long userId, Long id) {
         Require require = requireRepository.findByIdAndUserId(id, userId)
@@ -62,7 +83,14 @@ public class RequireService {
         return toDto(require);
     }
 
-    // 본인의 요청 수정
+    /**
+     * Updates a require owned by the given user.
+     *
+     * @param userId owner id
+     * @param id require id
+     * @param dto update payload
+     * @return updated require response
+     */
     @Transactional
     public RequireResponse update(Long userId, Long id, RequireRequest dto) {
         Require require = requireRepository.findByIdAndUserId(id, userId)
@@ -73,7 +101,12 @@ public class RequireService {
         return toDto(require);
     }
 
-    // 본인의 요청 삭제
+    /**
+     * Deletes a require owned by the given user.
+     *
+     * @param userId owner id
+     * @param id require id
+     */
     @Transactional
     public void delete(Long userId, Long id) {
         Require require = requireRepository.findByIdAndUserId(id, userId)
@@ -81,7 +114,12 @@ public class RequireService {
         requireRepository.delete(require);
     }
 
-    // status 변환
+    /**
+     * Updates a require status in an isolated transaction for admin workflows.
+     *
+     * @param id require id
+     * @param status new status value
+     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateStatus(Long id, RequireStatus status) {
         int updated = requireRepository.updateStatus(id, status);
@@ -101,12 +139,26 @@ public class RequireService {
     }
 
     @Transactional(readOnly = true)
+    /**
+     * Returns a paginated dashboard view of all requires.
+     *
+     * @param page zero-based page number
+     * @param size page size
+     * @return paginated require response list
+     */
     public PageResponse<RequireResponse> getRequiresAll(int page, int size) {
          Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
          Page<RequireResponse> p = requireRepository.findAll(pageable).map(this::toDto);
          return PageResponse.of(p);
     }
+
     @Transactional(readOnly = true)
+    /**
+     * Returns recent monthly status counts for dashboard charting.
+     *
+     * @param userId owner id
+     * @return monthly status counts
+     */
     public List<StatusCountResponse> requireStatusCounts(Long userId) {
         LocalDate today = LocalDate.now();
 

@@ -15,23 +15,50 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository for loading and updating {@link Require} entities.
+ */
 public interface RequireRepository extends JpaRepository<Require, Long> {
 
-    // 해당 유저의 모든 요구사항 조회
-//    @EntityGraph(attributePaths = {"user", "comments"})
+    /**
+     * Returns a paginated slice of requires owned by the given user.
+     *
+     * @param userId owner id
+     * @param pageable page and sort request
+     * @return paginated requires
+     */
     @EntityGraph(attributePaths = {"user"})
     Page<Require> findByUser_Id(Long userId, Pageable pageable);
 
-    // 유저가 작성한 특정 요구사항만 조회
-//    @EntityGraph(attributePaths = {"user", "comments"})
+    /**
+     * Returns a require only when it belongs to the given user.
+     *
+     * @param id require id
+     * @param userId owner id
+     * @return matching require if present
+     */
     @EntityGraph(attributePaths = {"user"})
     Optional<Require> findByIdAndUserId(Long id, Long userId);
 
+    /**
+     * Updates the status of a require without loading the entity into memory.
+     *
+     * @param id require id
+     * @param status new status value
+     * @return number of updated rows
+     */
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update Require r set r.status = :status, r.updatedAt = CURRENT_TIMESTAMP where r.id = :id")
     int updateStatus(@Param("id") Long id, @Param("status") RequireStatus status);
 
-    // Require status count
+    /**
+     * Aggregates require counts by month and status for the requested date range.
+     *
+     * @param userId owner id
+     * @param from inclusive range start
+     * @param to exclusive range end
+     * @return monthly status counts
+     */
     @Query("""
     SELECT new com.sisyphus.backend.require.dto.StatusCountResponse(
         r.status,
@@ -50,5 +77,4 @@ public interface RequireRepository extends JpaRepository<Require, Long> {
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to
     );
-
 }
