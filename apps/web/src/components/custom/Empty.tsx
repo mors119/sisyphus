@@ -1,15 +1,34 @@
 import { FileX2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-export const EmptyState = ({ message }: { message?: string }) => {
+type EmptyStateProps = {
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: React.ReactNode;
+  message?: string;
+};
+
+export function EmptyState({
+  title,
+  description,
+  action,
+  message,
+}: EmptyStateProps) {
   const { t } = useTranslation();
+
   return (
-    <div className="flex flex-col items-center justify-center text-center w-full py-12 text-gray-500">
-      <FileX2 className="h-12 w-12 mb-4 text-gray-400" />
-      <p className="text-lg font-semibold">{t('temp.no_found_data')}</p>
-      <p className="text-sm text-gray-400">
-        {message || t('temp.no_found_data_msg')}
+    <div className="flex w-full flex-col items-center justify-center px-4 py-12 text-center">
+      <FileX2
+        className="mb-4 size-12 text-muted-foreground"
+        aria-hidden="true"
+      />
+      <h2 className="text-lg font-semibold text-foreground">
+        {title ?? t('temp.no_found_data')}
+      </h2>
+      <p className="mt-2 max-w-md text-sm text-muted-foreground">
+        {description ?? message ?? t('temp.no_found_data_msg')}
       </p>
+      {action ? <div className="mt-6">{action}</div> : null}
     </div>
   );
-};
+}

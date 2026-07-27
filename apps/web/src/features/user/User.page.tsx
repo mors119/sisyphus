@@ -5,7 +5,8 @@ import { DeleteUserAlert } from './DeleteUserAlert.container';
 import { useUserDetailQuery } from './useUser.query';
 import { useTranslation } from 'react-i18next';
 import { CustomCard } from '@/components/custom/customCard';
-import { Loader } from '@/components/custom/Loader';
+import { LoadingState } from '@/components/custom/Loader';
+import { PageContent, PageLayout } from '@/features/layout';
 import { useEffect } from 'react';
 import { PATHS } from '@/app/router/paths.constants';
 import { useAlert } from '@/hooks/useAlert';
@@ -38,31 +39,33 @@ const UserPage = () => {
     }
   }, [isLoading, userDetailData, navigate]);
 
-  if (isLoading) return <Loader />;
+  if (isLoading) return <LoadingState />;
 
   // navigate()를 호출했더라도 여전히 렌더링이 한 번은 발생함 → null로 안전하게 처리
   if (!userDetailData) return null;
 
   return (
-    <div className="max-w-3xl mx-auto mt-10">
-      <CustomCard
-        title={<h1 className="mb-3">{t('user.manageAccount')}</h1>}
-        content={
-          <UserFormCard
-            user={userDetailData}
-            read={read}
-            setRead={setRead}
-            onDeleteRequest={() => setShowDeleteDialog(true)}
-          />
-        }
-        footer={
-          <DeleteUserAlert
-            open={showDeleteDialog}
-            setOpen={setShowDeleteDialog}
-          />
-        }
-      />
-    </div>
+    <PageLayout>
+      <PageContent width="medium">
+        <CustomCard
+          title={<h1 className="mb-3">{t('user.manageAccount')}</h1>}
+          content={
+            <UserFormCard
+              user={userDetailData}
+              read={read}
+              setRead={setRead}
+              onDeleteRequest={() => setShowDeleteDialog(true)}
+            />
+          }
+          footer={
+            <DeleteUserAlert
+              open={showDeleteDialog}
+              setOpen={setShowDeleteDialog}
+            />
+          }
+        />
+      </PageContent>
+    </PageLayout>
   );
 };
 

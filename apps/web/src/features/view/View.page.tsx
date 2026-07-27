@@ -2,9 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
+import { PageContent, PageLayout } from '@/features/layout';
 import { cn } from '@/lib/utils';
 import { CustomCard } from '@/components/custom/customCard';
-import { Loader } from '@/components/custom/Loader';
+import { LoadingState } from '@/components/custom/Loader';
 import { ErrorState } from '@/components/custom/Error';
 import { EmptyState } from '@/components/custom/Empty';
 import { Switch } from '@/components/ui/switch';
@@ -139,17 +140,18 @@ const ViewPage = () => {
   ]);
 
   return (
-    <section className="sm:p-2">
-      <CustomCard
-        content={
-          <>
-            {isLoading ? (
-              <Loader />
-            ) : isError ? (
-              <ErrorState />
-            ) : content.length === 0 ? (
-              <EmptyState />
-            ) : (
+    <PageLayout className="gap-4 py-4 sm:py-6">
+      <PageContent width="wide">
+        <CustomCard
+          content={
+            <>
+              {isLoading ? (
+                <LoadingState compact />
+              ) : isError ? (
+                <ErrorState />
+              ) : content.length === 0 ? (
+                <EmptyState />
+              ) : (
               <div>
                 <div className="flex justify-between">
                   <div className="flex justify-center items-center pl-2">
@@ -232,7 +234,9 @@ const ViewPage = () => {
 
                   {/* sentinel은 일반 모드에서만 의미가 있음 */}
                   {!isSearchMode && <div ref={loadMoreRef} className="h-8" />}
-                  {!isSearchMode && infiniteQ.isFetchingNextPage && <Loader />}
+                  {!isSearchMode && infiniteQ.isFetchingNextPage && (
+                    <LoadingState compact />
+                  )}
                 </div>
               </div>
             )}
@@ -252,8 +256,9 @@ const ViewPage = () => {
             </div>
           </>
         }
-      />
-    </section>
+        />
+      </PageContent>
+    </PageLayout>
   );
 };
 

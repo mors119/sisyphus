@@ -1,15 +1,41 @@
 import { AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-export const ErrorState = ({ message }: { message?: string }) => {
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
+type ErrorNoticeProps = {
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  action?: React.ReactNode;
+  message?: string;
+  className?: string;
+};
+
+export function ErrorNotice({
+  title,
+  description,
+  action,
+  message,
+  className,
+}: ErrorNoticeProps) {
   const { t } = useTranslation();
+
   return (
-    <div className="flex flex-col items-center justify-center text-center w-full py-12 text-red-500">
-      <AlertTriangle className="h-12 w-12 mb-4 text-red-400" />
-      <p className="text-lg font-semibold">{t('temp.something_went_wrong')}</p>
-      <p className="text-sm text-red-400">
-        {message || t('temp.something_went_wrong_msg')}
-      </p>
+    <Alert variant="destructive" className={className}>
+      <AlertTriangle aria-hidden="true" />
+      <AlertTitle>{title ?? t('temp.something_went_wrong')}</AlertTitle>
+      <AlertDescription>
+        <p>{description ?? message ?? t('temp.something_went_wrong_msg')}</p>
+        {action ? <div className="mt-4">{action}</div> : null}
+      </AlertDescription>
+    </Alert>
+  );
+}
+
+export function ErrorState(props: ErrorNoticeProps) {
+  return (
+    <div className="flex w-full justify-center px-4 py-12">
+      <ErrorNotice {...props} className="max-w-lg" />
     </div>
   );
-};
+}

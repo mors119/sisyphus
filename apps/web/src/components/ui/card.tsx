@@ -2,12 +2,28 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
-function Card({ className, ...props }: React.ComponentProps<'div'>) {
+const cardVariants = {
+  default: 'border bg-card shadow-none',
+  interactive:
+    'border bg-card shadow-none transition-colors hover:border-brand-primary hover:bg-brand-primary-subtle focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus-ring/50',
+  selected:
+    'border-brand-primary bg-brand-primary-subtle ring-1 ring-inset ring-brand-primary shadow-none',
+};
+
+type CardVariant = keyof typeof cardVariants;
+
+function Card({
+  className,
+  variant = 'default',
+  ...props
+}: React.ComponentProps<'div'> & { variant?: CardVariant }) {
   return (
     <div
       data-slot="card"
+      data-variant={variant}
       className={cn(
-        'bg-card text-card-foreground flex flex-col rounded-xl border py-4 shadow-sm',
+        'text-card-foreground flex flex-col gap-6 rounded-card py-6',
+        cardVariants[variant],
         className,
       )}
       {...props}

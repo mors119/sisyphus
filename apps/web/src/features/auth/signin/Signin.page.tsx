@@ -114,7 +114,12 @@ const Signin = () => {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full " disabled={isLoading}>
+          <Button
+            type="submit"
+            className="w-full"
+            variant="primary"
+            loading={isLoading}
+            loadingLabel={t('signin.signin')}>
             {t('signin.signin')}
           </Button>
         </form>

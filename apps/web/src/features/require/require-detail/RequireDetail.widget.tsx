@@ -2,7 +2,8 @@ import { CustomCard } from '@/components/custom/customCard';
 import { useSearchParams } from 'react-router-dom';
 import { EmptyState } from '@/components/custom/Empty';
 import { ErrorState } from '@/components/custom/Error';
-import { Loader } from '@/components/custom/Loader';
+import { Badge } from '@/components/ui/badge';
+import { LoadingState } from '@/components/custom/Loader';
 import { DeleteBtn, EditBtn } from '@/components/custom/Btn';
 import { cn } from '@/lib/utils';
 import { useDayjs } from '@/hooks/useDayjs.hook';
@@ -91,14 +92,14 @@ const RequireDetailPage = ({ setIsOpen }: Props) => {
   }, []);
 
   if (!isValidId) return <EmptyState />;
-  if (isLoading) return <Loader />;
+  if (isLoading) return <LoadingState />;
   if (isError || !data) return <ErrorState />;
 
   const effectiveStatus =
     (pendingStatus ?? (data.status as StatusKey)) || 'RECEIVED';
   const labelTuple = STATUS_LABELS[effectiveStatus];
+  const badgeVariant = labelTuple?.[1] ?? 'secondary';
   const badgeText = t(labelTuple?.[0]) ?? t('require.sheet.me');
-  const badgeClass = labelTuple?.[1] ?? 'bg-zinc-300 text-black';
 
   const deleting = deleteMutation.isPending;
   const committing = updateStatusMutation.isPending;
@@ -139,14 +140,14 @@ const RequireDetailPage = ({ setIsOpen }: Props) => {
             <h1 className="text-2xl font-semibold">{data.title}</h1>
 
             <div className="flex gap-3 justify-center items-center">
-              <span
+              <Badge
                 role="button"
                 onClick={handleBadge}
+                variant={badgeVariant}
                 className={cn(
-                  'text-sm px-3 py-1 rounded-xl select-none',
+                  'select-none rounded-xl px-3 py-1 text-sm',
                   canChange ? 'cursor-pointer' : 'cursor-default',
-                  committing ? 'opacity-60 pointer-events-none' : '',
-                  badgeClass,
+                  committing && 'pointer-events-none opacity-60',
                 )}
                 title={
                   canChange
@@ -154,7 +155,7 @@ const RequireDetailPage = ({ setIsOpen }: Props) => {
                     : t('require.sheet.black')
                 }>
                 {badgeText}
-              </span>
+              </Badge>
             </div>
           </div>
         )

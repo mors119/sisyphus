@@ -154,7 +154,6 @@ function FormMessage({ className, ...props }: React.ComponentProps<"p">) {
 }
 
 export {
-  
   Form,
   FormItem,
   FormLabel,
@@ -163,3 +162,5 @@ export {
   FormMessage,
   FormField,
 }
+
+export { FieldError } from '@/components/ui/field';
