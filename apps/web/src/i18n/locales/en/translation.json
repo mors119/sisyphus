@@ -361,5 +361,36 @@
       "ok": "Add",
       "loading": "Adding..."
     }
+  },
+  "knowledge": {
+    "input": {
+      "prompt": "What word did you discover today?",
+      "label": "Word",
+      "placeholder": "Enter a word",
+      "actions": {
+        "expand": "Expand",
+        "expanding": "Expanding",
+        "retry": "Retry"
+      },
+      "errors": {
+        "empty": "Please enter a word.",
+        "invalid": "This word format is not valid.",
+        "duplicate": "You already added this word.",
+        "request": "We couldn't expand this word.",
+        "preserved": "Your entered word has been kept."
+      }
+    },
+    "expansion": {
+      "heading": "Expanding your word",
+      "description": "Generating knowledge for {{word}}.",
+      "label": "Expansion progress",
+      "loading": "Preparing expansion",
+      "loadingDescription": "Please wait a moment.",
+      "steps": {
+        "analyze": "Analyze word",
+        "generate": "Generate fields",
+        "review": "Prepare review"
+      }
+    }
   }
 }
