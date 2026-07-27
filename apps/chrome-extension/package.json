@@ -37,5 +37,8 @@
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",
     "wxt": "^0.20.27"
+  },
+  "overrides": {
+    "@vitejs/plugin-react": "5.2.0"
   }
 }
