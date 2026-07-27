@@ -29,7 +29,8 @@ export const useViewForm = () => {
 
   const { editNote, resetEditNote } = useNoteStore();
   const { alertMessage } = useAlert();
-  const { activeDone, activeSubmit } = useDndStore();
+  const { activeDone, activeDrag } = useDndStore();
+  const isNoteDragging = activeDrag.kind === 'note';
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -47,14 +48,14 @@ export const useViewForm = () => {
 
   /* ---------- edit 모드일 때 폼 값 세팅 ---------- */
   useEffect(() => {
-    if (isEdit && !activeSubmit) {
+    if (isEdit && !isNoteDragging) {
       form.reset(normalizeNoteToForm(editNote));
       setImageInfo(editNote.image);
 
       const firstImageId = editNote.image?.[0]?.id;
       setImageId(firstImageId);
     }
-  }, [isEdit, editNote, form, activeSubmit]);
+  }, [isEdit, editNote, form, isNoteDragging]);
 
   /* ---------- 뮤테이션 준비 ---------- */
   const { mutateAsync: updateNote } = useUpdateNoteMutation();
@@ -126,3 +127,5 @@ export const useViewForm = () => {
     reset: () => form.reset(defaultValues),
   };
 };
+
+export type ViewFormController = ReturnType<typeof useViewForm>;

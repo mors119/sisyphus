@@ -1,47 +1,43 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { CloseBtn, DeleteBtn, EditBtn } from '@/components/custom/Btn';
-import { useNoteStore } from './note.store';
 import { ViewDetailSection } from './ViewDetailSection.presenter';
 import { ViewFormField } from './ViewForm.container';
 import { useClickAway } from 'react-use';
+import { ViewSheetMode } from './useViewSheet.hook';
+import { useViewForm } from './useViewForm.hook';
 
 interface ViewSheetProps {
-  openSheet: boolean;
+  mode: ViewSheetMode;
+  onClose: () => void;
+  onEdit: () => void;
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setDeleteNum: React.Dispatch<React.SetStateAction<number>>;
+  noteId: number;
 }
 
 export const ViewSheet = ({
-  openSheet,
+  mode,
+  onClose,
+  onEdit,
   setAlertOpen,
   setDeleteNum,
+  noteId,
 }: ViewSheetProps) => {
   const sheetRef = useRef<HTMLDivElement>(null);
-  const [isEdit, setIsEdit] = useState(false);
-  const { editNote, setEditNote } = useNoteStore();
 
   useClickAway(sheetRef, () => {
-    if (isEdit) return; // 편집 중이면 무시
-    setEditNote({ ...editNote, id: 0 });
-    setIsEdit(false);
+    if (mode === 'edit') return;
+    onClose();
   });
 
-  if (!editNote.id || !openSheet) return null;
-
-  console.log(isEdit);
+  if (mode === 'closed') return null;
 
   return (
     <div
       ref={sheetRef}
       className="w-full h-full p-6 overflow-auto bg-white dark:bg-black dark:border border-gray-600 shadow-lg rounded-lg space-y-6 relative">
-      <CloseBtn
-        className="absolute right-5"
-        onClick={() => {
-          setIsEdit(false);
-          setEditNote({ ...editNote, id: 0 });
-        }}
-      />
-      {!isEdit ? (
+      <CloseBtn className="absolute right-5" onClick={onClose} />
+      {mode === 'detail' ? (
         <>
           <ViewDetailSection />
           <div className="flex flex-col justify-center items-end gap-2">
@@ -49,24 +45,32 @@ export const ViewSheet = ({
               <EditBtn
                 onClick={(e) => {
                   e.stopPropagation();
-                  setIsEdit(true);
+                  onEdit();
                 }}
               />
               <DeleteBtn
                 onClick={(e) => {
                   e.stopPropagation();
                   setAlertOpen(true);
-                  setDeleteNum(editNote.id);
+                  setDeleteNum(noteId);
                 }}
               />
             </div>
           </div>
         </>
       ) : (
-        <div className="pt-10">
-          <ViewFormField key={editNote.id} />
-        </div>
+        <ViewSheetEdit noteId={noteId} />
       )}
+    </div>
+  );
+};
+
+const ViewSheetEdit = ({ noteId }: { noteId: number }) => {
+  const viewForm = useViewForm();
+
+  return (
+    <div className="pt-10">
+      <ViewFormField key={noteId} viewForm={viewForm} />
     </div>
   );
 };

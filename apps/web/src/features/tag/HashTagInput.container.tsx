@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { CustomTooltip } from '@/components/custom/customTooltip';
 import { TagTemp } from './tag.type';
-import { useTagStore } from './tag.store';
 import { useFetchTags } from './useTag.query';
 import { useTranslation } from 'react-i18next';
 
@@ -13,14 +12,9 @@ interface HashTagInputProps {
 export const HashTagInput = ({ value, onChange }: HashTagInputProps) => {
   const safeValue = Array.isArray(value) ? value : [];
   const [inputValue, setInputValue] = useState('');
-  const { tags, setTags } = useTagStore();
-  const [focusedIndex, setFocusedIndex] = useState(-1); // 드롭다운 항목 선택 상태
-  const { data } = useFetchTags();
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const { data: tags = [] } = useFetchTags();
   const { t } = useTranslation();
-
-  useEffect(() => {
-    if (data) setTags(data);
-  }, [data, setTags]);
 
   const addTempTag = (tag: TagTemp) =>
     onChange(
@@ -67,7 +61,6 @@ export const HashTagInput = ({ value, onChange }: HashTagInputProps) => {
     }
   };
 
-  // 포커싱된 항목의 텍스트를 input에 보여줌
   const currentSuggestion =
     focusedIndex >= 0 ? suggestions[focusedIndex] : null;
 

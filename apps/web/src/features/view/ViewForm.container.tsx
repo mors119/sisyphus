@@ -16,12 +16,16 @@ import { CleanBtn } from '@/components/custom/Btn';
 import { HashTagInput } from '../tag/HashTagInput.container';
 import { CategorySelectField } from '../category/CategorySelectField.form';
 import { useCategoriesQuery } from '../category/category.query';
-import { useDndStore } from '../quick_edit/editDnd.store';
-import { useViewForm } from './useViewForm.hook';
+import { isCategoryDrag, useDndStore } from '../quick_edit/editDnd.store';
+import { ViewFormController } from './useViewForm.hook';
 import { useTranslation } from 'react-i18next';
 import { ImageUploaderForm } from '../image/ImageUploader.container';
 
-export const ViewFormField = () => {
+interface ViewFormFieldProps {
+  viewForm: ViewFormController;
+}
+
+export const ViewFormField = ({ viewForm }: ViewFormFieldProps) => {
   const {
     form,
     onSubmit,
@@ -33,10 +37,12 @@ export const ViewFormField = () => {
     fileRef,
     imageInfo,
     setImageInfo,
-  } = useViewForm();
+  } = viewForm;
   const { t } = useTranslation();
   const { data: categoryArray = [] } = useCategoriesQuery();
-  const { activeSubmit, activeCategory } = useDndStore();
+  const activeDrag = useDndStore((state) => state.activeDrag);
+  const activeCategory = isCategoryDrag(activeDrag) ? activeDrag.category : null;
+  const activeSubmit = activeDrag.kind === 'note';
 
   const { isOver, setNodeRef, active } = useDroppable({
     id: 'note-form',

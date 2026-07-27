@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { HashTagInput } from './HashTagInput.container';
 import { useFetchTags } from './useTag.query';
 import {
@@ -7,7 +7,6 @@ import {
   useUpdateTagMutation,
 } from './useTag.mutation';
 import { TagTemp } from './tag.type';
-import { useTagStore } from './tag.store';
 import { Loader2 } from 'lucide-react';
 import { invalidateQuery } from '@/lib/react-query';
 import { useAlert } from '@/hooks/useAlert';
@@ -18,9 +17,7 @@ import { useTranslation } from 'react-i18next';
 const TagPage = () => {
   const createMutation = useCreateTagMutation();
   const { alertMessage } = useAlert();
-  const { data: tagsFromDB, isLoading } = useFetchTags();
-  const { setTags } = useTagStore();
-  const tags = useTagStore((state) => state.tags);
+  const { data: tags = [], isLoading } = useFetchTags();
   const [tempTags, setTempTags] = useState<TagTemp[]>([]);
   const deleteMutation = useDeleteTagMutation();
   const [delTags, setDelTags] = useState<number[]>([]);
@@ -33,10 +30,6 @@ const TagPage = () => {
     setEditingTagId(tagId);
     setEditValue(currentName);
   };
-
-  useEffect(() => {
-    if (tagsFromDB) setTags(tagsFromDB);
-  }, [tagsFromDB, setTags]);
 
   /** 제출 → tempTags를 TagRequest[] 형태로 변환 후 전송 */
   const onSubmit = (e: React.FormEvent) => {
