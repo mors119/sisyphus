@@ -1,5 +1,4 @@
 import { CheckCircle2 } from 'lucide-react';
-import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { Button } from '@/components/ui/button';
@@ -24,11 +23,6 @@ export const KnowledgeCompletion = ({
   onViewCreated,
 }: KnowledgeCompletionProps) => {
   const { t } = useTranslation();
-  const headingRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    headingRef.current?.focus();
-  }, []);
 
   return (
     <section
@@ -43,10 +37,10 @@ export const KnowledgeCompletion = ({
             />
             <div className="space-y-2">
               <h2
-                ref={headingRef}
+                data-flow-focus="true"
                 tabIndex={-1}
                 id="knowledge-completion-heading"
-                className="text-xl font-semibold leading-none outline-none">
+                className="text-xl font-semibold leading-none outline-none focus-visible:ring-[3px] focus-visible:ring-focus-ring/50">
                 {t('knowledge.completion.heading')}
               </h2>
               <CardDescription>

@@ -449,10 +449,6 @@
       "errors": {
         "section": "This section could not be generated.",
         "preserved": "Edits in other sections are preserved."
-      },
-      "save": {
-        "success": "Added to your knowledge.",
-        "error": "Could not save. Your edits remain on this screen."
       }
     },
     "completion": {

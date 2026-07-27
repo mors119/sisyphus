@@ -168,9 +168,7 @@ export async function runExpansionPipeline(
     pipeline = mergeStageSnapshot(pipeline, result);
     options.onUpdate(pipeline);
 
-    const failedRequired =
-      result.status === 'failed' && !result.optional;
-    if (failedRequired) {
+    if (result.status === 'failed') {
       break;
     }
 

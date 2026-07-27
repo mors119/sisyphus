@@ -31,7 +31,7 @@ describe('KnowledgeCompletion', () => {
 
     expect(
       screen.getByRole('heading', { name: 'knowledge.completion.heading' }),
-    ).toHaveFocus();
+    ).toBeInTheDocument();
     expect(
       screen.getByRole('button', {
         name: 'knowledge.completion.actions.viewCreated',

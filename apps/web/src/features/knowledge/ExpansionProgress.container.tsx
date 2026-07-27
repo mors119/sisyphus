@@ -28,7 +28,7 @@ export const ExpansionProgress = ({
   return (
     <section
       aria-labelledby="expansion-progress-heading"
-      className="mx-auto flex w-full max-w-xl flex-col gap-8 py-6 md:py-12">
+      className="mx-auto flex w-full min-w-0 max-w-xl flex-col gap-8 overflow-x-hidden py-6 md:py-12">
       <PageHeader
         title={
           <span id="expansion-progress-heading">
