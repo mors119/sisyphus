@@ -55,7 +55,7 @@ describe('expansion.service', () => {
     );
   });
 
-  it('allows optional image failure without terminating required stages', async () => {
+  it('pauses on optional image failure so the user can continue or retry', async () => {
     const promise = runExpansionPipeline('hello', {
       failStages: ['image'],
       onUpdate: () => undefined,
@@ -68,8 +68,8 @@ describe('expansion.service', () => {
       'failed',
     );
     expect(result.stages.find((stage) => stage.id === 'metadata')?.status).toBe(
-      'completed',
+      'pending',
     );
-    expect(result.status).toBe('partial');
+    expect(result.status).toBe('running');
   });
 });

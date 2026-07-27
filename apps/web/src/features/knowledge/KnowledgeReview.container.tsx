@@ -48,7 +48,7 @@ export const KnowledgeReview = ({
   return (
     <section
       aria-labelledby="knowledge-review-heading"
-      className="mx-auto w-full max-w-4xl py-6 md:py-10">
+      className="mx-auto w-full min-w-0 max-w-4xl overflow-x-hidden py-6 md:py-10">
       <PageHeader
         title={
           <span id="knowledge-review-heading">
@@ -122,7 +122,7 @@ export const KnowledgeReview = ({
             : null}
         </div>
 
-        <div className="sticky bottom-0 flex justify-end border-t border-border bg-background/95 pt-4 backdrop-blur">
+        <div className="sticky bottom-0 flex justify-end border-t border-border bg-background/95 px-1 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur">
           <Button
             type="button"
             variant="primary"

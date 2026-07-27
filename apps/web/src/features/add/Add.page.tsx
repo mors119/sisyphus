@@ -9,6 +9,7 @@ import { ExpansionProgress } from '../knowledge/ExpansionProgress.container';
 import { KnowledgeCompletion } from '../knowledge/KnowledgeCompletion.container';
 import { KnowledgeReview } from '../knowledge/KnowledgeReview.container';
 import { useExpansionPipeline } from '../knowledge/useExpansionPipeline.hook';
+import { useKnowledgeFlowFocus } from '../knowledge/useKnowledgeFlowFocus.hook';
 import { useWordInput } from '../knowledge/useWordInput.hook';
 import { WordInput } from '../knowledge/WordInput.container';
 
@@ -21,6 +22,7 @@ const AddPage = () => {
   );
 
   const { enterReview, phase, reset, createdNote, enterCompletion } = workspace;
+  const flowRef = useKnowledgeFlowFocus(phase);
 
   useEffect(() => {
     if (phase === 'expanding' && expansion.isReadyForReview) {
@@ -49,8 +51,11 @@ const AddPage = () => {
   };
 
   return (
-    <PageLayout className="min-h-[calc(100vh-var(--header-height,4rem))] justify-center">
-      <PageContent width="wide">
+    <PageLayout
+      data-knowledge-flow="true"
+      className="min-h-[calc(100vh-var(--header-height,4rem))] max-md:min-h-[100dvh] justify-center overflow-x-hidden max-md:px-0 max-md:py-4">
+      <div ref={flowRef} className="w-full">
+        <PageContent width="wide" className="max-md:max-w-full max-md:px-4">
         {phase === 'completed' && createdNote ? (
           <KnowledgeCompletion
             createdNote={createdNote}
@@ -74,7 +79,8 @@ const AddPage = () => {
         ) : (
           <WordInput workspace={workspace} />
         )}
-      </PageContent>
+        </PageContent>
+      </div>
     </PageLayout>
   );
 };

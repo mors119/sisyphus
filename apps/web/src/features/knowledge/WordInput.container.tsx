@@ -32,7 +32,7 @@ export const WordInput = ({ workspace }: WordInputProps) => {
   return (
     <section
       aria-labelledby="word-input-heading"
-      className="mx-auto flex w-full max-w-xl flex-col gap-8 py-6 md:py-12">
+      className="mx-auto flex w-full min-w-0 max-w-xl flex-col gap-8 overflow-x-hidden py-6 md:py-12">
       <PageHeader
         title={
           <span id="word-input-heading">{t('knowledge.input.prompt')}</span>

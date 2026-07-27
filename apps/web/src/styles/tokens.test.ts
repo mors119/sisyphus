@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 
 const stylesDirectory = fileURLToPath(new URL('.', import.meta.url));
 const sourceDirectory = fileURLToPath(new URL('..', import.meta.url));
+const repositoryRoot = fileURLToPath(new URL('../../../..', import.meta.url));
 
 const BRAND_PRIMARY = '#1186ce';
 const BRAND_ACCENT = '#ffcd49';
@@ -19,6 +20,22 @@ describe('design tokens', () => {
     expect(css).toContain('--color-action-primary: var(--action-primary)');
     expect(css).toContain('--color-focus-ring: var(--focus-ring)');
     expect(css).toContain('@media (prefers-reduced-motion: reduce)');
+  });
+
+  it('aligns chrome extension popup brand sources with web canonical tokens', () => {
+    const extensionCss = readFileSync(
+      join(
+        repositoryRoot,
+        'apps/chrome-extension/entrypoints/popup/styles/app.css',
+      ),
+      'utf8',
+    );
+
+    expect(extensionCss).toContain(`--sis: ${BRAND_PRIMARY}`);
+    expect(extensionCss).toContain(`--sisy: ${BRAND_ACCENT}`);
+    expect(extensionCss).toContain('--color-action-primary: var(--sis)');
+    expect(extensionCss).toContain('--color-highlight: var(--sisy)');
+    expect(extensionCss).toMatch(/prefers-reduced-motion:\s*reduce/);
   });
 
   it('keeps brand focus, action, and accent combinations at accessible contrast', () => {
