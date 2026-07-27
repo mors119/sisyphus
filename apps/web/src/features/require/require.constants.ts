@@ -1,13 +1,23 @@
 import { RequireStatus } from './require.types';
 
-export const STATUS_LABELS = {
-  RECEIVED: ['require.status.received', 'bg-warning text-white'],
-  IN_PROGRESS: ['require.status.inProgress', 'bg-info text-white'],
-  COMPLETED: ['require.status.completed', 'bg-success text-white'],
-  REJECTED: ['require.status.rejected', 'bg-danger text-white'],
-} as const;
+import type { badgeVariants } from '@/components/ui/badge';
+import type { VariantProps } from 'class-variance-authority';
 
 export type StatusKey = keyof typeof STATUS_LABELS;
+
+type StatusBadgeVariant = NonNullable<
+  VariantProps<typeof badgeVariants>['variant']
+>;
+
+export const STATUS_LABELS = {
+  RECEIVED: ['require.status.received', 'warning'],
+  IN_PROGRESS: ['require.status.inProgress', 'default'],
+  COMPLETED: ['require.status.completed', 'success'],
+  REJECTED: ['require.status.rejected', 'destructive'],
+} as const satisfies Record<
+  RequireStatus,
+  [translationKey: string, badgeVariant: StatusBadgeVariant]
+>;
 
 export const STATUS_FLOW: StatusKey[] = [
   'RECEIVED',

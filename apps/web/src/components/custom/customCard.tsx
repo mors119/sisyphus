@@ -15,6 +15,8 @@ interface CustomCardProps {
   description?: React.ReactNode | string;
   content?: React.ReactNode | string;
   footer?: React.ReactNode | string;
+  selected?: boolean;
+  interactive?: boolean;
 }
 
 export const CustomCard = ({
@@ -24,36 +26,38 @@ export const CustomCard = ({
   description,
   content,
   footer,
+  selected = false,
+  interactive = Boolean(onClick),
 }: CustomCardProps) => {
+  const variant = selected ? 'selected' : interactive ? 'interactive' : 'default';
+
   return (
     <Card
       onClick={onClick}
-      className={cn(
-        'border-2 rounded-md h-full overflow-auto shadow dark:bg-black ',
-        className,
-      )}>
-      <CardHeader className="space-y-1 w-full">
-        {title && (
-          <CardTitle className="text-lg font-semibold text-gray-800 dark:text-white ">
-            {title}
-          </CardTitle>
-        )}
-        {description && (
-          <CardDescription className="text-sm text-gray-500 dark:text-white">
-            {description}
-          </CardDescription>
-        )}
-      </CardHeader>
-      {content && (
-        <CardContent className="px-6 text-sm text-gray-700 leading-relaxed dark:text-white">
+      variant={variant}
+      className={cn('h-full overflow-auto', className)}>
+      {(title || description) && (
+        <CardHeader className="w-full space-y-1 px-0 pt-0">
+          {title ? (
+            <CardTitle className="text-lg font-semibold text-foreground">
+              {title}
+            </CardTitle>
+          ) : null}
+          {description ? (
+            <CardDescription>{description}</CardDescription>
+          ) : null}
+        </CardHeader>
+      )}
+      {content ? (
+        <CardContent className="px-0 text-sm leading-relaxed text-foreground">
           {content}
         </CardContent>
-      )}
-      {footer && (
-        <CardFooter className="text-sm text-gray-400 mt-2 mr-2">
+      ) : null}
+      {footer ? (
+        <CardFooter className="mt-2 px-0 pb-0 text-sm text-muted-foreground">
           {footer}
         </CardFooter>
-      )}
+      ) : null}
     </Card>
   );
 };

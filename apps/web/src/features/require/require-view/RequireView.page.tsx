@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useMyRequiresQuery } from '../useRequireQuery.query';
+import { Badge } from '@/components/ui/badge';
 import { CustomPagination } from '@/components/custom/customPagination';
-import { Loader } from '@/components/custom/Loader';
+import { LoadingState } from '@/components/custom/Loader';
 import { ErrorState } from '@/components/custom/Error';
 import { CustomCard } from '@/components/custom/customCard';
-import { cn } from '@/lib/utils';
 import { RequireResponse } from '../require.types';
 import { useDayjs } from '@/hooks/useDayjs.hook';
 import { RequireSheet } from '../require-detail/RequireSheet.page';
@@ -28,7 +28,7 @@ const RequireViewPage = () => {
 
   const totalPages = data?.totalPages ?? 1;
 
-  if (isLoading || !data) return <Loader />;
+  if (isLoading || !data) return <LoadingState />;
   if (error) return <ErrorState />;
 
   // 댓글 기능 추가 시 사용
@@ -46,7 +46,8 @@ const RequireViewPage = () => {
             }
             setIsOpen(!isOpen);
           }}
-          className="hover:bg-zinc-100 duration-200 cursor-pointer"
+          interactive
+          className="cursor-pointer"
           key={v.id}
           title={
             <div className="flex justify-between items-center">
@@ -56,13 +57,9 @@ const RequireViewPage = () => {
                   ({t(typeLabels[v.requireType])})
                 </span>
               </span>
-              <span
-                className={cn(
-                  'inline-block w-fit px-3 py-0.5 text-center rounded-full text-xs font-semibold',
-                  STATUS_LABELS[v.status][1],
-                )}>
+              <Badge variant={STATUS_LABELS[v.status][1]}>
                 {t(STATUS_LABELS[v.status][0])}
-              </span>
+              </Badge>
             </div>
           }
           content={

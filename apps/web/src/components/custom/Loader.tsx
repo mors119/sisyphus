@@ -1,14 +1,45 @@
+import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
-export const Loader = ({ message }: { message?: string }) => {
+import { cn } from '@/lib/utils';
+
+type LoadingStateProps = {
+  message?: React.ReactNode;
+  description?: React.ReactNode;
+  className?: string;
+  compact?: boolean;
+};
+
+export function LoadingState({
+  message,
+  description,
+  className,
+  compact = false,
+}: LoadingStateProps) {
   const { t } = useTranslation();
+
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full py-10">
-      <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-action-primary border-t-transparent" />
-      <p className="text-sm text-gray-600 font-medium tracking-wide">
-        {t('temp.loading')}
+    <div
+      role="status"
+      aria-live="polite"
+      className={cn(
+        'flex w-full flex-col items-center justify-center text-center',
+        compact ? 'py-6' : 'min-h-[12rem] py-10',
+        className,
+      )}>
+      <Loader2
+        className="mb-4 size-10 animate-spin text-action-primary"
+        aria-hidden="true"
+      />
+      <p className="text-sm font-medium tracking-wide text-foreground">
+        {message ?? t('temp.loading')}
       </p>
-      <p className="text-sm text-gray-400">{message}</p>
+      {description ? (
+        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+      ) : null}
+      <span className="sr-only">{t('temp.loading')}</span>
     </div>
   );
-};
+}
+
+export const Loader = LoadingState;

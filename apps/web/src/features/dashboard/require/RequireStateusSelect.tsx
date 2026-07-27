@@ -11,6 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { badgeVariants } from '@/components/ui/badge';
+import type { VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 import { RequireStatus } from '@/features/require/require.types';
@@ -28,11 +30,14 @@ type Props = {
   className?: string;
 };
 
-const statusLabels: Record<RequireStatus, { label: string; cls: string }> = {
-  RECEIVED: { label: '접수', cls: 'bg-warning text-white' },
-  IN_PROGRESS: { label: '처리 중', cls: 'bg-info text-white' },
-  COMPLETED: { label: '완료', cls: 'bg-success text-white' },
-  REJECTED: { label: '거절', cls: 'bg-danger text-white' },
+const statusLabels: Record<
+  RequireStatus,
+  { label: string; variant: NonNullable<VariantProps<typeof badgeVariants>['variant']> }
+> = {
+  RECEIVED: { label: '접수', variant: 'warning' },
+  IN_PROGRESS: { label: '처리 중', variant: 'default' },
+  COMPLETED: { label: '완료', variant: 'success' },
+  REJECTED: { label: '거절', variant: 'destructive' },
 };
 
 export function RequireStatusSelect({
@@ -82,9 +87,8 @@ export function RequireStatusSelect({
                       {/* Trigger를 "뱃지"처럼 보이게 */}
                       <SelectTrigger
                         className={cn(
-                          'h-7 px-2 py-1 text-xs border-0 shadow-none focus:ring-0 focus:ring-offset-0',
-                          'rounded',
-                          meta.cls,
+                          badgeVariants({ variant: meta.variant }),
+                          'h-7 rounded-pill border-0 px-2 py-1 text-xs shadow-none focus:ring-0 focus:ring-offset-0',
                         )}>
                         <SelectValue placeholder="상태" />
                       </SelectTrigger>
