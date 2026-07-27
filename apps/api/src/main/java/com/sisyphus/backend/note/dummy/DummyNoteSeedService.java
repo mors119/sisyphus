@@ -182,7 +182,7 @@ public class DummyNoteSeedService {
         List<Tag> result = new ArrayList<>();
         for (String n : names) {
             if (n == null || n.isBlank()) continue;
-            Tag t = map.get(n.trim());
+            Tag t = map.get(n.trim().toLowerCase());
             if (t != null) result.add(t);
         }
         return result;

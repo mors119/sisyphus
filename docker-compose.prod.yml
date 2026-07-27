@@ -65,7 +65,7 @@ services:
       API_HOST: ${API_HOST}
       IMG_HOST: ${IMG_HOST}
 
-      C_EX_HOST: ${C_EX_HOST}
+      APP_EXTENSION_HOST: ${APP_EXTENSION_HOST}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
 
       APP_UPLOAD_ALLOWED_EXTENSIONS: png,jpg,jpeg,webp,gif
@@ -75,10 +75,11 @@ services:
 
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      NAVER_CLIENT_ID: ${NAVER_CLIENT_ID}
-      NAVER_CLIENT_SECRET: ${NAVER_CLIENT_SECRET}
-      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID}
-      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET:-}
+      # Naver/Kakao OAuth is temporarily disabled.
+      # NAVER_CLIENT_ID: ${NAVER_CLIENT_ID}
+      # NAVER_CLIENT_SECRET: ${NAVER_CLIENT_SECRET}
+      # KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID}
+      # KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET:-}
 
     volumes:
       - uploads:/data/uploads/images
@@ -89,6 +90,16 @@ services:
   web:
     image: ${WEB_IMAGE}
     container_name: sisy-web
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+        VITE_PROXY_TARGET: ${VITE_PROXY_TARGET}
+        VITE_EXTENSION_URL: ${VITE_EXTENSION_URL}
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID}
+        VITE_GOOGLE_REDIRECT_URI: ${VITE_GOOGLE_REDIRECT_URI}
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL}
     depends_on:
       - backend
     expose:

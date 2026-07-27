@@ -1,6 +1,7 @@
 package com.sisyphus.backend.note.controller;
 
 import com.sisyphus.backend.note.dummy.DummyNoteSeedService;
+import com.sisyphus.backend.global.exception.UnauthorizedException;
 import com.sisyphus.backend.security.principal.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
@@ -22,6 +23,10 @@ public class DummyNoteController {
     public ResponseEntity<String> seed(
             @AuthenticationPrincipal UserPrincipal principal
     ) {
+        if (principal == null) {
+            throw new UnauthorizedException("더미 데이터 시딩은 로그인 후에만 가능합니다.");
+        }
+
         int created = dummyNoteSeedService.seed(principal.getId());
 
         return ResponseEntity

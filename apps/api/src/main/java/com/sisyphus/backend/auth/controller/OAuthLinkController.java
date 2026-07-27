@@ -1,5 +1,6 @@
 package com.sisyphus.backend.auth.controller;
 
+import com.sisyphus.backend.global.props.AppProps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +30,8 @@ import java.io.IOException;
 @RequestMapping("/api/auth")
 public class OAuthLinkController {
 
+    private final AppProps appProps;
+
     // ----- Session keys -----
     private static final String SESSION_KEY_MODE = "mode";
     private static final String SESSION_KEY_USER_ID = "userId";
@@ -46,7 +49,8 @@ public class OAuthLinkController {
      * - 값은 /oauth2/authorization/{provider} 경로와 일치해야 합니다.
      */
     public enum OAuthProvider {
-        google, naver, kakao
+        google
+        // naver, kakao: temporarily disabled
     }
 
     /**
@@ -54,7 +58,7 @@ public class OAuthLinkController {
      *
      * @param request HttpServletRequest (세션 저장에 사용)
      * @param response HttpServletResponse (302 리다이렉트에 사용)
-     * @param provider OAuth 제공자 (google|naver|kakao)
+     * @param provider OAuth 제공자 (google)
      * @param mode 동작 모드: null(기본 로그인) | link(계정 연결) | extension(확장프로그램)
      * @param userId mode=link 일 때 연결 대상 사용자 ID(필수)
      * @param redirectedUri mode=extension 일 때 OAuth 완료 후 복귀할 URI(필수)
@@ -64,7 +68,7 @@ public class OAuthLinkController {
     @Operation(
             summary = "OAuth 인증 시작(Provider Redirect)",
             description = """
-                provider(google|naver|kakao)에 따라 /oauth2/authorization/{provider} 로 302 리다이렉트합니다.
+                provider(google)에 따라 /oauth2/authorization/{provider} 로 302 리다이렉트합니다.
 
                 - mode 미지정: 일반 로그인 플로우로 간주
                 - mode=link: userId를 세션에 저장하여 '계정 연결' 플로우에서 사용
@@ -92,8 +96,8 @@ public class OAuthLinkController {
         validateParams(mode, userId, redirectedUri);
         persistSessionAttributes(request, mode, userId, redirectedUri);
 
-        // Spring Security OAuth2 Client 기본 엔드포인트로 리다이렉트
-        response.sendRedirect("/oauth2/authorization/" + provider.name());
+        // 프론트 dev proxy 뒤에서도 백엔드 OAuth 엔드포인트로 안정적으로 이동하도록 절대 URL 사용
+        response.sendRedirect(appProps.hosts().api() + "/oauth2/authorization/" + provider.name());
     }
 
     /**

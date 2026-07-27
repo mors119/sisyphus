@@ -18,61 +18,48 @@ repositories {
 }
 
 dependencies {
-    // 기본 웹 & API
+    // 공통 애플리케이션 의존성
     implementation "org.springframework.boot:spring-boot-starter-web"
-
-    // test
-    testImplementation 'com.h2database:h2'
-
-    // ! spring dev TODO: 배포 시 삭제
-    // developmentOnly("org.springframework.boot:spring-boot-devtools")
-
-    // mail 인증
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
     implementation "org.springframework.boot:spring-boot-starter-mail"
-    // redis
     implementation "org.springframework.boot:spring-boot-starter-data-redis"
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14"
+    implementation "com.fasterxml.jackson.core:jackson-databind"
 
-    // JPA + DB + flayway
+    // JWT
+    implementation "io.jsonwebtoken:jjwt-api:0.12.5"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:0.12.5"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:0.12.5"
+
+    // 마이그레이션/DB 드라이버
     implementation "org.flywaydb:flyway-core"
     implementation "org.flywaydb:flyway-database-postgresql"
-    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    runtimeOnly "org.postgresql:postgresql"   // 운영/개발 공통(PostgreSQL 실행 시)
+    runtimeOnly "com.h2database:h2"           // 로컬 실행(Local profile)용
+
+    // Lombok
     implementation "org.projectlombok:lombok"
     annotationProcessor "org.projectlombok:lombok"
-    runtimeOnly "org.postgresql:postgresql"
 
-    // H2
-//    implementation "com.h2database:h2"   // runtimeOnly -> implementation 로 변경
+    // 로컬(macOS Apple Silicon) DNS resolver 보강
+    implementation("io.netty:netty-resolver-dns-native-macos:4.1.114.Final:osx-aarch_64")
 
-    // Security & JWT
-    implementation "org.springframework.boot:spring-boot-starter-security"
-    implementation "io.jsonwebtoken:jjwt-api:0.12.5"
-    runtimeOnly   "io.jsonwebtoken:jjwt-impl:0.12.5"
-    runtimeOnly   "io.jsonwebtoken:jjwt-jackson:0.12.5"
-
-    // 검증 (DTO @Valid 등)
-    implementation "org.springframework.boot:spring-boot-starter-validation"
+    // 테스트
     testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "org.mockito:mockito-core"
+    testImplementation "org.mockito:mockito-junit-jupiter"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
-    testImplementation 'org.mockito:mockito-core'
-    testImplementation 'org.mockito:mockito-junit-jupiter'
-    // JSON 직렬화 (Jackson)
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
 
-    // oAuth 관련
-    implementation "org.springframework.boot:spring-boot-starter-oauth2-client"
-
-    // actuator health
-    implementation "org.springframework.boot:spring-boot-starter-actuator"
-
-    // Swagger UI + OpenAPI 문서 자동 생성 (Spring MVC)
-    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14"
+    // ! spring dev TODO: 배포 시 삭제
+     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     // dotenv
-//    implementation "me.paulschwarz:spring-dotenv:3.0.0"
-//    implementation 'io.github.cdimascio:java-dotenv:5.2.2' // 꼭 명시적으로 추가
-
-    // MacOS 오류 방지
-    implementation("io.netty:netty-resolver-dns-native-macos:4.1.114.Final:osx-aarch_64")
+     implementation "me.paulschwarz:spring-dotenv:3.0.0"
+//     implementation "io.github.cdimascio:java-dotenv:5.2.2"
 }
 
 
