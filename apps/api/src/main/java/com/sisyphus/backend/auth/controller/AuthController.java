@@ -70,6 +70,7 @@ public class AuthController {
 
         // refresh token: 쿠키로 반환
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
+        refreshTokenService.save(user.getId(), refreshToken, 7L * 24 * 60 * 60);
         ResponseCookie refreshCookie = jwtTokenProvider.createRefreshTokenCookie(refreshToken);
 
         return ResponseEntity.ok()
@@ -101,6 +102,17 @@ public class AuthController {
     }
 
     @Operation(
+            summary = "Chrome extension local login",
+            description = "Authenticates the extension without issuing a durable refresh-token cookie."
+    )
+    @PostMapping("/extension/login")
+    public ResponseEntity<TokenResponse> loginExtension(
+            @Valid @RequestBody LoginRequest request
+    ) {
+        return ResponseEntity.ok(new TokenResponse(authService.loginExtension(request)));
+    }
+
+    @Operation(
             summary = "AccessToken 재발급 (Refresh)",
             description = """
                 RefreshToken 쿠키를 사용해 AccessToken을 재발급합니다.
@@ -123,6 +135,9 @@ public class AuthController {
         if (refreshToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new UnauthorizedException("Refresh token invalid or expired");
+        }
 
         Long userId = jwtTokenProvider.getUserId(refreshToken);
 
@@ -132,6 +147,21 @@ public class AuthController {
 
         String newAccessToken = authService.refreshAccessToken(refreshToken);
         return ResponseEntity.ok(new TokenResponse(newAccessToken));
+    }
+
+    @Operation(
+            summary = "Chrome extension OAuth code exchange",
+            description = "Exchanges a short-lived, single-use authorization code using an S256 PKCE verifier."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Exchange succeeded (AccessToken body returned)"),
+            @ApiResponse(responseCode = "401", description = "Code is invalid, expired, reused, or PKCE validation failed")
+    })
+    @PostMapping("/extension/token")
+    public ResponseEntity<TokenResponse> exchangeExtensionCode(
+            @Valid @RequestBody ExtensionTokenExchangeRequest request
+    ) {
+        return ResponseEntity.ok(new TokenResponse(authService.exchangeExtensionCode(request)));
     }
 
     @Operation(

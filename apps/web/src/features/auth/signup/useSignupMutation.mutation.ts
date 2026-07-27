@@ -4,7 +4,6 @@ import { checkApi, sendVerificationCode, signupApi } from '../auth.api';
 import { SignupForm } from '../auth.types';
 import { useFormContext } from 'react-hook-form';
 import { useAuthStore } from '../auth.store';
-import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 
 // 아이디 체크
@@ -61,7 +60,6 @@ export const useSignupMutation = (onSuccess: () => void) => {
       const accessToken = res.data.accessToken;
 
       setAccessToken(accessToken);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
 
       alertMessage(t('signup.msg.success.title'), {
         description: t('signup.msg.success.desc'),

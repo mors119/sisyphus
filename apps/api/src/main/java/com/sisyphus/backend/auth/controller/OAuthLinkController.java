@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.net.URI;
 
 /**
  * OAuth 인증 시작(리다이렉트) 컨트롤러
@@ -36,6 +37,7 @@ public class OAuthLinkController {
     private static final String SESSION_KEY_MODE = "mode";
     private static final String SESSION_KEY_USER_ID = "userId";
     private static final String SESSION_KEY_REDIRECT_URI = "redirectedUri";
+    private static final String SESSION_KEY_CODE_CHALLENGE = "codeChallenge";
 
     // ----- Modes -----
     private static final String MODE_LINK = "link";
@@ -90,11 +92,18 @@ public class OAuthLinkController {
             @Parameter(description = "계정 연결 시 대상 사용자 ID (mode=link 필수)", example = "123")
             @RequestParam(required = false) String userId,
             @Parameter(description = "extension 모드에서 OAuth 완료 후 복귀할 URI (mode=extension 필수)", example = "chrome-extension://xxxx/index.html")
-            @RequestParam(required = false) String redirectedUri
+            @RequestParam(required = false) String redirectedUri,
+            @Parameter(description = "extension 모드의 S256 PKCE challenge")
+            @RequestParam(required = false) String codeChallenge,
+            @Parameter(description = "PKCE challenge method (S256)")
+            @RequestParam(required = false) String codeChallengeMethod
     ) throws IOException {
 
-        validateParams(mode, userId, redirectedUri);
-        persistSessionAttributes(request, mode, userId, redirectedUri);
+        validateParams(mode, userId, redirectedUri, codeChallenge, codeChallengeMethod);
+        String canonicalRedirectUri = MODE_EXTENSION.equals(mode)
+                ? normalizeRedirectUri(redirectedUri)
+                : redirectedUri;
+        persistSessionAttributes(request, mode, userId, canonicalRedirectUri, codeChallenge);
 
         // 프론트 dev proxy 뒤에서도 백엔드 OAuth 엔드포인트로 안정적으로 이동하도록 절대 URL 사용
         response.sendRedirect(appProps.hosts().api() + "/oauth2/authorization/" + provider.name());
@@ -115,8 +124,10 @@ public class OAuthLinkController {
             HttpServletRequest request,
             String mode,
             String userId,
-            String redirectedUri
+            String redirectedUri,
+            String codeChallenge
     ) {
+        clearSessionAttributes(request);
         if (mode == null) return;
 
         if (MODE_LINK.equals(mode)) {
@@ -128,7 +139,15 @@ public class OAuthLinkController {
         if (MODE_EXTENSION.equals(mode)) {
             request.getSession().setAttribute(SESSION_KEY_MODE, MODE_EXTENSION);
             request.getSession().setAttribute(SESSION_KEY_REDIRECT_URI, redirectedUri);
+            request.getSession().setAttribute(SESSION_KEY_CODE_CHALLENGE, codeChallenge);
         }
+    }
+
+    private void clearSessionAttributes(HttpServletRequest request) {
+        request.getSession().removeAttribute(SESSION_KEY_MODE);
+        request.getSession().removeAttribute(SESSION_KEY_USER_ID);
+        request.getSession().removeAttribute(SESSION_KEY_REDIRECT_URI);
+        request.getSession().removeAttribute(SESSION_KEY_CODE_CHALLENGE);
     }
 
     /**
@@ -143,7 +162,13 @@ public class OAuthLinkController {
      * @param userId String | null
      * @param redirectedUri String | null
      */
-    private void validateParams(String mode, String userId, String redirectedUri) {
+    private void validateParams(
+            String mode,
+            String userId,
+            String redirectedUri,
+            String codeChallenge,
+            String codeChallengeMethod
+    ) {
         if (mode == null) return;
 
         if (MODE_LINK.equals(mode)) {
@@ -163,6 +188,20 @@ public class OAuthLinkController {
                         "mode=extension requires redirectedUri"
                 );
             }
+            if (!expectedExtensionRedirectUri().equals(normalizeRedirectUri(redirectedUri))) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "redirectedUri is not registered for this extension"
+                );
+            }
+            if (!"S256".equals(codeChallengeMethod)
+                    || codeChallenge == null
+                    || !codeChallenge.matches("^[A-Za-z0-9_-]{43}$")) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "mode=extension requires a valid S256 PKCE challenge"
+                );
+            }
             return;
         }
 
@@ -171,5 +210,20 @@ public class OAuthLinkController {
                 HttpStatus.BAD_REQUEST,
                 "Invalid mode: " + mode
         );
+    }
+
+    private String expectedExtensionRedirectUri() {
+        URI extensionOrigin = URI.create(appProps.hosts().chromeExtension());
+        String extensionId = extensionOrigin.getHost();
+        if (extensionId == null || extensionId.isBlank()) {
+            throw new IllegalStateException("app.hosts.chrome-extension must contain an extension ID");
+        }
+        return "https://" + extensionId + ".chromiumapp.org";
+    }
+
+    private String normalizeRedirectUri(String redirectUri) {
+        return redirectUri.endsWith("/")
+                ? redirectUri.substring(0, redirectUri.length() - 1)
+                : redirectUri;
     }
 }

@@ -18,7 +18,6 @@ type AuthType = {
 export const SocialLoginButton = ({ item }: { item: AuthType }) => {
   const handleLogin = (ItemId: string) => {
     useAuthStore.getState().clear();
-    localStorage.removeItem('auth-storage');
     window.location.href = `/api/auth/${ItemId}`;
   };
 

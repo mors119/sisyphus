@@ -106,7 +106,6 @@ const Signup = () => {
     }
 
     useAuthStore.getState().clear();
-    localStorage.removeItem('auth-storage');
 
     signupMutation({ name, email, password });
   };
