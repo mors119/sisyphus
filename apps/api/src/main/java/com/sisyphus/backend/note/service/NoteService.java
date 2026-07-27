@@ -1,9 +1,11 @@
 package com.sisyphus.backend.note.service;
 
 import com.sisyphus.backend.category.entity.Category;
+import com.sisyphus.backend.category.exception.CategoryNotFoundException;
 import com.sisyphus.backend.category.repository.CategoryRepository;
 import com.sisyphus.backend.global.dto.PageResponse;
 import com.sisyphus.backend.image.entity.NoteImage;
+import com.sisyphus.backend.image.exception.NotFoundImageException;
 import com.sisyphus.backend.image.repository.ImageRepository;
 import com.sisyphus.backend.image.repository.NoteImageRepository;
 import com.sisyphus.backend.image.service.ImageService;
@@ -24,7 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -39,10 +40,6 @@ public class NoteService {
     private final TagRepository tagRepository;
     private final TagService tagService;
     private final ImageService imageService;
-
-    public static class NotFoundException extends RuntimeException {
-        public NotFoundException(String message) { super(message); }
-    }
 
     /* -------------------- CUD -------------------- */
 
@@ -136,7 +133,7 @@ public class NoteService {
         // 3) 이미지 동기화(단일 이미지 기준이라면 clear 후 add)
         if (req.getImageId() != null) {
             NoteImage newImage = (NoteImage) imageRepository.findById(req.getImageId())
-                    .orElseThrow(() -> new NotFoundException("Image not found"));
+                    .orElseThrow(NotFoundImageException::new);
 
             note.clearImages();
             note.addImage(newImage);
@@ -147,13 +144,12 @@ public class NoteService {
 
     /* -------------------- 조회 -------------------- */
 
-    public boolean existsNote(Long noteId) { return noteRepository.existsById(noteId); }
-
     @Transactional(readOnly = true)
-    public Note findNoteByUserId(Long noteId, Long userId) {
+    public NoteResponse findNoteByUserId(Long noteId, Long userId) {
         User user = userRepository.getReferenceById(userId);
-        return noteRepository.findNoteByUserId(noteId, user)
-                .orElseThrow(() -> new RuntimeException("Note not found"));
+        Note note = noteRepository.findNoteByUserId(noteId, user)
+                .orElseThrow(NoteNotFoundException::new);
+        return NoteResponse.fromEntity(note);
     }
 
     /**
@@ -184,58 +180,40 @@ public class NoteService {
 
         // 1) 페이지(컬렉션 fetch 없음 → 경고 없음)
         Page<Note> p = noteRepository.findAllFiltered(userId, categoryId, tagId, titlePattern, pageable);
-        if (p.isEmpty()) {
-            return PageResponse.of(Page.empty(pageable));
-        }
-
-        // 2) 상세 fetch (images, noteTags.tag)
-        List<Long> ids = p.getContent().stream().map(Note::getId).toList();
-        var detailed = noteRepository.findDetailsByIdIn(ids);
-
-        // 3) 원래 순서 보존 정렬
-        Map<Long, Integer> ord = new HashMap<>();
-        for (int i = 0; i < ids.size(); i++) ord.put(ids.get(i), i);
-        detailed.sort(Comparator.comparingInt(n -> ord.getOrDefault(n.getId(), Integer.MAX_VALUE)));
-
-        // 4) 트랜잭션 안에서 DTO 변환
-        List<NoteResponse> content = detailed.stream()
-                .map(NoteResponse::fromEntity)
-                .collect(Collectors.toList());
-
-        return new PageResponse<>(
-                content,
-                p.getNumber(), p.getSize(),
-                p.getTotalElements(), p.getTotalPages(),
-                p.isFirst(), p.isLast()
-        );
+        return toDetailedPage(p, pageable);
     }
 
     /**
      * 카테고리 없는 노트 페이징 (동일 패턴)
      */
     @Transactional(readOnly = true)
-    public PageResponse<NoteResponse> findNotesWithoutCategory(Long userId, Pageable pageable) {
+    public PageResponse<NoteResponse> findNotesWithoutCategory(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<Note> p = noteRepository.findNotesWithNullCategoryByUser(userId, pageable);
-        if (p.isEmpty()) {
+        return toDetailedPage(p, pageable);
+    }
+
+    private PageResponse<NoteResponse> toDetailedPage(Page<Note> page, Pageable pageable) {
+        if (page.isEmpty()) {
             return PageResponse.of(Page.empty(pageable));
         }
 
-        List<Long> ids = p.getContent().stream().map(Note::getId).toList();
+        List<Long> ids = page.getContent().stream().map(Note::getId).toList();
         var detailed = noteRepository.findDetailsByIdIn(ids);
 
-        Map<Long, Integer> ord = new HashMap<>();
-        for (int i = 0; i < ids.size(); i++) ord.put(ids.get(i), i);
-        detailed.sort(Comparator.comparingInt(n -> ord.getOrDefault(n.getId(), Integer.MAX_VALUE)));
-
-        List<NoteResponse> content = detailed.stream()
-                .map(NoteResponse::fromEntity)
-                .toList();
+        Map<Long, Integer> order = new HashMap<>();
+        for (int i = 0; i < ids.size(); i++) {
+            order.put(ids.get(i), i);
+        }
+        detailed.sort(Comparator.comparingInt(
+                note -> order.getOrDefault(note.getId(), Integer.MAX_VALUE)
+        ));
 
         return new PageResponse<>(
-                content,
-                p.getNumber(), p.getSize(),
-                p.getTotalElements(), p.getTotalPages(),
-                p.isFirst(), p.isLast()
+                detailed.stream().map(NoteResponse::fromEntity).toList(),
+                page.getNumber(), page.getSize(),
+                page.getTotalElements(), page.getTotalPages(),
+                page.isFirst(), page.isLast()
         );
     }
 
@@ -249,8 +227,7 @@ public class NoteService {
     private Category findCategoryOrNull(Long categoryId) {
         if (categoryId == null) return null;
         return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
-        // TODO: CategoryNotFoundException 같은 도메인 예외로 교체 추천
+                .orElseThrow(CategoryNotFoundException::new);
     }
 
     private List<Tag> findTagsOrEmpty(List<Long> tagIds) {
@@ -262,7 +239,7 @@ public class NoteService {
     private List<NoteImage> findImagesOrEmpty(Long imageId) {
         if (imageId == null) return List.of();
         NoteImage img = noteImageRepository.findById(imageId)
-                .orElseThrow(() -> new RuntimeException("NoteImage not found"));
+                .orElseThrow(NotFoundImageException::new);
         return List.of(img);
     }
 

@@ -32,7 +32,92 @@ The project is designed with a clear separation between reusable platform infras
 
 # API Architecture
 
-The API application lives in `apps/api` and is divided into two conceptual layers.
+The API application lives in `apps/api`. It uses feature packages rather than a
+second, parallel layer tree. Each feature may contain:
+
+- `controller`: HTTP validation, authentication principal extraction, and response mapping
+- `service`: use-case orchestration, business rules, and transaction boundaries
+- `repository`: persistence queries
+- `entity`: JPA persistence and domain state
+- `dto`: explicit request and response contracts
+- `exception`: expected domain failures
+
+Cross-cutting framework configuration and shared response types live in `global`;
+JWT filters and Spring Security adapters live in `security`; external storage,
+mail, Redis, and OAuth adapters remain in their owning feature packages.
+
+## Request flow
+
+```text
+Security filter
+  → Controller (transport only)
+  → Service (@Transactional boundary)
+  → Repository
+  → Entity
+  → Service maps Response DTO
+  → Controller returns HTTP response
+```
+
+Controllers must not access repositories, make business decisions, or return
+entities. Request and response DTOs remain separate when their roles differ.
+Entity-to-response conversion is completed inside the service transaction so
+lazy persistence state does not cross the application boundary.
+
+## Transactions
+
+Write use cases declare `@Transactional` on service methods. Query use cases that
+need a persistence context declare `@Transactional(readOnly = true)`. Controllers
+and repositories do not define application transaction boundaries. A propagation
+override such as `REQUIRES_NEW` must remain visible and be justified by the use case.
+
+## Error handling
+
+Expected failures extend `BaseException` and are translated once by
+`GlobalExceptionHandler`. Authentication entry points use the same JSON shape.
+Validation failures include every rejected field; internal exceptions and stack
+traces are logged server-side and never returned.
+
+```json
+{
+  "status": 400,
+  "code": "VALIDATION_ERROR",
+  "message": "email: 올바른 이메일 형식이어야 합니다.",
+  "path": "/api/auth/check",
+  "timestamp": "2026-07-26T00:00:00Z",
+  "fieldErrors": [
+    {
+      "field": "email",
+      "message": "올바른 이메일 형식이어야 합니다."
+    }
+  ]
+}
+```
+
+The `status` field is retained for backward compatibility. Domain failures use
+stable application codes with empty `fieldErrors`; validation failures use
+`VALIDATION_ERROR`. Unexpected failures return `INTERNAL_SERVER_ERROR` without
+implementation details. Ownership failures that previously surfaced as 500 now
+consistently return 403, and missing resources return 404.
+
+## Configuration and logging
+
+Environment-dependent values are bound through `AppProps`, `JwtProps`, and
+`FileProps`. Security owns CORS configuration, while MVC configuration owns static
+resources. Refresh-token persistence derives its TTL from `JwtProps`; callers do
+not duplicate expiration constants. Application code uses SLF4J and must not log
+tokens, passwords, cookies, or complete sensitive payloads.
+
+## Testing boundaries
+
+- unit tests cover service rules and token utilities
+- MVC slice tests lock transport and error contracts
+- integration tests verify application wiring and persistence
+
+Issue-specific changes add focused regression tests. The broader layered test
+matrix is maintained separately so architecture refactoring does not create a
+parallel test implementation.
+
+The backend is also divided into two conceptual product layers.
 
 ## Platform Layer
 

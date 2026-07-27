@@ -1,8 +1,11 @@
 package com.sisyphus.backend.category.service;
 
 import com.sisyphus.backend.category.dto.CategoryRequest;
+import com.sisyphus.backend.category.dto.CategoryResponse;
 import com.sisyphus.backend.category.entity.Category;
+import com.sisyphus.backend.category.exception.CategoryNotFoundException;
 import com.sisyphus.backend.category.repository.CategoryRepository;
+import com.sisyphus.backend.global.exception.ForbiddenException;
 import com.sisyphus.backend.note.repository.NoteRepository;
 import com.sisyphus.backend.user.entity.User;
 import com.sisyphus.backend.user.exception.UserNotFoundException;
@@ -22,10 +25,13 @@ public class CategoryService {
     private final NoteRepository noteRepository;
 
     @Transactional(readOnly = true)
-    public List<Category> getAllCategories(Long userId) {
-        return categoryRepository.findAllByUserId(userId);
+    public List<CategoryResponse> getAllCategories(Long userId) {
+        return categoryRepository.findAllByUserId(userId).stream()
+                .map(CategoryResponse::fromEntity)
+                .toList();
     }
 
+    @Transactional
     public void createCategory(CategoryRequest categoryRequest, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(UserNotFoundException::new);
@@ -39,9 +45,10 @@ public class CategoryService {
     }
 
     @Transactional
-    public void deleteCategory(Long id) {
+    public void deleteCategory(Long id, Long userId) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("태그를 찾을 수 없습니다."));
+                .orElseThrow(CategoryNotFoundException::new);
+        validateOwner(category, userId);
         // 일치 하는 note 카테고리 null
         noteRepository.nullifyCategory(id);
         categoryRepository.delete(category);
@@ -50,15 +57,16 @@ public class CategoryService {
     @Transactional
     public void updateCategory(Long categoryId, CategoryRequest request, Long userId) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new IllegalArgumentException("태그를 찾을 수 없습니다."));
-
-        // 사용자 검증 (보안용)
-        if (!category.getUser().getId().equals(userId)) {
-            throw new SecurityException("해당 태그를 수정할 권한이 없습니다.");
-        }
+                .orElseThrow(CategoryNotFoundException::new);
+        validateOwner(category, userId);
 
         category.setTitle(request.getTitle());
         category.setColor(request.getColor());
     }
 
+    private void validateOwner(Category category, Long userId) {
+        if (!category.getUser().getId().equals(userId)) {
+            throw new ForbiddenException("해당 카테고리에 접근할 권한이 없습니다.");
+        }
+    }
 }

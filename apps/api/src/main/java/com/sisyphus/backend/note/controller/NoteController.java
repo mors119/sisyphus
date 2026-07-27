@@ -5,7 +5,6 @@ import com.sisyphus.backend.security.principal.UserPrincipal;
 import com.sisyphus.backend.global.dto.PageResponse;
 import com.sisyphus.backend.note.dto.NoteRequest;
 import com.sisyphus.backend.note.dto.NoteResponse;
-import com.sisyphus.backend.note.entity.Note;
 import com.sisyphus.backend.note.service.NoteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,9 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -92,8 +88,7 @@ public class NoteController {
     ) {
         Long userId = principal.getId();
 
-        Note note = noteService.findNoteByUserId(id, userId);
-        return ResponseEntity.ok(NoteResponse.fromEntity(note));
+        return ResponseEntity.ok(noteService.findNoteByUserId(id, userId));
     }
 
     @Operation(
@@ -148,8 +143,7 @@ public class NoteController {
     ) {
         Long userId = principal.getId();
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-        PageResponse<NoteResponse> notes = noteService.findNotesWithoutCategory(userId, pageable);
+        PageResponse<NoteResponse> notes = noteService.findNotesWithoutCategory(userId, page, size);
         return ResponseEntity.ok(notes);
     }
 

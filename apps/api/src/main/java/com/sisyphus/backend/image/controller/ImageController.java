@@ -1,7 +1,6 @@
 package com.sisyphus.backend.image.controller;
 
 import com.sisyphus.backend.image.dto.ImageUploadResponse;
-import com.sisyphus.backend.image.entity.Image;
 import com.sisyphus.backend.image.service.ImageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,8 +38,7 @@ public class ImageController {
             )
             @RequestPart("file") MultipartFile file
     ) {
-        Image image = imageService.store(file);
-        return ResponseEntity.status(201).body(ImageUploadResponse.from(image));
+        return ResponseEntity.status(201).body(imageService.store(file));
     }
 
     @Operation(
@@ -75,7 +73,6 @@ public class ImageController {
             )
             @RequestPart("file") MultipartFile newFile
     ) {
-        Image image = imageService.replace(id, newFile);
-        return ResponseEntity.ok(ImageUploadResponse.from(image));
+        return ResponseEntity.ok(imageService.replace(id, newFile));
     }
 }

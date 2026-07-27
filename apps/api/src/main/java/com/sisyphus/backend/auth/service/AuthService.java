@@ -8,25 +8,20 @@ import com.sisyphus.backend.auth.token.RefreshTokenService;
 import com.sisyphus.backend.auth.dto.TokenWithRefresh;
 import com.sisyphus.backend.security.jwt.JwtTokenProvider;
 import com.sisyphus.backend.global.exception.UnauthorizedException;
+import com.sisyphus.backend.user.dto.AccountUserSnapshot;
 import com.sisyphus.backend.user.entity.Account;
 import com.sisyphus.backend.user.entity.User;
 import com.sisyphus.backend.user.exception.UserNotFoundException;
 import com.sisyphus.backend.user.repository.AccountRepository;
 import com.sisyphus.backend.user.repository.UserRepository;
+import com.sisyphus.backend.user.service.AccountService;
 import com.sisyphus.backend.user.util.Provider;
-import com.sisyphus.backend.user.util.Role;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 
 // 로그인/회원가입 로직과 JWT 발급 처리
 @Service
@@ -36,61 +31,24 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final MessageSource messageSource;
     private final RefreshTokenService refreshTokenService;
     private final AccountRepository accountRepository;
+    private final AccountService accountService;
     private final ExtensionAuthorizationCodeService extensionAuthorizationCodeService;
 
-
-    // OAuth -> account 정보 저장
-    // TIP: O Auth 정보를 DB에 저장 *** AuthService에 아래처럼 순환참조 오류가 발생
-    @Transactional
-    public Account saveOrLinkAccount(RegisterRequest request) {
-        Provider provider = request.getProvider();
-        String email = request.getEmail();
-        String name = request.getName();
-
-        // 1. 이미 존재하는 Account가 있다면 그대로 반환
-        Optional<Account> existingAccount = accountRepository.findByEmailAndProvider(email, provider);
-        if (existingAccount.isPresent()) return existingAccount.get();
-
-        // 처음 가입하는 아이디만 role admin 설정
-        boolean isFirstUser = userRepository.count() == 0;
-        Role role = isFirstUser ? Role.ADMIN : Role.USER;
-
-        // 2. 같은 이메일을 가진 User가 있는지 확인 (User는 이메일 기준으로 통합)
-        User user = userRepository.findByEmail(email)
-                .orElseGet(() -> userRepository.save(new User(email, name, role)));
-
-        // 3. provider에 따라 Account 생성 방식 분기
-        Account account;
-        if (provider == null) {
-            // 로컬 계정은 비밀번호 인코딩 포함
-            String encodedPassword = passwordEncoder.encode(request.getPassword());
-            account = Account.ofLocal(email, name, encodedPassword);
-        } else {
-            // OAuth 계정은 비밀번호 필요 없음
-            account = Account.ofOauth(email, name, provider);
-        }
-
-        // 4. User와 연결
-        account.linkToUser(user);
-
-        // 5. 저장
-        return accountRepository.save(account);
+    public TokenWithRefresh signup(RegisterRequest request) {
+        AccountUserSnapshot user = accountService.saveOrGetLocalAccount(
+                request.getEmail(),
+                request.getName(),
+                request.getPassword()
+        );
+        return issueSession(user.id(), user.email(), user.role().name());
     }
 
     // 로그인 로직 실행 후 jwtToken 반환
     public TokenWithRefresh login(LoginRequest request) {
         User user = authenticate(request);
-        String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), List.of(user.getRole().name()));
-        String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
-
-        refreshTokenService.save(user.getId(), refreshToken, 7L * 24 * 60 * 60);
-
-        ResponseCookie refreshCookie = jwtTokenProvider.createRefreshTokenCookie(refreshToken);
-
-        return new TokenWithRefresh(accessToken, refreshCookie);
+        return issueSession(user.getId(), user.getEmail(), user.getRole().name());
     }
 
     public String loginExtension(LoginRequest request) {
@@ -122,11 +80,14 @@ public class AuthService {
 
     // access 토큰 재발급
     public String refreshAccessToken(String refreshToken) {
-        if (!jwtTokenProvider.validateToken(refreshToken))
-            throw new UnauthorizedException("올바른 형식이 아닙니다.");
+        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
+            throw new UnauthorizedException("Refresh token invalid or expired");
+        }
 
-        // userId 추출
         Long userId = jwtTokenProvider.getUserId(refreshToken);
+        if (!refreshTokenService.isValid(userId, refreshToken)) {
+            throw new UnauthorizedException("Refresh token invalid or expired");
+        }
         User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 
         return jwtTokenProvider.createAccessToken(user.getId(), user.getEmail(), List.of(user.getRole().name()));
@@ -152,5 +113,22 @@ public class AuthService {
         return  accountRepository.existsByEmailAndProvider(email, Provider.CAMUS);
     }
 
+    public ResponseCookie logout(String refreshToken) {
+        if (refreshToken != null) {
+            try {
+                refreshTokenService.delete(jwtTokenProvider.getUserId(refreshToken));
+            } catch (RuntimeException ignored) {
+                // Logout remains idempotent for malformed or expired cookies.
+            }
+        }
+        return jwtTokenProvider.deleteRefreshTokenCookie();
+    }
 
+    private TokenWithRefresh issueSession(Long userId, String email, String role) {
+        String accessToken = jwtTokenProvider.createAccessToken(userId, email, List.of(role));
+        String refreshToken = jwtTokenProvider.createRefreshToken(userId);
+        refreshTokenService.save(userId, refreshToken);
+        ResponseCookie refreshCookie = jwtTokenProvider.createRefreshTokenCookie(refreshToken);
+        return new TokenWithRefresh(accessToken, refreshCookie);
+    }
 }

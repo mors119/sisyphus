@@ -5,7 +5,6 @@ import com.sisyphus.backend.user.dto.CountsResponse;
 import com.sisyphus.backend.user.dto.UserNameRequest;
 import com.sisyphus.backend.user.dto.UserResponse;
 import com.sisyphus.backend.user.dto.UserWithAccountResponse;
-import com.sisyphus.backend.user.entity.User;
 import com.sisyphus.backend.user.service.AccountService;
 import com.sisyphus.backend.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,8 +44,7 @@ public class UserController {
             @AuthenticationPrincipal UserPrincipal principal // principal: 인증된 사용자
     ) {
         Long userId = principal.getId();
-        User user = userService.findById(userId);
-        return ResponseEntity.ok(new UserResponse(user));
+        return ResponseEntity.ok(userService.getUserResponse(userId));
     }
 
     @Operation(

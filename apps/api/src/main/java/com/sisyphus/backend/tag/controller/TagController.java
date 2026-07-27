@@ -3,7 +3,6 @@ package com.sisyphus.backend.tag.controller;
 import com.sisyphus.backend.security.principal.UserPrincipal;
 import com.sisyphus.backend.tag.dto.TagRequest;
 import com.sisyphus.backend.tag.dto.TagResponse;
-import com.sisyphus.backend.tag.entity.Tag;
 import com.sisyphus.backend.tag.service.TagService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -43,11 +42,7 @@ public class TagController {
     ) {
         Long userId = principal.getId();
 
-        List<TagResponse> responses = tagService.list(userId).stream()
-                .map(t -> new TagResponse(t.getId(), t.getName()))
-                .toList();
-
-        return ResponseEntity.ok(responses);
+        return ResponseEntity.ok(tagService.list(userId));
     }
 
     @Operation(
@@ -93,8 +88,7 @@ public class TagController {
     ) {
         Long userId = principal.getId();
 
-        Tag t = tagService.update(dto.getId(), dto.getName(), userId);
-        return ResponseEntity.ok(new TagResponse(t.getId(), t.getName()));
+        return ResponseEntity.ok(tagService.update(dto.getId(), dto.getName(), userId));
     }
 
     @Operation(

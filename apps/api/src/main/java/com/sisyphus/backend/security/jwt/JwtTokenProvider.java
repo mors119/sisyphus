@@ -46,9 +46,6 @@ public class JwtTokenProvider {
     public static final String USER_ID_KEY = "userId";
     public static final String ROLES_KEY   = "roles"; // 예: ["ADMIN","USER"]
 
-    /** RefreshToken 기본 만료(초) */
-    private static final long REFRESH_TOKEN_EXPIRATION_SEC = 7L * 24 * 60 * 60; // 7일
-
     /** 서명용 SecretKey (HMAC-SHA) */
     private SecretKey signingKey() {
         return Keys.hmacShaKeyFor(jwt.secret().getBytes(StandardCharsets.UTF_8));

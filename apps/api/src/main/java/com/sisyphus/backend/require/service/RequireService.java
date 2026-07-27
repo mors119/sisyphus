@@ -5,16 +5,17 @@ import com.sisyphus.backend.require.dto.RequireRequest;
 import com.sisyphus.backend.require.dto.RequireResponse;
 import com.sisyphus.backend.require.dto.StatusCountResponse;
 import com.sisyphus.backend.require.entity.Require;
+import com.sisyphus.backend.require.exception.RequireNotFoundException;
 import com.sisyphus.backend.require.repository.RequireRepository;
 import com.sisyphus.backend.require.util.RequireStatus;
 import com.sisyphus.backend.require.util.RequireType;
 import com.sisyphus.backend.user.entity.User;
-import com.sisyphus.backend.user.repository.UserRepository;
 import com.sisyphus.backend.user.service.UserService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,8 +31,6 @@ public class RequireService {
 
     private final RequireRepository requireRepository;
     private final UserService userService;
-    private final UserRepository userRepository;
-//    private final CommentService commentService;
 
     // 등록
     @Transactional
@@ -59,17 +58,16 @@ public class RequireService {
     // 본인의 특정 요청 단건 조회
     @Transactional(readOnly = true)
     public RequireResponse getRequireById(Long userId, Long id) {
-        if (!userRepository.existsById(userId)) {
-            throw new EntityNotFoundException("User not found");
-        }
-        Require require = requireRepository.findByIdAndUserId(id, userId).orElseThrow(() -> new IllegalArgumentException("요청을 찾을 수 없습니다."));
+        Require require = requireRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(RequireNotFoundException::new);
         return toDto(require);
     }
 
     // 본인의 요청 수정
     @Transactional
     public RequireResponse update(Long userId, Long id, RequireRequest dto) {
-        Require require = requireRepository.findByIdAndUserId(id, userId).orElseThrow(() -> new IllegalArgumentException("수정 권한이 없거나 요청이 존재하지 않습니다."));
+        Require require = requireRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(RequireNotFoundException::new);
 
         require.updateContent(dto.getTitle(), dto.getDescription());
 
@@ -79,7 +77,8 @@ public class RequireService {
     // 본인의 요청 삭제
     @Transactional
     public void delete(Long userId, Long id) {
-        Require require = requireRepository.findByIdAndUserId(id, userId).orElseThrow(() -> new IllegalArgumentException("삭제 권한이 없거나 요청이 존재하지 않습니다."));
+        Require require = requireRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(RequireNotFoundException::new);
         requireRepository.delete(require);
     }
 
@@ -87,7 +86,7 @@ public class RequireService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void updateStatus(Long id, RequireStatus status) {
         int updated = requireRepository.updateStatus(id, status);
-        if (updated == 0) throw new IllegalArgumentException("요청이 존재하지 않습니다.");
+        if (updated == 0) throw new RequireNotFoundException();
     }
 
     // Entity → DTO 변환
@@ -104,12 +103,12 @@ public class RequireService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<RequireResponse> getRequiresAll(Pageable pageable) {
+    public PageResponse<RequireResponse> getRequiresAll(int page, int size) {
+         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
          Page<RequireResponse> p = requireRepository.findAll(pageable).map(this::toDto);
          return PageResponse.of(p);
     }
-
-
+    @Transactional(readOnly = true)
     public List<StatusCountResponse> requireStatusCounts(Long userId) {
         LocalDate today = LocalDate.now();
 
