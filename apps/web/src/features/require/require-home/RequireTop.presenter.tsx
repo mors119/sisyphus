@@ -78,7 +78,7 @@ export default function RequireTop({
           className="md:text-sm text-xs"
           aria-label={t('require.home.my')}
           onClick={onViewMyRequests}>
-          <span className="mr-2 inline-block h-2 w-2 rounded-full bg-[#1186ce]" />
+          <span className="mr-2 inline-block h-2 w-2 rounded-full bg-brand-primary" />
           {t('require.home.my')}
         </Button>
       </div>
@@ -92,7 +92,7 @@ export default function RequireTop({
       {/* <div className="flex items-center justify-end px-4">
         <Button
           onClick
-          className="text-sm md:text-base font-medium hover:text-[#1186ce] hover:underline underline-offset-4 decoration-1 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded">
+          className="rounded text-sm font-medium underline-offset-4 decoration-1 hover:text-info hover:underline focus:outline-none focus:ring-2 focus:ring-focus-ring md:text-base">
           이외의 요청사항 
         </Button>
       </div> */}

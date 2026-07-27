@@ -34,8 +34,9 @@ export const EditBtn = ({
           variant="ghost"
           size="icon"
           disabled={disabled}
+          aria-label={message || t('edit')}
           className={cn(
-            'ml-auto text-blue-500 hover:text-white hover:bg-blue-500 p-1',
+            'ml-auto p-1 text-info hover:bg-action-primary hover:text-on-brand-primary',
             className,
           )}
           onClick={onClick}>
@@ -68,8 +69,9 @@ export const DeleteBtn = ({
           variant="ghost"
           size="icon"
           disabled={disabled}
+          aria-label={message || t('delete')}
           className={cn(
-            'ml-auto text-red-500 hover:text-white hover:bg-red-500 p-1',
+            'ml-auto p-1 text-danger hover:bg-danger hover:text-white',
             className,
           )}
           onClick={onClick}>
@@ -105,6 +107,7 @@ export const CloseBtn = ({
           variant="ghost"
           size="icon"
           disabled={disabled}
+          aria-label={message || t('close')}
           className={cn(
             'ml-auto text-black hover:text-white hover:bg-black p-1 dark:text-white dark:bg-none',
             className,
@@ -140,8 +143,9 @@ export const CleanBtn = ({
           variant="ghost"
           size="icon"
           disabled={disabled}
+          aria-label={message || t('clean')}
           className={cn(
-            'ml-auto text-black hover:text-blue-500 p-1 hover:bg-color-none duration-500 dark:text-white dark:hover:bg-gray-700',
+            'ml-auto p-1 text-black duration-[var(--motion-standard)] hover:text-info dark:text-white dark:hover:bg-gray-700',
             className,
           )}
           onClick={onClick}>
@@ -156,7 +160,7 @@ export const CleanBtn = ({
 };
 
 export const QuestionBtn = ({
-  className = 'cursor-pointer text-sisy',
+  className = 'cursor-pointer text-warning',
   location = 'bottom',
   message,
   size = 16,
@@ -164,7 +168,7 @@ export const QuestionBtn = ({
 }: ButtonProps) => {
   return (
     <Tooltip>
-      <TooltipTrigger>
+      <TooltipTrigger aria-label={message || 'Help'}>
         <CircleQuestionMark size={size} className={className} />
       </TooltipTrigger>
       {tip && <TooltipContent side={location}>{message}</TooltipContent>}

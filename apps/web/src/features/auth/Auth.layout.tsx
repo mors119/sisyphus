@@ -11,10 +11,10 @@ const AuthLayout = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col items-center mx-auto w-full h-dvh">
+    <div className="flex min-h-dvh w-full flex-col items-center px-4">
       <Logo className="py-10" />
-      <div className="border-2 border-sisy p-1 rounded-xl bg-white dark:bg-neutral-900">
-        <div className="border-2 p-4 border-sis rounded-xl">
+      <div className="brand-frame w-full max-w-[var(--content-narrow)]">
+        <div className="brand-frame-inner p-4">
           <h1 className="text-center text-xl pb-3 font-semibold text-accent-foreground">
             {t(
               location.pathname === PATHS.AUTH_SIGN_IN
@@ -39,7 +39,7 @@ const AuthLayout = () => {
                   ? PATHS.AUTH_SIGN_UP
                   : PATHS.AUTH_SIGN_IN
               }
-              className="text-blue-500  hover:underline">
+              className="text-info underline-offset-4 hover:underline">
               {t(
                 location.pathname === PATHS.AUTH_SIGN_IN
                   ? 'signup.signup'

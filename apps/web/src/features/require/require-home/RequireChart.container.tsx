@@ -18,15 +18,15 @@ import { useIsMobile } from '@/hooks/use-mobile';
 const chartConfig = {
   received: {
     label: 'Received',
-    color: '#ffcd49',
+    color: 'var(--warning)',
   },
   inProgress: {
     label: 'InProgress',
-    color: '#11cd49',
+    color: 'var(--info)',
   },
   completed: {
     label: 'Completed',
-    color: '#1186ce',
+    color: 'var(--success)',
   },
 } satisfies ChartConfig;
 

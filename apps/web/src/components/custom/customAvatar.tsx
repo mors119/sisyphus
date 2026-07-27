@@ -15,11 +15,11 @@ export const CustomAvatar = ({ user }: CustomAvatarProps) => {
       className="flex items-center gap-2 px-2 border-none group"
       asChild>
       <div className="flex items-center gap-2">
-        <span className="hidden xl:inline-block text-sm dark:text-[#ffcd49] text-[#ffcd49]">
+        <span className="hidden text-sm text-brand-accent xl:inline-block">
           {user.name}
         </span>
         <Avatar className="border border-sisy">
-          <AvatarFallback className="border border-sis dark:text-[#ffcd49] group-hover:dark:bg-[#1186ce]">
+          <AvatarFallback className="border border-brand-primary dark:text-brand-accent group-hover:dark:bg-action-primary">
             {user.name
               ? user.name.charAt(0).toUpperCase()
               : user.email.charAt(0).toUpperCase()}

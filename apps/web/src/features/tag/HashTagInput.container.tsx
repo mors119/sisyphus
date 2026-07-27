@@ -77,7 +77,7 @@ export const HashTagInput = ({ value, onChange }: HashTagInputProps) => {
         {safeValue.map((tag) => (
           <div
             key={tag.id}
-            className="flex items-center gap-1 px-3 py-1 text-sm rounded-full border border-neutral-300 dark:border-neutral-700 bg-blue-50 dark:bg-blue-900/40 text-blue-800 dark:text-blue-200">
+            className="flex items-center gap-1 rounded-full border border-neutral-300 bg-brand-primary-subtle px-3 py-1 text-sm text-info dark:border-neutral-700">
             <CustomTooltip content={t('tags.tip.delete')} location="top">
               <button
                 type="button"
@@ -109,8 +109,8 @@ export const HashTagInput = ({ value, onChange }: HashTagInputProps) => {
               key={s.id}
               className={`px-3 py-2 text-sm cursor-pointer ${
                 i === focusedIndex
-                  ? 'bg-blue-100 dark:bg-blue-900/40'
-                  : 'hover:bg-blue-50 dark:hover:bg-blue-800/40'
+                  ? 'bg-brand-primary-subtle'
+                  : 'hover:bg-brand-primary-subtle'
               }`}
               onMouseEnter={() => setFocusedIndex(i)}
               onClick={() => {

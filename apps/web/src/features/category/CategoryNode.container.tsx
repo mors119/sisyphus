@@ -74,10 +74,10 @@ export const CategoryNode = ({
         className={cn(
           'absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-300 font-bold',
           activeSubmit && !activeCategory && active?.id
-            ? 'text-blue-600 border-4 border-blue-300 bg-blue-50 bg-opacity-50'
+            ? 'border-4 border-brand-primary bg-brand-primary-subtle text-info'
             : 'hidden',
           isOver &&
-            'z-50 text-white border-4 border-dashed border-blue-600 bg-gradient-to-br from-blue-500 via-blue-400 to-blue-600 shadow-xl',
+            'z-50 border-4 border-dashed border-brand-accent bg-action-primary text-on-brand-primary shadow-raised',
         )}>
         {isOver ? 'Dorp here' : 'Drop zone'}
       </div>
@@ -87,7 +87,7 @@ export const CategoryNode = ({
         {...listeners}
         {...attributes}>
         <div
-          className="flex-col items-center justify-center px-3 py-2 rounded-md transition-all bg-blue-50 border border-blue-200 group"
+          className="group flex-col items-center justify-center rounded-md border border-brand-primary bg-brand-primary-subtle px-3 py-2 transition-all"
           style={{
             backgroundColor: category.color,
             color: getTextColorForHex(category.color),

@@ -58,7 +58,7 @@ export const ViewDetailSection = () => {
         {data.tags?.map((tag) => (
           <span
             key={tag.id}
-            className="inline-block px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-800/40 dark:text-blue-200">
+            className="inline-block rounded-full bg-brand-primary-subtle px-2 py-1 text-xs font-medium text-info">
             # {tag.name}
           </span>
         ))}

@@ -22,8 +22,13 @@
   --muted: rgba(255, 255, 255, 0.62);
   --muted2: rgba(255, 255, 255, 0.48);
 
-  --point-y: #ffcd49;
-  --point-b: #1186ce;
+  --sis: #1186ce;
+  --sisy: #ffcd49;
+  --color-action-primary: var(--sis);
+  --color-highlight: var(--sisy);
+  /* Legacy aliases retained while popup styles are consolidated. */
+  --point-b: var(--color-action-primary);
+  --point-y: var(--color-highlight);
 
   --danger: #ff4d6d;
   --success: #3ddc97;

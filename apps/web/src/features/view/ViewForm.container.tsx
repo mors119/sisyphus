@@ -49,7 +49,7 @@ export const ViewFormField = () => {
       className={cn(
         'relative w-full h-full rounded-lg transition-all duration-300 dark:bg-black',
         isOver
-          ? 'border-blue-400 bg-blue-50 p-4 border-2 border-dashed'
+          ? 'border-brand-primary bg-brand-primary-subtle p-4 border-2 border-dashed'
           : 'border-gray-300 bg-white',
       )}>
       {/* DnD 오버레이 */}
@@ -57,10 +57,10 @@ export const ViewFormField = () => {
         className={cn(
           'absolute inset-0 flex items-center justify-center pointer-events-none font-bold transition-all duration-300',
           !activeSubmit && activeCategory && active?.id
-            ? 'text-blue-600 border-4 z-50 border-blue-300 bg-blue-50 bg-opacity-50'
+            ? 'text-info border-4 z-50 border-brand-primary bg-brand-primary-subtle'
             : 'hidden',
           isOver &&
-            'z-50 text-white border-4 border-dashed border-blue-600 bg-gradient-to-br from-blue-500 via-blue-400 to-blue-600 shadow-xl',
+            'z-50 border-4 border-dashed border-brand-accent bg-action-primary text-on-brand-primary shadow-raised',
         )}>
         {isOver ? 'Drop here' : 'Drop category here to apply'}
       </div>

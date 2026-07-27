@@ -268,6 +268,19 @@ Sisyphus Academy v0.1 is defined as:
 
 ---
 
+## UI design contract
+
+Web and Chrome extension UI work follows:
+
+- [UI foundation and design tokens](docs/design/ui-foundation.md)
+- [Component and state contracts](docs/design/component-contracts.md)
+- [Product UX and terminology](docs/product/ux-language.md)
+
+These documents extend the existing Tailwind and shadcn architecture and are
+the visual and interaction baseline for page-specific work.
+
+---
+
 ## Execution
 
 ```bash

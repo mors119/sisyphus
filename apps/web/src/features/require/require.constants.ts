@@ -1,10 +1,10 @@
 import { RequireStatus } from './require.types';
 
 export const STATUS_LABELS = {
-  RECEIVED: ['require.status.received', 'bg-orange-400'],
-  IN_PROGRESS: ['require.status.inProgress', 'bg-green-400'],
-  COMPLETED: ['require.status.completed', 'bg-blue-400'],
-  REJECTED: ['require.status.rejected', 'bg-rose-400'],
+  RECEIVED: ['require.status.received', 'bg-warning text-white'],
+  IN_PROGRESS: ['require.status.inProgress', 'bg-info text-white'],
+  COMPLETED: ['require.status.completed', 'bg-success text-white'],
+  REJECTED: ['require.status.rejected', 'bg-danger text-white'],
 } as const;
 
 export type StatusKey = keyof typeof STATUS_LABELS;

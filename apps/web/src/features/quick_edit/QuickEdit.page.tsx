@@ -176,7 +176,7 @@ const QuickEditPage = () => {
           {activeCategory && !activeSubmit && (
             <div
               className={cn(
-                'w-32 px-3 py-2 rounded-md shadow-lg flex-col justify-center items-center text-white font-bold border border-blue-200',
+                'w-32 flex-col items-center justify-center rounded-md border border-brand-primary px-3 py-2 font-bold text-white shadow-lg',
               )}
               style={{
                 backgroundColor: activeCategory.color,
