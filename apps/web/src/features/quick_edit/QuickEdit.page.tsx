@@ -1,4 +1,3 @@
-import { DndContext } from '@dnd-kit/core';
 import { useTranslation } from 'react-i18next';
 
 import { PageContent, PageHeader, PageLayout } from '@/features/layout';
@@ -21,9 +20,8 @@ const QuickEditPage = () => {
   };
 
   return (
-    <DndContext>
-      <div className="flex h-[calc(100dvh-3.5rem)] min-h-0 flex-col overflow-hidden">
-        <PageLayout className="flex h-full min-h-0 flex-col gap-4 overflow-hidden py-4 md:gap-6 md:py-6">
+    <div className="flex h-[calc(100dvh-3.5rem)] min-h-0 flex-col overflow-hidden">
+      <PageLayout className="flex h-full min-h-0 flex-col gap-4 overflow-hidden py-4 md:gap-6 md:py-6">
           <PageHeader
             className="shrink-0"
             title={t('item.quick')}
@@ -49,9 +47,8 @@ const QuickEditPage = () => {
               <ViewFormField viewForm={viewForm} variant="compact" />
             </section>
           </PageContent>
-        </PageLayout>
-      </div>
-    </DndContext>
+      </PageLayout>
+    </div>
   );
 };
 

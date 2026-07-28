@@ -45,15 +45,3 @@ export const fetchNotes = async (
   const res = await api.get(`/note/read/all?${queryParams.toString()}`);
   return res.data;
 };
-
-// category 별 노트 전체 보기
-export const fetchCategoryNullNotes = async (
-  params: NoteQueryParams,
-): Promise<NotePageResponse> => {
-  const queryParams = new URLSearchParams();
-  queryParams.set('page', String(params.page));
-  queryParams.set('size', String(params.size));
-
-  const res = await api.get(`/note/categoryNull?${queryParams.toString()}`);
-  return res.data;
-};

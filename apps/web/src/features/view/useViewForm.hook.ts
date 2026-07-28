@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { normalizeNoteToForm } from '@/utils/convertType.util';
-import { invalidateQuery, removeQuery } from '@/lib/react-query';
+import { removeQuery } from '@/lib/react-query';
 import { useAlert } from '@/hooks/useAlert';
 import { useNoteStore } from './note.store';
 import {
@@ -12,7 +12,6 @@ import {
 } from './useView.mutation';
 import { noteSchema } from './view.schema';
 
-import { useDndStore } from '../quick_edit/editDnd.store';
 import { NoteForm } from '../quick_edit/note.types';
 import { useTranslation } from 'react-i18next';
 import { updateImage, uploadImage } from '../image/image.api';
@@ -29,8 +28,6 @@ export const useViewForm = () => {
 
   const { editNote, resetEditNote } = useNoteStore();
   const { alertMessage } = useAlert();
-  const { activeDone, activeDrag } = useDndStore();
-  const isNoteDragging = activeDrag.kind === 'note';
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -48,14 +45,14 @@ export const useViewForm = () => {
 
   /* ---------- edit 모드일 때 폼 값 세팅 ---------- */
   useEffect(() => {
-    if (isEdit && !isNoteDragging) {
+    if (isEdit) {
       form.reset(normalizeNoteToForm(editNote));
       setImageInfo(editNote.image);
 
       const firstImageId = editNote.image?.[0]?.id;
       setImageId(firstImageId);
     }
-  }, [isEdit, editNote, form, isNoteDragging]);
+  }, [isEdit, editNote, form]);
 
   /* ---------- 뮤테이션 준비 ---------- */
   const { mutateAsync: updateNote } = useUpdateNoteMutation();
@@ -98,8 +95,6 @@ export const useViewForm = () => {
       setPreviewUrl(null);
 
       /* 캐시 무효화 & refetch */
-      await invalidateQuery(['categoryNullNotes']);
-      // await invalidateQuery(['notes']);
       await removeQuery(['notes']);
     } catch (err) {
       console.error(err);
@@ -107,7 +102,6 @@ export const useViewForm = () => {
     } finally {
       setTimeout(() => {
         resetEditNote();
-        activeDone();
         setIsLoading(false);
         form.reset(defaultValues);
       }, 300);

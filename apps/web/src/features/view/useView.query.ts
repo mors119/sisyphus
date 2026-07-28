@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { fetchNotes, fetchCategoryNullNotes } from './view.api';
+import { fetchNotes } from './view.api';
 import { NotePageResponse, SortOption } from '../quick_edit/note.types';
 import { useAuthStore } from '../auth/auth.store';
 
@@ -34,24 +34,6 @@ export const useNotesQuery = (
       }),
     staleTime: 1000 * 60, // 1분 정도는 fresh 처리
     enabled: !!accessToken,
-  });
-};
-
-// 태그가 없는 노트 전체
-export const useCategoryNullNotesQuery = (size = 10) => {
-  const sortOption = { field: 'createdAt', order: 'asc' } as const;
-
-  return useInfiniteQuery<NotePageResponse, Error>({
-    queryKey: ['categoryNullNotes', size, sortOption.field, sortOption.order],
-    initialPageParam: 0,
-    queryFn: ({ pageParam }) =>
-      fetchCategoryNullNotes({
-        page: typeof pageParam === 'number' ? pageParam : 0,
-        size,
-        sortOption,
-      }),
-    getNextPageParam: (lastPage) =>
-      lastPage.last ? undefined : lastPage.page + 1,
   });
 };
 
