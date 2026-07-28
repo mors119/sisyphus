@@ -13,61 +13,63 @@ export const ViewDetailSection = () => {
   const image = data.image?.[0];
 
   return (
-    <div className="space-y-4">
-      {/* 카테고리 */}
-      {data.category && (
-        <span
-          className="inline-block w-fit px-3 py-1 rounded-full text-xs font-semibold"
-          style={{
-            background: data.category.color,
-            color: getTextColorForHex(data.category.color),
-          }}>
-          {data.category.title}
-        </span>
-      )}
-      {/* 이미지 영역 */}
-      {image && (
-        <div className="w-full aspect-[4/3] max-w-80 bg-gray-100 dark:bg-neutral-800 overflow-hidden rounded-lg">
-          <ImageCard item={image} />
-        </div>
-      )}
+    <div className="min-h-0 flex-1 overflow-y-auto p-6">
+      <article className="mx-auto flex w-full flex-col gap-6">
+        <header className="space-y-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            {data.category ? (
+              <span
+                className="inline-flex rounded-[var(--radius-role-pill)] px-3 py-1 text-xs font-semibold"
+                style={{
+                  background: data.category.color,
+                  color: getTextColorForHex(data.category.color),
+                }}>
+                {data.category.title}
+              </span>
+            ) : (
+              <span />
+            )}
+          </div>
 
-      {/* 제목 & 부제 */}
-      <div className="space-y-1">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          {data.title}
-        </h1>
-        {data.subTitle && (
-          <p className="text-base text-muted-foreground">{data.subTitle}</p>
+          <div className="space-y-1">
+            <h1 className="text-[length:var(--font-h1)] font-semibold leading-[var(--line-h1)] text-foreground">
+              {data.title}
+            </h1>
+            {data.subTitle && (
+              <p className="text-[length:var(--font-small)] leading-[var(--line-small)] text-muted-foreground">
+                {data.subTitle}
+              </p>
+            )}
+          </div>
+        </header>
+
+        {image && (
+          <figure className="max-w-md overflow-hidden rounded-[var(--radius-role-card)] border border-border">
+            <ImageCard item={image} />
+          </figure>
         )}
-      </div>
 
-      <hr />
+        <section className="space-y-4">
+          <p className="whitespace-pre-wrap text-[length:var(--font-body)] leading-[var(--line-body)] text-foreground">
+            {data.description || t('view.desc_msg')}
+          </p>
 
-      {/* 설명 */}
-      <div>
-        <p className="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
-          {data.description || t('view.desc_msg')}
-        </p>
-      </div>
-
-      <hr />
-
-      {/* 태그 */}
-      <div className="flex flex-wrap gap-1">
-        {data.tags?.map((tag) => (
-          <span
-            key={tag.id}
-            className="inline-block rounded-full bg-brand-primary-subtle px-2 py-1 text-xs font-medium text-info">
-            # {tag.name}
-          </span>
-        ))}
-      </div>
-
-      {/* 작성일 */}
-      <div className="text-xs text-right text-gray-400 dark:text-gray-500">
-        {t('view.date')}: {formatDate(data.createdAt)}
-      </div>
+          {data.tags && data.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {data.tags.map((tag) => (
+                <span
+                  key={tag.id}
+                  className="inline-flex rounded-[var(--radius-role-pill)] bg-brand-primary-subtle px-2.5 py-1 text-[length:var(--font-caption)] font-medium leading-[var(--line-caption)] text-info">
+                  # {tag.name}
+                </span>
+              ))}
+            </div>
+          )}
+          <time className="text-[length:var(--font-caption)] leading-[var(--line-caption)] text-muted-foreground">
+            {t('view.date')}: {formatDate(data.createdAt)}
+          </time>
+        </section>
+      </article>
     </div>
   );
 };

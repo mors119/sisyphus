@@ -29,14 +29,11 @@ export const RequireWrite = ({ isOpen, setIsOpen, type }: Props) => {
             )}
           </DialogTitle>
           <DialogDescription>
-            {t('require.write.desc')}
             {t(
               type === RequireCate.Bug
-                ? 'require.view.bug'
-                : 'require.view.req',
+                ? 'require.write.bugDesc'
+                : 'require.write.reqDesc',
             )}
-
-            {t('require.write.desc2')}
           </DialogDescription>
         </DialogHeader>
         <RequireFormField setIsOpen={setIsOpen} type={type} />

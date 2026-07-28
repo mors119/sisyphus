@@ -35,28 +35,27 @@ export const ViewSheet = ({
   return (
     <div
       ref={sheetRef}
-      className="w-full h-full p-6 overflow-auto bg-white dark:bg-black dark:border border-gray-600 shadow-lg rounded-lg space-y-6 relative">
-      <CloseBtn className="absolute right-5" onClick={onClose} />
+      className="relative flex h-full min-h-0 flex-col border-l border-border bg-background">
+      <CloseBtn className="absolute right-4 top-4 z-10" onClick={onClose} />
+
       {mode === 'detail' ? (
         <>
           <ViewDetailSection />
-          <div className="flex flex-col justify-center items-end gap-2">
-            <div className="flex gap-2">
-              <EditBtn
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit();
-                }}
-              />
-              <DeleteBtn
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setAlertOpen(true);
-                  setDeleteNum(noteId);
-                }}
-              />
-            </div>
-          </div>
+          <footer className="flex shrink-0 justify-end gap-2 border-t border-border p-6">
+            <EditBtn
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit();
+              }}
+            />
+            <DeleteBtn
+              onClick={(e) => {
+                e.stopPropagation();
+                setAlertOpen(true);
+                setDeleteNum(noteId);
+              }}
+            />
+          </footer>
         </>
       ) : (
         <ViewSheetEdit noteId={noteId} />
@@ -69,7 +68,7 @@ const ViewSheetEdit = ({ noteId }: { noteId: number }) => {
   const viewForm = useViewForm();
 
   return (
-    <div className="pt-10">
+    <div className="flex min-h-0 flex-1 flex-col px-6 pb-6 pt-14">
       <ViewFormField key={noteId} viewForm={viewForm} />
     </div>
   );

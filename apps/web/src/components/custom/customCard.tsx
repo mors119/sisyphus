@@ -11,6 +11,8 @@ import { cn } from '@/lib/utils';
 interface CustomCardProps {
   onClick?: () => void;
   className?: string;
+  contentClassName?: string;
+  headerClassName?: string;
   title?: React.ReactNode | string;
   description?: React.ReactNode | string;
   content?: React.ReactNode | string;
@@ -22,6 +24,8 @@ interface CustomCardProps {
 export const CustomCard = ({
   onClick,
   className,
+  contentClassName,
+  headerClassName,
   title,
   description,
   content,
@@ -37,7 +41,8 @@ export const CustomCard = ({
       variant={variant}
       className={cn('h-full overflow-auto', className)}>
       {(title || description) && (
-        <CardHeader className="w-full space-y-1 px-0 pt-0">
+        <CardHeader
+          className={cn('w-full space-y-1 px-0 pt-0', headerClassName)}>
           {title ? (
             <CardTitle className="text-lg font-semibold text-foreground">
               {title}
@@ -49,7 +54,8 @@ export const CustomCard = ({
         </CardHeader>
       )}
       {content ? (
-        <CardContent className="px-0 text-sm leading-relaxed text-foreground">
+        <CardContent
+          className={cn('px-0 text-sm leading-relaxed text-foreground', contentClassName)}>
           {content}
         </CardContent>
       ) : null}

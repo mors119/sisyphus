@@ -120,6 +120,14 @@ export const RequireFormField = ({
           : 'require.form.create',
       );
 
+  const isBug = (type ?? initial?.requireType) === RequireCate.Bug;
+  const titlePlaceholder = t(
+    isBug ? 'require.form.exPlaceBug' : 'require.form.exPlaceReq',
+  );
+  const descriptionPlaceholder = t(
+    isBug ? 'require.form.exPlace2Bug' : 'require.form.exPlace2Req',
+  );
+
   return (
     <Form {...form} key={isEdit ? `edit-${isValidId ?? 'na'}` : 'new'}>
       <form
@@ -136,7 +144,7 @@ export const RequireFormField = ({
               <FormLabel>TITLE</FormLabel>
               <FormControl>
                 <Input
-                  placeholder={t('require.form.exPlace')}
+                  placeholder={titlePlaceholder}
                   {...field}
                   disabled={isBusy}
                 />
@@ -156,7 +164,7 @@ export const RequireFormField = ({
               <FormControl>
                 <Textarea
                   className="w-full max-h-80"
-                  placeholder={t('require.form.exPlace2')}
+                  placeholder={descriptionPlaceholder}
                   disabled={isBusy}
                   {...field}
                 />

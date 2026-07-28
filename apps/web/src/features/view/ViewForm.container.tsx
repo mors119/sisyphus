@@ -23,9 +23,13 @@ import { ImageUploaderForm } from '../image/ImageUploader.container';
 
 interface ViewFormFieldProps {
   viewForm: ViewFormController;
+  variant?: 'default' | 'compact';
 }
 
-export const ViewFormField = ({ viewForm }: ViewFormFieldProps) => {
+export const ViewFormField = ({
+  viewForm,
+  variant = 'default',
+}: ViewFormFieldProps) => {
   const {
     form,
     onSubmit,
@@ -49,14 +53,19 @@ export const ViewFormField = ({ viewForm }: ViewFormFieldProps) => {
     data: { type: 'note-form' },
   });
 
+  const isCompact = variant === 'compact';
+
   return (
     <div
       ref={setNodeRef}
       className={cn(
-        'relative w-full h-full rounded-lg transition-all duration-300 dark:bg-black',
+        'relative w-full transition-all duration-300 dark:bg-black',
+        isCompact
+          ? 'min-h-0 rounded-[var(--radius-role-card)] border border-border bg-card p-3 md:p-4'
+          : 'flex min-h-0 flex-1 flex-col rounded-[var(--radius-role-card)] border border-border bg-card',
         isOver
-          ? 'border-brand-primary bg-brand-primary-subtle p-4 border-2 border-dashed'
-          : 'border-gray-300 bg-white',
+          ? 'border-brand-primary bg-brand-primary-subtle border-2 border-dashed p-4'
+          : isCompact && 'border border-border bg-card',
       )}>
       {/* DnD 오버레이 */}
       <div
@@ -75,32 +84,92 @@ export const ViewFormField = ({ viewForm }: ViewFormFieldProps) => {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-2 w-full flex flex-col">
-          <div className="flex justify-between gap-3 items-center">
-            <ImageUploaderForm
-              fileRef={fileRef}
-              previewUrl={previewUrl}
-              setPreviewUrl={setPreviewUrl}
-              imageInfo={imageInfo}
-              setImageInfo={setImageInfo}
-            />
-            <div className="flex items-center gap-3 justify-end">
-              <CleanBtn onClick={() => reset()} />
-
-              <CategorySelectField
-                control={form.control}
-                name="categoryId"
-                categoryArray={categoryArray}
+          className={cn(
+            'flex w-full flex-col',
+            isCompact ? 'space-y-1.5' : 'min-h-0 flex-1',
+          )}>
+          {isCompact ? (
+            <div className="flex flex-wrap items-start gap-3 sm:grid sm:grid-cols-[auto_minmax(10rem,1fr)_auto]">
+              <ImageUploaderForm
+                fileRef={fileRef}
+                previewUrl={previewUrl}
+                setPreviewUrl={setPreviewUrl}
+                imageInfo={imageInfo}
+                setImageInfo={setImageInfo}
               />
-            </div>
-          </div>
 
+              <div className="flex min-w-0 flex-col gap-1 self-start">
+                <span className="text-sm font-medium leading-none">
+                  {t('category.page.category')}
+                </span>
+                <CategorySelectField
+                  control={form.control}
+                  name="categoryId"
+                  categoryArray={categoryArray}
+                />
+              </div>
+
+              <CleanBtn onClick={() => reset()} />
+            </div>
+          ) : (
+            <div className="min-h-0 flex-1 space-y-6 overflow-y-auto p-6">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <ImageUploaderForm
+                  fileRef={fileRef}
+                  previewUrl={previewUrl}
+                  setPreviewUrl={setPreviewUrl}
+                  imageInfo={imageInfo}
+                  setImageInfo={setImageInfo}
+                  variant="panel"
+                />
+
+                <div className="flex items-center gap-3 sm:ml-auto">
+                  <CategorySelectField
+                    control={form.control}
+                    name="categoryId"
+                    categoryArray={categoryArray}
+                  />
+                  <CleanBtn onClick={() => reset()} />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {renderFields()}
+              </div>
+            </div>
+          )}
+
+          {isCompact && (
+            <div className="space-y-1.5">
+              {renderFields()}
+            </div>
+          )}
+
+          <div
+            className={cn(
+              isCompact ? undefined : 'flex shrink-0 justify-end border-t border-border p-6 pt-4',
+            )}>
+            <Button
+              className={cn('w-full', !isCompact && 'sm:w-auto')}
+              type="submit"
+              disabled={isLoading}>
+              {t(isEdit ? 'edit' : 'add')}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+
+  function renderFields() {
+    return (
+      <>
           {/* title */}
           <FormField
             control={form.control}
             name="title"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className={cn(isCompact && 'gap-1')}>
                 <FormLabel>{t('view.title')}</FormLabel>
                 <FormControl>
                   <Input
@@ -119,7 +188,7 @@ export const ViewFormField = ({ viewForm }: ViewFormFieldProps) => {
             control={form.control}
             name="subTitle"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className={cn(isCompact && 'gap-1')}>
                 <FormLabel>{t('view.subtitle')}</FormLabel>
                 <FormControl>
                   <Input
@@ -138,11 +207,14 @@ export const ViewFormField = ({ viewForm }: ViewFormFieldProps) => {
             control={form.control}
             name="description"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className={cn(isCompact && 'gap-1')}>
                 <FormLabel>{t('view.desc')}</FormLabel>
                 <FormControl>
                   <Textarea
-                    className="w-full max-h-80"
+                    className={cn(
+                      'w-full',
+                      isCompact ? 'min-h-12 max-h-28' : 'max-h-80',
+                    )}
                     placeholder={t('view.desc2')}
                     disabled={isLoading}
                     {...field}
@@ -158,7 +230,7 @@ export const ViewFormField = ({ viewForm }: ViewFormFieldProps) => {
             control={form.control}
             name="tags"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className={cn(isCompact && 'gap-1')}>
                 <FormLabel>{t('view.tags')}</FormLabel>
                 <FormControl>
                   <HashTagInput value={field.value} onChange={field.onChange} />
@@ -167,11 +239,7 @@ export const ViewFormField = ({ viewForm }: ViewFormFieldProps) => {
             )}
           />
 
-          <Button className="w-full" type="submit" disabled={isLoading}>
-            {t(isEdit ? 'edit' : 'add')}
-          </Button>
-        </form>
-      </Form>
-    </div>
-  );
+      </>
+    );
+  }
 };

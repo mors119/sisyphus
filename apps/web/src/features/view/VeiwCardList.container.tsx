@@ -68,17 +68,17 @@ export const ViewCardList = ({
             onClick={() => {
               onOpenDetail(item);
             }}
-            className="cursor-pointer group rounded-xl shadow hover:shadow-xl border bg-white dark:bg-neutral-900 hover:bg-gray-50 dark:hover:bg-neutral-800 transition overflow-hidden">
+            className="group cursor-pointer overflow-hidden rounded-[var(--radius-role-card)] border border-border bg-card transition-colors hover:border-brand-primary">
             {/* 이미지 영역 */}
             <ImageCard item={item.image && item.image[0]} />
 
             {/* 내용 영역 */}
-            <div className="p-4 flex flex-col gap-2">
+            <div className="flex flex-col gap-2 p-4">
               <div>
-                <h3 className="md:text-lg text-sm font-semibold text-gray-900 dark:text-sis truncate">
+                <h3 className="truncate text-sm font-semibold text-foreground md:text-base">
                   {item.title}
                 </h3>
-                <p className="md:sm sm:text-xs text-gray-600 dark:text-gray-300 truncate">
+                <p className="truncate text-xs text-muted-foreground md:text-sm">
                   {item.subTitle || '-'}
                 </p>
               </div>
@@ -98,14 +98,13 @@ export const ViewCardList = ({
                     </span>
                   ))}
                 {item.tags && item.tags.length > 3 && (
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs text-muted-foreground">
                     +{item.tags.length - 3}
                   </span>
                 )}
               </div>
 
-              {/* 푸터 정보 */}
-              <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <div className="mt-1 flex justify-between text-xs text-muted-foreground">
                 <span>{formatRelativeDate(item.createdAt)}</span>
                 {item.category && (
                   <span

@@ -243,6 +243,8 @@
   },
   "quick": {
     "new": "New Item",
+    "notes": "Notes",
+    "select_note": "Select a note to edit or add a new item.",
     "no_category": "Only items without a category will be shown.",
     "drag_msg": "Drag items to a category to organize them easily.",
     "category": "Category",
@@ -322,13 +324,15 @@
       "edit": "Edit",
       "creating": "Submitting…",
       "create": "Submit",
-      "exPlace": "e.g., Please build a Chrome extension.",
-      "exPlace2": "Please enter the details of your request.",
+      "exPlaceBug": "e.g., Tags aren't saving",
+      "exPlace2Bug": "Describe how to reproduce it, your browser/OS, and when it happened.",
+      "exPlaceReq": "e.g., Please build a Chrome extension.",
+      "exPlace2Req": "Please enter the details of your request.",
       "cancel": "Cancel"
     },
     "write": {
-      "desc": "Your",
-      "desc2": " feedback is the foundation that helps Sisyphus become a more useful and enjoyable service. Even a short comment can make a big difference."
+      "bugDesc": "Your bug report helps Sisyphus become a more useful and enjoyable service. Even a short comment can make a big difference.",
+      "reqDesc": "Your feature request helps Sisyphus become a more useful and enjoyable service. Even a short comment can make a big difference."
     },
     "query": {
       "tit": "Enter a title",

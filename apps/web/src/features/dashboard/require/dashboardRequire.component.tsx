@@ -20,24 +20,23 @@ export const DashboardRequire = () => {
   if (isError || !data) return <ErrorState />;
 
   return (
-    <div className="w-full p-2 rounded-md shadow-sm  space-y-4">
-      {/* 상태 처리 */}
+    <div className="w-full space-y-4">
       {!isLoading && !isError && data && (
         <>
           <ul className="space-y-3">
             {data.content.length === 0 ? (
-              <li className="text-gray-500 text-center">
+              <li className="text-center text-sm text-muted-foreground">
                 요청사항이 없습니다.
               </li>
             ) : (
               data.content.map((item: RequireResponse) => (
                 <li
                   key={item.id}
-                  className="border rounded-md p-4 hover:bg-zinc-500">
-                  <div className="flex justify-between items-center">
-                    {/* 기존 버튼 유지 */}
+                  className="rounded-[var(--radius-role-card)] border border-border p-4">
+                  <div className="flex items-center justify-between gap-3">
                     <Button
                       variant="ghost"
+                      className="h-auto min-h-10 justify-start px-2 text-left"
                       onClick={() =>
                         setOpenItemId((prev) =>
                           prev === item.id ? null : item.id,
@@ -48,7 +47,7 @@ export const DashboardRequire = () => {
                       ) : (
                         <ChevronRightCircle />
                       )}
-                      <span className="font-semibold text-lg hover:text-black">
+                      <span className="text-base font-semibold text-foreground">
                         {item.title}
                       </span>
                     </Button>
@@ -61,14 +60,14 @@ export const DashboardRequire = () => {
                       }}
                     />
                   </div>
-                  <div className="px-3">
+                  <div className="px-2">
                     {openItemId === item.id && (
-                      <p className="mt-1 text-gray-700 text-sm">
+                      <p className="mt-2 text-sm text-muted-foreground">
                         {item.description}
                       </p>
                     )}
 
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p className="mt-2 text-xs text-muted-foreground">
                       {new Date(item.createdAt).toLocaleString()}
                     </p>
                   </div>
@@ -77,7 +76,7 @@ export const DashboardRequire = () => {
             )}
           </ul>
 
-          <div className="pt-4">
+          <div className="pt-2">
             <CustomPagination
               totalPages={data.totalPages}
               page={page}
