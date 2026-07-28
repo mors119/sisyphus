@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-import { useDroppable } from '@dnd-kit/core';
 
 import { Form } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -16,7 +15,6 @@ import { CleanBtn } from '@/components/custom/Btn';
 import { HashTagInput } from '../tag/HashTagInput.container';
 import { CategorySelectField } from '../category/CategorySelectField.form';
 import { useCategoriesQuery } from '../category/category.query';
-import { isCategoryDrag, useDndStore } from '../quick_edit/editDnd.store';
 import { ViewFormController } from './useViewForm.hook';
 import { useTranslation } from 'react-i18next';
 import { ImageUploaderForm } from '../image/ImageUploader.container';
@@ -44,43 +42,17 @@ export const ViewFormField = ({
   } = viewForm;
   const { t } = useTranslation();
   const { data: categoryArray = [] } = useCategoriesQuery();
-  const activeDrag = useDndStore((state) => state.activeDrag);
-  const activeCategory = isCategoryDrag(activeDrag) ? activeDrag.category : null;
-  const activeSubmit = activeDrag.kind === 'note';
-
-  const { isOver, setNodeRef, active } = useDroppable({
-    id: 'note-form',
-    data: { type: 'note-form' },
-  });
 
   const isCompact = variant === 'compact';
 
   return (
     <div
-      ref={setNodeRef}
       className={cn(
-        'relative w-full transition-all duration-300 dark:bg-black',
+        'relative w-full dark:bg-black',
         isCompact
           ? 'min-h-0 rounded-[var(--radius-role-card)] border border-border bg-card p-3 md:p-4'
           : 'flex min-h-0 flex-1 flex-col rounded-[var(--radius-role-card)] border border-border bg-card',
-        isOver
-          ? 'border-brand-primary bg-brand-primary-subtle border-2 border-dashed p-4'
-          : isCompact && 'border border-border bg-card',
       )}>
-      {/* DnD 오버레이 */}
-      <div
-        className={cn(
-          'absolute inset-0 flex items-center justify-center pointer-events-none font-bold transition-all duration-300',
-          !activeSubmit && activeCategory && active?.id
-            ? 'text-info border-4 z-50 border-brand-primary bg-brand-primary-subtle'
-            : 'hidden',
-          isOver &&
-            'z-50 border-4 border-dashed border-brand-accent bg-action-primary text-on-brand-primary shadow-raised',
-        )}>
-        {isOver ? 'Drop here' : 'Drop category here to apply'}
-      </div>
-
-      {/* 폼 UI */}
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -133,21 +105,17 @@ export const ViewFormField = ({
                 </div>
               </div>
 
-              <div className="space-y-4">
-                {renderFields()}
-              </div>
+              <div className="space-y-4">{renderFields()}</div>
             </div>
           )}
 
-          {isCompact && (
-            <div className="space-y-1.5">
-              {renderFields()}
-            </div>
-          )}
+          {isCompact && <div className="space-y-1.5">{renderFields()}</div>}
 
           <div
             className={cn(
-              isCompact ? undefined : 'flex shrink-0 justify-end border-t border-border p-6 pt-4',
+              isCompact
+                ? undefined
+                : 'flex shrink-0 justify-end border-t border-border p-6 pt-4',
             )}>
             <Button
               className={cn('w-full', !isCompact && 'sm:w-auto')}
@@ -164,81 +132,76 @@ export const ViewFormField = ({
   function renderFields() {
     return (
       <>
-          {/* title */}
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem className={cn(isCompact && 'gap-1')}>
-                <FormLabel>{t('view.title')}</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t('view.title2')}
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem className={cn(isCompact && 'gap-1')}>
+              <FormLabel>{t('view.title')}</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder={t('view.title2')}
+                  {...field}
+                  disabled={isLoading}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          {/* subTitle */}
-          <FormField
-            control={form.control}
-            name="subTitle"
-            render={({ field }) => (
-              <FormItem className={cn(isCompact && 'gap-1')}>
-                <FormLabel>{t('view.subtitle')}</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder={t('view.subtitle2')}
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <FormField
+          control={form.control}
+          name="subTitle"
+          render={({ field }) => (
+            <FormItem className={cn(isCompact && 'gap-1')}>
+              <FormLabel>{t('view.subtitle')}</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder={t('view.subtitle2')}
+                  {...field}
+                  disabled={isLoading}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          {/* description */}
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem className={cn(isCompact && 'gap-1')}>
-                <FormLabel>{t('view.desc')}</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className={cn(
-                      'w-full',
-                      isCompact ? 'min-h-12 max-h-28' : 'max-h-80',
-                    )}
-                    placeholder={t('view.desc2')}
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem className={cn(isCompact && 'gap-1')}>
+              <FormLabel>{t('view.desc')}</FormLabel>
+              <FormControl>
+                <Textarea
+                  className={cn(
+                    'w-full',
+                    isCompact ? 'min-h-12 max-h-28' : 'max-h-80',
+                  )}
+                  placeholder={t('view.desc2')}
+                  disabled={isLoading}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          {/* tags */}
-          <FormField
-            control={form.control}
-            name="tags"
-            render={({ field }) => (
-              <FormItem className={cn(isCompact && 'gap-1')}>
-                <FormLabel>{t('view.tags')}</FormLabel>
-                <FormControl>
-                  <HashTagInput value={field.value} onChange={field.onChange} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
+        <FormField
+          control={form.control}
+          name="tags"
+          render={({ field }) => (
+            <FormItem className={cn(isCompact && 'gap-1')}>
+              <FormLabel>{t('view.tags')}</FormLabel>
+              <FormControl>
+                <HashTagInput value={field.value} onChange={field.onChange} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
       </>
     );
   }

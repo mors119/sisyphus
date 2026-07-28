@@ -19,7 +19,7 @@ interface ImageUploaderProps {
   >;
 
   /** @description UI 크기 모드 */
-  variant?: 'compact' | 'full' | 'panel';
+  variant?: 'compact' | 'panel';
 }
 
 export function ImageUploaderForm({
@@ -31,7 +31,6 @@ export function ImageUploaderForm({
   variant = 'compact',
 }: ImageUploaderProps) {
   const isPanel = variant === 'panel';
-  const isFull = variant === 'full' || isPanel;
   const isEmptyImages = !imageInfo || imageInfo.length === 0;
 
   const { getRootProps, getInputProps, isDragActive } = useImageDropzone({
@@ -50,19 +49,15 @@ export function ImageUploaderForm({
     'relative overflow-hidden',
     isPanel
       ? 'aspect-[4/3] w-full max-w-md rounded-[var(--radius-role-card)] border border-border'
-      : isFull
-        ? 'h-80 w-80 rounded border'
-        : 'h-16 w-16 rounded border',
+      : 'h-16 w-16 rounded border',
   );
 
   const dropzoneClassName = cn(
     'flex cursor-pointer items-center justify-center border-2 border-dashed',
     isPanel
       ? 'aspect-[4/3] w-full max-w-md rounded-[var(--radius-role-card)] border-border bg-muted/40'
-      : cn('rounded', isFull ? 'h-80 w-80' : 'h-16 w-20'),
-    isDragActive
-      ? 'border-brand-primary bg-brand-primary-subtle'
-      : !isPanel && 'border-gray-300',
+      : 'h-16 w-20 rounded border-gray-300',
+    isDragActive && 'border-brand-primary bg-brand-primary-subtle',
   );
 
   /**

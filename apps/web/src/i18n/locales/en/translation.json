@@ -244,12 +244,7 @@
   "quick": {
     "new": "New Item",
     "notes": "Notes",
-    "select_note": "Select a note to edit or add a new item.",
-    "no_category": "Only items without a category will be shown.",
-    "drag_msg": "Drag items to a category to organize them easily.",
-    "category": "Category",
-    "category_msg": "Add New Category",
-    "cate_drag_msg": "Drag here to quickly add a category."
+    "select_note": "Select a note to edit or add a new item."
   },
   "temp": {
     "loading": "Loading...",
