@@ -9,13 +9,13 @@
 
 Sisyphus Academy is a multi-platform knowledge input system designed to provide ubiquitous access to personal knowledge capture through web, mobile, and browser extensions.
 
-The current **0.1 version focuses on a Word Expansion System**, where raw user input is transformed into structured, enriched knowledge entries.
+The current **0.0.1 version focuses on a Word Expansion System**, where raw user input is transformed into structured, enriched knowledge entries.
 
 Instead of functioning as a traditional vocabulary application, the system is designed as an **automated data enrichment pipeline for words**.
 
 ---
 
-## Core Concept (v0.1)
+## Core Concept (v0.0.1)
 
 When a user submits a word, the system automatically:
 
@@ -180,7 +180,7 @@ All platforms share a unified backend processing pipeline.
 
 ---
 
-## Current Status (v0.1)
+## Current Status (v0.0.1)
 
 ### Completed
 
@@ -198,7 +198,7 @@ All platforms share a unified backend processing pipeline.
 
 ## Roadmap
 
-### v0.1 — Word Expansion System (Current)
+### v0.0.1 — Word Expansion System (Current)
 
 * Word ingestion
 * Automated definition generation
@@ -267,7 +267,7 @@ The goal is not simple storage, but automatic transformation of raw input into u
 
 ## Project Definition
 
-Sisyphus Academy v0.1 is defined as:
+Sisyphus Academy v0.0.1 is defined as:
 
 > A system that transforms raw word input into structured, enriched knowledge entities through an automated expansion pipeline.
 
