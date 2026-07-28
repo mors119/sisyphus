@@ -2,9 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { PageContent, PageLayout } from '@/features/layout';
+import { PageContent, PageHeader, PageLayout } from '@/features/layout';
 import { cn } from '@/lib/utils';
-import { CustomCard } from '@/components/custom/customCard';
 import { LoadingState } from '@/components/custom/Loader';
 import { ErrorState } from '@/components/custom/Error';
 import { EmptyState } from '@/components/custom/Empty';
@@ -159,126 +158,125 @@ const ViewPage = () => {
   ]);
 
   return (
-    <PageLayout className="gap-4 py-4 sm:py-6">
-      <PageContent width="wide">
-        <CustomCard
-          content={
-            <>
-              {isLoading ? (
-                <LoadingState compact />
-              ) : isError ? (
-                <ErrorState />
-              ) : content.length === 0 ? (
-                <EmptyState />
-              ) : (
-              <div>
-                <div className="flex justify-between">
-                  <div className="flex justify-center items-center pl-2">
-                    <Button
-                      className="hover:bg-transparent bg-transparent dark:text-white/80 border-transparent shadow-none text-black/80 hover:text-black dark:hover:text-white"
-                      onClick={() => {
-                        const next = new URLSearchParams(searchParams);
-                        next.delete('mode');
-                        next.delete('type');
-                        next.delete('id');
-                        next.delete('q'); // or title
-                        setSearchParams(next);
-                        setCategoryId(null);
-                        setTagId(null);
-                        setTit(null);
-                      }}>
-                      전체보기
-                    </Button>
+    <PageLayout className="flex min-h-0 flex-1 flex-col">
+      <PageHeader
+        title={t('item.note')}
+        actions={
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <IdCard size={15} />
+              {t('item.card')}
+            </span>
+            <Switch checked={mode} onCheckedChange={setMode} />
+            <span className="flex items-center gap-1">
+              <Table size={15} />
+              {t('item.table')}
+            </span>
+          </div>
+        }
+      />
 
-                    <CategorySelector
-                      categoryId={categoryId}
-                      open={cateOpen}
-                      setCategoryId={setCategoryId}
-                      setOpen={setCateOpen}
-                      data={Array.from(
-                        new Map(
-                          content
-                            .map((item) => item.category)
-                            .filter((c): c is CategorySummary => !!c)
-                            .map((c) => [c.id, c]),
-                        ).values(),
-                      )}
-                    />
-                  </div>
+      <PageContent width="wide" className="relative flex min-h-0 flex-1 flex-col">
+        {isLoading ? (
+          <LoadingState compact />
+        ) : isError ? (
+          <ErrorState />
+        ) : content.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <div className="flex min-h-0 flex-1 flex-col gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  className="px-2 text-muted-foreground"
+                  onClick={() => {
+                    const next = new URLSearchParams(searchParams);
+                    next.delete('mode');
+                    next.delete('type');
+                    next.delete('id');
+                    next.delete('q');
+                    setSearchParams(next);
+                    setCategoryId(null);
+                    setTagId(null);
+                    setTit(null);
+                  }}>
+                  {t('item.view')}
+                </Button>
 
-                  <div className="flex gap-2 items-center">
-                    <span className="flex gap-1 items-center text-xs">
-                      <IdCard size={15} />
-                      {t('item.card')}
-                    </span>
-                    <Switch checked={mode} onCheckedChange={setMode} />
-                    <span className="flex gap-1 items-center text-xs">
-                      <Table size={15} />
-                      {t('item.table')}
-                    </span>
-                  </div>
-                </div>
-
-                <div
-                  className="h-[calc(100vh-150px)] overflow-hidden flex flex-col overflow-y-auto"
-                  ref={listRef}>
-                  {mode ? (
-                    <ViewTable
-                      isLoading={isLoading}
-                      deleteNum={deleteNum}
-                      setDeleteNum={setDeleteNum}
-                      content={content}
-                      alertOpen={alertOpen}
-                      setAlertOpen={setAlertOpen}
-                      onOpenDetail={viewSheet.openDetail}
-                      categoryId={categoryId}
-                      setCategoryId={setCategoryId}
-                      tagId={tagId}
-                      setTagId={setTagId}
-                    />
-                  ) : (
-                    <ViewCardList
-                      deleteNum={deleteNum}
-                      setDeleteNum={setDeleteNum}
-                      content={content}
-                      alertOpen={alertOpen}
-                      setAlertOpen={setAlertOpen}
-                      onOpenDetail={viewSheet.openDetail}
-                      categoryId={categoryId}
-                      setCategoryId={setCategoryId}
-                      tagId={tagId}
-                      setTagId={setTagId}
-                    />
+                <CategorySelector
+                  categoryId={categoryId}
+                  open={cateOpen}
+                  setCategoryId={setCategoryId}
+                  setOpen={setCateOpen}
+                  data={Array.from(
+                    new Map(
+                      content
+                        .map((item) => item.category)
+                        .filter((c): c is CategorySummary => !!c)
+                        .map((c) => [c.id, c]),
+                    ).values(),
                   )}
-
-                  {/* sentinel은 일반 모드에서만 의미가 있음 */}
-                  {!isSearchMode && <div ref={loadMoreRef} className="h-8" />}
-                  {!isSearchMode && infiniteQ.isFetchingNextPage && (
-                    <LoadingState compact />
-                  )}
-                </div>
-              </div>
-            )}
-
-            <div
-              className={cn(
-                'absolute left-0 top-0 w-full h-full z-40 translate-x-full duration-300 flex justify-end',
-                viewSheet.isOpen && 'translate-x-0',
-              )}>
-              <div className="max-w-3/4 h-full w-full">
-                <ViewSheet
-                  mode={viewSheet.mode}
-                  onClose={viewSheet.close}
-                  onEdit={viewSheet.openEdit}
-                  setAlertOpen={setAlertOpen}
-                  setDeleteNum={setDeleteNum}
-                  noteId={viewSheet.editNote.id}
                 />
               </div>
             </div>
-          </>
-        }
-        />
+
+            <div
+              className="min-h-0 flex-1 overflow-y-auto"
+              ref={listRef}>
+              {mode ? (
+                <ViewTable
+                  isLoading={isLoading}
+                  deleteNum={deleteNum}
+                  setDeleteNum={setDeleteNum}
+                  content={content}
+                  alertOpen={alertOpen}
+                  setAlertOpen={setAlertOpen}
+                  onOpenDetail={viewSheet.openDetail}
+                  categoryId={categoryId}
+                  setCategoryId={setCategoryId}
+                  tagId={tagId}
+                  setTagId={setTagId}
+                />
+              ) : (
+                <ViewCardList
+                  deleteNum={deleteNum}
+                  setDeleteNum={setDeleteNum}
+                  content={content}
+                  alertOpen={alertOpen}
+                  setAlertOpen={setAlertOpen}
+                  onOpenDetail={viewSheet.openDetail}
+                  categoryId={categoryId}
+                  setCategoryId={setCategoryId}
+                  tagId={tagId}
+                  setTagId={setTagId}
+                />
+              )}
+
+              {!isSearchMode && <div ref={loadMoreRef} className="h-8" />}
+              {!isSearchMode && infiniteQ.isFetchingNextPage && (
+                <LoadingState compact />
+              )}
+            </div>
+          </div>
+        )}
+
+        <div
+          className={cn(
+            'absolute left-0 top-0 z-40 flex h-full w-full translate-x-full justify-end transition-transform duration-[var(--motion-standard)]',
+            viewSheet.isOpen && 'translate-x-0',
+          )}>
+          <div className="h-full w-full max-w-[var(--content-medium)]">
+            <ViewSheet
+              mode={viewSheet.mode}
+              onClose={viewSheet.close}
+              onEdit={viewSheet.openEdit}
+              setAlertOpen={setAlertOpen}
+              setDeleteNum={setDeleteNum}
+              noteId={viewSheet.editNote.id}
+            />
+          </div>
+        </div>
       </PageContent>
     </PageLayout>
   );

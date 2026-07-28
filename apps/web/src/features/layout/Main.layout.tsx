@@ -5,7 +5,9 @@ import { AppShell } from './AppShell';
 const Layout = () => {
   return (
     <AppShell>
-      <Outlet />
+      <div className="h-full min-h-0">
+        <Outlet />
+      </div>
     </AppShell>
   );
 };

@@ -19,7 +19,7 @@ interface ImageUploaderProps {
   >;
 
   /** @description UI 크기 모드 */
-  variant?: 'compact' | 'full';
+  variant?: 'compact' | 'full' | 'panel';
 }
 
 export function ImageUploaderForm({
@@ -30,7 +30,8 @@ export function ImageUploaderForm({
   setImageInfo,
   variant = 'compact',
 }: ImageUploaderProps) {
-  const isFull = variant === 'full';
+  const isPanel = variant === 'panel';
+  const isFull = variant === 'full' || isPanel;
   const isEmptyImages = !imageInfo || imageInfo.length === 0;
 
   const { getRootProps, getInputProps, isDragActive } = useImageDropzone({
@@ -44,6 +45,25 @@ export function ImageUploaderForm({
     },
     setPreviewUrl,
   });
+
+  const mediaClassName = cn(
+    'relative overflow-hidden',
+    isPanel
+      ? 'aspect-[4/3] w-full max-w-md rounded-[var(--radius-role-card)] border border-border'
+      : isFull
+        ? 'h-80 w-80 rounded border'
+        : 'h-16 w-16 rounded border',
+  );
+
+  const dropzoneClassName = cn(
+    'flex cursor-pointer items-center justify-center border-2 border-dashed',
+    isPanel
+      ? 'aspect-[4/3] w-full max-w-md rounded-[var(--radius-role-card)] border-border bg-muted/40'
+      : cn('rounded', isFull ? 'h-80 w-80' : 'h-16 w-20'),
+    isDragActive
+      ? 'border-brand-primary bg-brand-primary-subtle'
+      : !isPanel && 'border-gray-300',
+  );
 
   /**
    * @description 선택/프리뷰/기존 이미지 상태를 초기화
@@ -62,25 +82,21 @@ export function ImageUploaderForm({
   }, [previewUrl]);
 
   return (
-    <div className="flex items-center gap-2">
+    <div className={cn(isPanel ? 'w-full max-w-md' : 'flex items-center gap-2')}>
       {/* 1) 새로 선택된 프리뷰(기존 이미지가 없을 때만 보여주는 현재 정책 유지) */}
       {previewUrl && isEmptyImages && (
-        <div
-          className={cn(
-            'relative overflow-hidden rounded border',
-            isFull ? 'w-80 h-80' : 'w-16 h-16',
-          )}>
+        <div className={mediaClassName}>
           <img
             src={previewUrl}
             alt="preview"
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
           />
 
           <button
             type="button"
             onClick={clearSelection}
-            className="absolute top-1 right-1 rounded bg-black/50 p-1 text-white">
-            <X size={14} />
+            className="absolute right-2 top-2 rounded bg-black/50 p-1 text-white">
+            <X size={isPanel ? 16 : 14} />
           </button>
         </div>
       )}
@@ -88,16 +104,11 @@ export function ImageUploaderForm({
       {/* 2) 기존 이미지들 */}
       {!previewUrl &&
         imageInfo?.map((item) => (
-          <div
-            key={item.id}
-            className={cn(
-              'relative overflow-hidden rounded border',
-              isFull ? 'w-80 h-80' : 'w-16 h-16',
-            )}>
+          <div key={item.id} className={mediaClassName}>
             <img
               src={item.url}
               alt={item.originName}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
             />
 
             {/* 여기서 “기존 이미지 제거”는 명시적 버튼으로 */}
@@ -107,30 +118,23 @@ export function ImageUploaderForm({
                 // TODO: 실제 삭제 API가 있다면 여기서 호출 후 state 갱신
                 setImageInfo(undefined);
               }}
-              className="absolute top-1 right-1 rounded bg-black/50 p-1 text-white">
-              <X size={14} />
+              className="absolute right-2 top-2 rounded bg-black/50 p-1 text-white">
+              <X size={isPanel ? 16 : 14} />
             </button>
           </div>
         ))}
 
       {/* 3) 업로드 입력(조건: 기존 이미지도 없고 프리뷰도 없을 때) */}
       {!previewUrl && isEmptyImages && (
-        <div
-          {...getRootProps()}
-          className={cn(
-            'flex items-center justify-center rounded border-2 border-dashed cursor-pointer',
-            isFull ? 'w-80 h-80' : 'w-20 h-16',
-            isDragActive
-              ? 'border-brand-primary bg-brand-primary-subtle'
-              : 'border-gray-300',
-          )}>
+        <div {...getRootProps()} className={dropzoneClassName}>
           <div
             className={cn(
-              'flex items-center gap-1 text-xs',
+              'flex items-center gap-2',
+              isPanel ? 'text-sm text-muted-foreground' : 'gap-1 text-xs',
               isDragActive && 'text-info',
             )}>
-            <span>image</span>
-            <Plus size={14} />
+            <span>{isPanel ? 'image' : 'image'}</span>
+            <Plus size={isPanel ? 16 : 14} />
           </div>
           <input {...getInputProps()} />
         </div>

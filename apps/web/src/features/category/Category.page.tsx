@@ -6,6 +6,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from '@/components/ui/resizable';
+import { PageContent, PageHeader, PageLayout } from '@/features/layout';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -14,25 +15,36 @@ const CategoryPage = () => {
   const isMobile = useIsMobile();
 
   return (
-    <section className="relative mx-auto max-w-[1680px] h-full lg:p-6 sm:p-4 p-2">
-      <ResizablePanelGroup direction={isMobile ? 'vertical' : 'horizontal'}>
-        <ResizablePanel>
-          <CustomCard
-            title={t('category.page.category')}
-            className="h-full space-y-1"
-            content={<CategoryField condition={true} />}
-          />
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel>
-          <CustomCard
-            title={t('category.page.add_edit')}
-            className="h-full"
-            content={<CategoryFormUnified />}
-          />
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    </section>
+    <PageLayout className="flex min-h-0 flex-1 flex-col py-0">
+      <PageHeader title={t('item.category')} />
+
+      <PageContent width="wide" className="flex min-h-0 flex-1 flex-col">
+        <ResizablePanelGroup
+          id="category-page"
+          orientation={isMobile ? 'vertical' : 'horizontal'}
+          className="min-h-0 flex-1 gap-3">
+          <ResizablePanel id="category-list" defaultSize="50%" minSize="25%">
+            <CustomCard
+              title={t('category.page.category')}
+              className="h-full"
+              headerClassName="px-6 pb-0 pt-6"
+              contentClassName="px-6 pb-6"
+              content={<CategoryField condition={true} />}
+            />
+          </ResizablePanel>
+          <ResizableHandle withHandle className={isMobile ? 'my-1' : 'mx-1'} />
+          <ResizablePanel id="category-form" defaultSize="50%" minSize="25%">
+            <CustomCard
+              title={t('category.page.add_edit')}
+              className="h-full"
+              headerClassName="px-6 pb-0 pt-6"
+              contentClassName="px-6 pb-6"
+              content={<CategoryFormUnified />}
+            />
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </PageContent>
+    </PageLayout>
   );
 };
 
