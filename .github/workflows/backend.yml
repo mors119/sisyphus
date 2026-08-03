@@ -46,7 +46,7 @@ jobs:
         run: test -s build/reports/jacoco/test/jacocoTestReport.xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           files: apps/api/build/reports/jacoco/test/jacocoTestReport.xml
           flags: backend
