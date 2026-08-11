@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -21,10 +21,10 @@ import { EMPTY_FORM } from './view.constants';
 export const useViewForm = () => {
   const fileRef = useRef<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [imageInfo, setImageInfo] = useState<ImageResponse[] | undefined>(
-    undefined,
-  );
-  const [imageId, setImageId] = useState<number | undefined>(undefined);
+  const [imageOverride, setImageOverride] = useState<{
+    noteId: number;
+    value: ImageResponse[] | undefined;
+  } | null>(null);
 
   const { editNote, resetEditNote } = useNoteStore();
   const { alertMessage } = useAlert();
@@ -42,15 +42,35 @@ export const useViewForm = () => {
 
   /* ---------- edit / create 판단 ---------- */
   const isEdit = editNote.id > 0;
+  const imageInfo =
+    imageOverride?.noteId === editNote.id
+      ? imageOverride.value
+      : isEdit
+        ? editNote.image
+        : undefined;
+  const imageId = editNote.image?.[0]?.id;
+
+  const setImageInfo: React.Dispatch<
+    React.SetStateAction<ImageResponse[] | undefined>
+  > = useCallback(
+    (value) => {
+      setImageOverride((current) => {
+        const currentValue =
+          current?.noteId === editNote.id ? current.value : imageInfo;
+        return {
+          noteId: editNote.id,
+          value:
+            typeof value === 'function' ? value(currentValue) : value,
+        };
+      });
+    },
+    [editNote.id, imageInfo],
+  );
 
   /* ---------- edit 모드일 때 폼 값 세팅 ---------- */
   useEffect(() => {
     if (isEdit) {
       form.reset(normalizeNoteToForm(editNote));
-      setImageInfo(editNote.image);
-
-      const firstImageId = editNote.image?.[0]?.id;
-      setImageId(firstImageId);
     }
   }, [isEdit, editNote, form]);
 

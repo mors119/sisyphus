@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { TagTemp } from '../tag/tag.type';
 import {
@@ -14,16 +14,12 @@ import {
 } from './review.types';
 
 export function useKnowledgeReview(word: string, enabled: boolean) {
-  const [review, setReview] = useState<KnowledgeReviewState | null>(null);
+  const [review, setReview] = useState<KnowledgeReviewState | null>(() =>
+    enabled && word ? createReviewState(word) : null,
+  );
   const [editingSection, setEditingSection] = useState<ReviewSectionId | null>(
     null,
   );
-
-  useEffect(() => {
-    if (!enabled || !word) return;
-    setReview(createReviewState(word));
-    setEditingSection(null);
-  }, [enabled, word]);
 
   const updateDraft = useCallback(
     (sectionId: ReviewSectionId, value: string | TagTemp[]) => {

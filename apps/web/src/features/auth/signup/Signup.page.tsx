@@ -46,7 +46,8 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   // 이메일 인증 탭 열기
   const [openVerifyEmail, setOpenVerifyEmail] = useState(false);
-  const { secondsLeft } = useEmailVerificationTimer(openVerifyEmail);
+  const { secondsLeft, startTimer } =
+    useEmailVerificationTimer(openVerifyEmail);
   // 이메일 인증 버튼 활성화
   const [verified, setVerified] = useState(true);
   // 이메일 검증
@@ -119,6 +120,7 @@ const Signup = () => {
   const { mutate: sendCode } = useSendVerificationMutation();
 
   const onSendCode = () => {
+    startTimer();
     setOpenVerifyEmail(true);
     sendCode(emailValue, {
       onError: () => setOpenVerifyEmail(false),
@@ -129,7 +131,6 @@ const Signup = () => {
     <Dialog open={openVerifyEmail} onOpenChange={setOpenVerifyEmail}>
       <VerifyEmail
         emailValue={emailValue}
-        open={openVerifyEmail}
         secondsLeft={secondsLeft}
         setOpen={setOpenVerifyEmail}
         setConfirm={setConfirm}
