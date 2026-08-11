@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form';
-import { AuthRequest, useAuthSchema } from './auth.schema';
+import { useAuthSchema } from './auth.schema';
+import type { AuthRequest } from './auth.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useAuthStore } from './auth.store';

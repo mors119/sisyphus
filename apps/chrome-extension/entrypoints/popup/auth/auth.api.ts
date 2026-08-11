@@ -1,5 +1,5 @@
 import { api } from '../route.api';
-import { AuthRequest } from './auth.schema';
+import type { AuthRequest } from './auth.schema';
 
 export const loginApi = async (req: AuthRequest) => {
   const res = await api.post('/auth/extension/login', req);

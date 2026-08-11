@@ -36,9 +36,11 @@
     "@wxt-dev/module-react": "^1.2.2",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10",
-    "wxt": "^0.20.27"
+    "wxt": "^0.21.3"
   },
   "overrides": {
-    "@vitejs/plugin-react": "5.2.0"
+    "@vitejs/plugin-react": "5.2.0",
+    "nanoid": "3.3.18",
+    "postcss": "8.5.26"
   }
 }
