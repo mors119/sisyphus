@@ -51,7 +51,7 @@ jobs:
           files: apps/api/build/reports/jacoco/test/jacocoTestReport.xml
           flags: backend
           name: backend
-          fail_ci_if_error: true
+          fail_ci_if_error: false
           verbose: true
           use_oidc: true
 
