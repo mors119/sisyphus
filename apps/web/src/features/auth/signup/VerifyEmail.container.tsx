@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useAlert } from '@/hooks/useAlert';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { formatTime } from '@/utils/formatTime.util';
 import { verifyEmailCode } from '../auth.api';
 import { useTranslation } from 'react-i18next';
@@ -19,7 +19,6 @@ import { useTranslation } from 'react-i18next';
 interface VerifyEmailProps {
   emailValue: string;
   secondsLeft: number;
-  open: boolean;
   setOpen: (open: boolean) => void;
   setConfirm: (confirm: boolean) => void;
 }
@@ -27,7 +26,6 @@ interface VerifyEmailProps {
 export const VerifyEmail = ({
   emailValue,
   secondsLeft,
-  open,
   setOpen,
   setConfirm,
 }: VerifyEmailProps) => {
@@ -36,24 +34,10 @@ export const VerifyEmail = ({
   const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // 모달 열릴 때마다 초기화
-  useEffect(() => {
-    if (open) {
-      setCode('');
-    }
-  }, [open]);
-
-  // 코드가 6자리 되면 자동 제출
-  useEffect(() => {
-    if (code.length === 6) {
-      handleSubmit();
-    }
-  }, [code]);
-
-  const handleSubmit = async () => {
+  const handleSubmit = async (verificationCode: string) => {
     setIsLoading(true);
     try {
-      const isValid = await verifyEmailCode(emailValue, code);
+      const isValid = await verifyEmailCode(emailValue, verificationCode);
       if (isValid) {
         setOpen(false);
         setConfirm(true);
@@ -84,7 +68,12 @@ export const VerifyEmail = ({
         <InputOTP
           maxLength={6}
           value={code}
-          onChange={(val) => setCode(val)}
+          onChange={(value) => {
+            setCode(value);
+            if (value.length === 6) {
+              void handleSubmit(value);
+            }
+          }}
           disabled={isLoading}>
           <InputOTPGroup>
             {[0, 1, 2, 3, 4, 5].map((index) => (

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -35,10 +35,6 @@ const ViewPage = () => {
   const [alertOpen, setAlertOpen] = useState(false);
   const [deleteNum, setDeleteNum] = useState<number>(0);
 
-  const [categoryId, setCategoryId] = useState<number | null>(null);
-  const [tagId, setTagId] = useState<number | null>(null);
-  const [tit, setTit] = useState<string | null>(null);
-
   const { sortOption } = useNoteStore();
   const viewSheet = useViewSheet();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -72,33 +68,49 @@ const ViewPage = () => {
   const id = searchParams.get('id');
   const title = searchParams.get('title');
   const isSearchMode = searchParams.get('mode') === 'search';
+  const categoryId =
+    type === SEARCH_ITEM.CATE ? parseInt(id ?? '0', 10) || null : null;
+  const tagId =
+    type === SEARCH_ITEM.TAG ? parseInt(id ?? '0', 10) || null : null;
+  const tit = type === SEARCH_ITEM.NOTE ? title : null;
 
   // 스크롤 root
   const listRef = useRef<HTMLDivElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  // 1) URL search params -> 필터 state 동기화
+  const setFilter = useCallback(
+    (filterType: string, filterId: number | null) => {
+      const next = new URLSearchParams(searchParams);
+      next.delete('title');
+      next.delete('q');
+
+      if (filterId === null) {
+        if (next.get('type') === filterType) {
+          next.delete('type');
+          next.delete('id');
+        }
+      } else {
+        next.set('type', filterType);
+        next.set('id', String(filterId));
+      }
+
+      setSearchParams(next);
+    },
+    [searchParams, setSearchParams],
+  );
+
+  const setCategoryId = useCallback(
+    (categoryId: number | null) => setFilter(SEARCH_ITEM.CATE, categoryId),
+    [setFilter],
+  );
+  const setTagId = useCallback(
+    (tagId: number | null) => setFilter(SEARCH_ITEM.TAG, tagId),
+    [setFilter],
+  );
+
+  // 1) URL 필터가 바뀌면 결과 목록의 시작점으로 이동
   useEffect(() => {
-    // NOTE: 검색 모드가 아닐 때도 URL 필터가 있을 수 있으니 그대로 유지
     if (!(type && id) && !title) return;
-
-    setCategoryId(null);
-    setTagId(null);
-    setTit(null);
-
-    switch (type) {
-      case SEARCH_ITEM.CATE:
-        setCategoryId(parseInt(id ?? '0', 10) || null);
-        break;
-      case SEARCH_ITEM.TAG:
-        setTagId(parseInt(id ?? '0', 10) || null);
-        break;
-      case SEARCH_ITEM.NOTE:
-        setTit(title ?? null);
-        break;
-    }
-
-    // 검색 모드로 들어오면 스크롤을 맨 위로(UX)
     listRef.current?.scrollTo({ top: 0 });
   }, [type, id, title]);
 
@@ -196,10 +208,8 @@ const ViewPage = () => {
                     next.delete('type');
                     next.delete('id');
                     next.delete('q');
+                    next.delete('title');
                     setSearchParams(next);
-                    setCategoryId(null);
-                    setTagId(null);
-                    setTit(null);
                   }}>
                   {t('item.view')}
                 </Button>

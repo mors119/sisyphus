@@ -27,9 +27,9 @@ export interface ViewTableProps {
   setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onOpenDetail: (note: NoteResponse) => void;
   categoryId: number | null;
-  setCategoryId: React.Dispatch<React.SetStateAction<number | null>>;
+  setCategoryId: (id: number | null) => void;
   tagId: number | null;
-  setTagId: React.Dispatch<React.SetStateAction<number | null>>;
+  setTagId: (id: number | null) => void;
 }
 export const ViewTable = ({
   deleteNum,

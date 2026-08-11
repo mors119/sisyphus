@@ -76,7 +76,13 @@ jobs:
         working-directory: apps/web
         run: |
           npm ci
+          npm audit --audit-level=high
           npm run build
+
+      - name: Audit extension dependencies
+        if: matrix.language == 'javascript-typescript'
+        working-directory: apps/chrome-extension
+        run: npm audit --package-lock-only --audit-level=high
 
       - name: Build extension for analysis
         if: matrix.language == 'javascript-typescript'
